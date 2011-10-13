@@ -58,7 +58,7 @@ class GoogleResultParserThread(threading.Thread):
 
         try:
             # Go to the pagerank page, enter this url, and hit 'submit' using Twill
-            pageRankHTML = subprocess.check_output(["python", "src/engines/GetPageRank.py", url])
+            pageRankHTML = subprocess.check_output(["python", "src/engines/google/GetPageRank.py", url])
             pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
 
             # Parse the output
@@ -78,7 +78,7 @@ class GoogleResultParserThread(threading.Thread):
                 domain = url[:url.find('/')]
 
                 # Go to the pagerank page, enter this url, and hit 'submit' using Twill
-                pageRankHTML = subprocess.check_output(["python", "src/engines/GetPageRank.py", domain])
+                pageRankHTML = subprocess.check_output(["python", "src/engines/google/GetPageRank.py", domain])
                 pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
 
                 # Parse the output
