@@ -2,7 +2,7 @@ from BeautifulSoup import BeautifulSoup
 import subprocess
 import threading
 from urllib2 import HTTPError
-from src.results.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent
+from src.search.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent
 
 __author__ = 'jon'
 

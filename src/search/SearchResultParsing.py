@@ -6,7 +6,7 @@ __author__ = 'jon'
 # Spoof the User-Agent so we don't get flagged as spam
 SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1"
 
-def getPageContent( url):
+def getPageContent(url):
     """
       Returns the text content of a single URL. (emulates Firefox 7 on Linux for the user-agent)
 

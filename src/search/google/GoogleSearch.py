@@ -1,7 +1,7 @@
-from src.results.SearchInterface import SearchInterface
+from src.search.SearchInterface import SearchInterface
 from BeautifulSoup import BeautifulSoup
-from src.results.SearchResultParsing import getPageContent
-from src.results.google.GoogleResultParserThread import GoogleResultParserThread
+from src.search.SearchResultParsing import getPageContent
+from src.search.google.GoogleResultParserThread import GoogleResultParserThread
 
 __author__ = 'jon'
 
