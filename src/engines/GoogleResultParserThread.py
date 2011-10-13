@@ -1,4 +1,8 @@
+from BeautifulSoup import BeautifulSoup
+import subprocess
 import threading
+from urllib2 import HTTPError
+from src.engines.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent
 
 __author__ = 'jon'
 
@@ -8,7 +12,90 @@ class GoogleResultParserThread(threading.Thread):
         """
           Initialize this parser, given the dictionary into which the page's data is going to be placed
         """
-
         threading.Thread.__init__(self)
 
-    
+        self.resultDictionary = resultDictionary
+        self.url = resultDictionary['url']
+
+    def run(self):
+        """
+          Parse the content of this page, and update the given dictionary for this thread
+        """
+        try:
+            # Get the content from this page
+            content = getPageContent(self.url).lower()
+
+            # Verify that this is binary data
+            if isHTML(content):
+
+                # Extract data about this result
+                title, keywords, description = parseMetaDataFromContent(content)
+                pageRank = self.__getPageRank(self.url)
+
+                # Add this result data
+                self.resultDictionary['title'] = title
+                self.resultDictionary['keywords'] = keywords
+                self.resultDictionary['description'] = description
+                self.resultDictionary['pageRank'] = pageRank
+                self.resultDictionary['content'] = '...'
+
+            else:
+                print("Skipping binary file '%s'" % self.url)
+
+        except HTTPError:
+
+            # Skip this element
+            print("Error accessing '%s', skipping" % self.url)
+
+
+    def __getPageRank(self, url):
+        """
+          Retrieves the approximate PageRank of a given url, as an integer between 0 and 10.
+
+            @param  url The url for which to find the PageRank
+            @return An integer representing the PageRank
+        """
+
+        try:
+            # Go to the pagerank page, enter this url, and hit 'submit' using Twill
+            pageRankHTML = subprocess.check_output(["python", "src/engines/GetPageRank.py", url])
+            pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
+
+            # Parse the output
+            parsedPageRankData = BeautifulSoup(pageRankHTML)
+            pageRankElementText = parsedPageRankData.find('ul', {'class' : 'prlist'}).text
+            try:
+
+                if pageRankElementText[1] == '1':
+                    pageRank = int(pageRankElementText[0:2])
+                else:
+                    pageRank = int(pageRankElementText[0])
+
+            except ValueError:
+
+                # Try to extract the domain this time
+                url = url.lstrip('http://')
+                domain = url[:url.find('/')]
+
+                # Go to the pagerank page, enter this url, and hit 'submit' using Twill
+                pageRankHTML = subprocess.check_output(["python", "src/engines/GetPageRank.py", domain])
+                pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
+
+                # Parse the output
+                parsedPageRankData = BeautifulSoup(pageRankHTML)
+                pageRankElementText = parsedPageRankData.find('ul', {'class' : 'prlist'}).text
+
+                try:
+
+                    if pageRankElementText[1] == '1':
+                        pageRank = int(pageRankElementText[0:2])
+                    else:
+                        pageRank = int(pageRankElementText[0])
+
+                except ValueError:
+                    pageRank = 0
+
+        except Exception:
+            pageRank = 0
+
+        return pageRank

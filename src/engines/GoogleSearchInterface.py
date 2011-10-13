@@ -1,7 +1,7 @@
-import subprocess
-from urllib2 import HTTPError
+from src.engines.GoogleResultParserThread import GoogleResultParserThread
 from src.engines.SearchInterface import SearchInterface
 from BeautifulSoup import BeautifulSoup
+from src.engines.SearchResultParsing import getPageContent
 
 __author__ = 'jon'
 
@@ -23,14 +23,14 @@ class GoogleSearchInterface(SearchInterface):
         """
 
         # Start on the first page of results
-        url = "http://google.com/search?q=" + self.__prepareQuery(query)
+        url = "http://google.com/search?q=" + self.__prepareGoogleQuery(query)
 
         # Parse the content of the results page
         results = []
         while len(results) < numberOfResults:
 
             # Get the HTML content of the (next) results page
-            searchPage = self.getPageContent(url)
+            searchPage = getPageContent(url)
 
             # Add the results from this page
             newResults, nextPageUrl = self.__parseResults(searchPage)
@@ -62,50 +62,35 @@ class GoogleSearchInterface(SearchInterface):
         # Add entries, and content for each
         for resultEntry in resultEntries:
 
-            # Get the URL of the page
+            # Extract all the data we can for this result from the main results page
             url = str(resultEntry.find('a').attrs[0][1])
+            preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
 
-            try:
-                # Get the content from this page
-                content = self.getPageContent(url).lower()
+            # Add it to our results
+            results.append({
+                'url' : url,
+                'preview' : preview
+            })
 
-                # Verify that this is binary data
-                if self.isHTML(content):
+        # Create threads to process the pages for this set of results
+        threads = []
+        for resultData in results:
+            parserThread = GoogleResultParserThread(resultData)
+            threads.append(parserThread)
 
-                    # Extract data about this result
-                    preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
-                    title, keywords, description = self.parseMetaDataFromContent(content)
-                    pageRank = self.__getPageRank(url)
+        # Launch all threads
+        for thread in threads:
+            thread.start()
 
-                    # Add this result
-                    if url not in results:
-
-                        results.append({
-                            'url' : url,
-                            'title' : title,
-                            'keywords' : keywords,
-                            'description' : description,
-                            'preview' : preview,
-                            'pageRank' : pageRank,
-                            'content' : '...'
-                        })
-
-                    else:
-                        print("Found duplicate result entry!")
-                else:
-                    print("Skipping binary file '%s'" % url)
-
-            except HTTPError:
-                
-                # Skip this element
-                print("Error accessing '%s', skipping" % url)
-
+        # Wait for all the threads to finish
+        for thread in threads:
+            thread.join()
 
         nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
         return results, nextURL
 
 
-    def __prepareQuery(self, query):
+    def __prepareGoogleQuery(self, query):
         """
           Cleans up a query string before submission to Google
 
@@ -117,55 +102,4 @@ class GoogleSearchInterface(SearchInterface):
         query = query.replace(' ', '+')
 
         return query
-
-
-    def __getPageRank(self, url):
-        """
-          Retrieves the approximate PageRank of a given url, as an integer between 0 and 10.
-
-            @param  url The url for which to find the PageRank
-            @return An integer representing the PageRank
-        """
-
-        # Go to the pagerank page, enter this url, and hit 'submit' using Twill
-        pageRankHTML = subprocess.check_output(["python", "src/engines/GetPageRank.py", url])
-        pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
-
-        # Parse the output
-        parsedPageRankData = BeautifulSoup(pageRankHTML)
-        pageRankElementText = parsedPageRankData.find('ul', {'class' : 'prlist'}).text
-        try:
-            
-            if pageRankElementText[1] == '1':
-                pageRank = int(pageRankElementText[0:2])
-            else:
-                pageRank = int(pageRankElementText[0])
-
-        except ValueError:
-
-            # Try to extract the domain this time
-            url = url.lstrip('http://')
-            domain = url[:url.find('/')]
-            
-            # Go to the pagerank page, enter this url, and hit 'submit' using Twill
-            pageRankHTML = subprocess.check_output(["python", "src/engines/GetPageRank.py", domain])
-            pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
-
-            # Parse the output
-            parsedPageRankData = BeautifulSoup(pageRankHTML)
-            pageRankElementText = parsedPageRankData.find('ul', {'class' : 'prlist'}).text
-
-            try:
-
-                if pageRankElementText[1] == '1':
-                    pageRank = int(pageRankElementText[0:2])
-                else:
-                    pageRank = int(pageRankElementText[0])
-
-            except ValueError:
-
-                # Default to 0 (minimum pagerank)
-                pageRank = 0
-
-        return pageRank
 
