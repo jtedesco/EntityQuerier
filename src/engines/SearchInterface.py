@@ -1,0 +1,114 @@
+import gevent
+from gevent import monkey
+from gevent.event import AsyncResult
+
+monkey.patch_all()
+import urllib2
+from BeautifulSoup import BeautifulSoup
+
+__author__ = 'jon'
+
+
+class SearchInterface(object):
+    """
+      Represents an interface to a search engine. This contains methods that are not specific to any particular search
+        engine, but rather ones that can be used for any.
+    """
+
+    def __init__(self):
+
+        # Spoof the User-Agent so we don't get flagged as spam
+        self.USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1"
+
+
+    def query(self, query, numberOfResults=10):
+        """
+          Query the search interface and return a dictionary of results
+        """
+        
+        raise NotImplementedError("Must instantiate a concrete SearchInterface!")
+
+
+    def getPagesContent(self, urls, pageData = None):
+        """
+          Returns the text content of a list of URLs. (emulates Firefox 7 on Linux for the user-agent)
+
+            @param  urls      The urls from which to fetch the content
+            @param  pageData  A dictionary, indexed by URLs, to supplement with page contents
+            @return The list of contents of the pages (returned in the same order in which they were given
+        """
+
+        result = AsyncResult()
+
+
+#        # Build a request object to grab the content of the url
+#        request = urllib2.Request(url)
+#        request.add_header("User-Agent", self.USER_AGENT)
+#
+#        # Open the URL and read the content
+#        opener = urllib2.build_opener()
+#        content = opener.open(request).read()
+#        return content
+
+    
+    def getPageContent(self, url):
+        """
+          Returns the text content of a single URL. (emulates Firefox 7 on Linux for the user-agent)
+
+            @param  urls The url from which to fetch the content
+            @return The contents of the page
+        """
+
+        # Build a request object to grab the content of the url
+        request = urllib2.Request(url)
+        request.add_header("User-Agent", self.USER_AGENT)
+
+        # Open the URL and read the content
+        opener = urllib2.build_opener()
+        content = opener.open(request).read()
+
+        return content
+
+    
+    def parseMetaDataFromContent(self, content):
+        """
+          Parses the raw string data from the website. This function acts as a critical helper function to extract the
+           title, keywords, and links using regular expressions.
+
+           @param  content the raw content to parse
+                title:       should always be able to find
+                keywords:    a list, empty if none were found
+                description: the meta description of the page or <code>None</code> if none was found
+        """
+
+        # Parse this HTML content using 'beautiful soup'
+        soup = BeautifulSoup(content)
+
+        # Pull out the title via BeautifulSoup
+        title = soup.find('title').text.encode('ascii', 'ignore').strip('\n').lower()
+
+        # Pull out the meta data using beautiful soup
+        try:
+            keywordResults = soup.findAll(attrs={"name":"keywords"})
+            keywords = str(keywordResults[0].attrs[0][1]).lower().split(',')
+            if len(keywords) == 0 or 'keywords' in keywords:
+                keywords = str(keywordResults[0].attrs[1][1]).lower().split(',')
+        except Exception:
+            keywords = []
+        try:
+            descriptionResults = soup.findAll(attrs={"name":"description"})
+            description = str(descriptionResults[0].attrs[1][1]).lower()
+            if len(description) == 0 or 'description' in description:
+                description = str(descriptionResults[0].attrs[0][1]).lower()
+        except Exception:
+            description = None
+
+        # Return the parsed data
+        return title, keywords, description
+
+    def isHTML(self, content):
+        """
+          Check whether or not some content is HTML
+        """
+
+        return '<html' in content or 'html>' in content
