@@ -37,7 +37,7 @@ class GoogleResultParserThread(threading.Thread):
                 self.resultDictionary['keywords'] = keywords
                 self.resultDictionary['description'] = description
                 self.resultDictionary['pageRank'] = pageRank
-                self.resultDictionary['content'] = '...'
+                self.resultDictionary['content'] = content
 
             else:
                 print("Skipping binary file '%s'" % self.url)

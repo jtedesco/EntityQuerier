@@ -47,6 +47,19 @@ class GoogleSearchInterface(SearchInterface):
         """
           Parse the results from the HTML content of Google's results page
 
+          The data structure returned, the first returned value holds data as:
+          [
+            {
+                'url': <url>
+                'preview' : <preview snippet>
+                'title' : <title>
+                'description' : <meta description>
+                'pageRank' : <PageRank, between 0 and 10>
+                'content' : <page content>
+            },
+            ...
+          ]
+
             @param  resultsContent The HTML content to parse (the results page of Google)
             @return
                 results: A dictionary, parsed from the results, that contains the basic result information
