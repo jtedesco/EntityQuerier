@@ -9,15 +9,18 @@ class TermFrequencyAnalysis(object):
         engine from which the results were retrieved.
     """
 
-    def __init__(self, results, trainingSet = None):
+    def __init__(self, data):
         """
           Construct an analysis using the search results given, and an optional training set for smooth the term
             frequencies.
+
+            @param  data    the results retrieved from the search interface, which contains a set of documents
         """
 
-        self.results = results
+        self.data = data
         self.termFrequencyIndex = None
         self.termFrequencyInvertedIndex = None
+        self.wordCount = None
         self.cleanResults()
 
         # Generate the word index (maps url -> terms and term frequencies)
@@ -45,10 +48,10 @@ class TermFrequencyAnalysis(object):
             and will look like this:
 
                 {
-                    <url> : {
+                    <url> : (totalWordCount, {
                        <term> : <count>
                         ...
-                    }
+                    })
                     ...
                 }
         """
@@ -57,7 +60,7 @@ class TermFrequencyAnalysis(object):
         if self.termFrequencyIndex is None:
             self.termFrequencyIndex = {}
 
-            for result in self.results:
+            for result in self.data:
 
                 terms = result['cleanContent'].split()
 
@@ -69,7 +72,8 @@ class TermFrequencyAnalysis(object):
                     else:
                         documentTermFrequencyIndex[term] += 1
 
-                self.termFrequencyIndex[result['url']] = documentTermFrequencyIndex
+                url = result['url']
+                self.termFrequencyIndex[url] = (len(terms), documentTermFrequencyIndex)
 
 
     def __buildTermFrequencyInvertedIndex(self):
@@ -78,7 +82,7 @@ class TermFrequencyAnalysis(object):
             and will look like this:
 
                 {
-                    <term> : (totalCount, {
+                    <term> : (totalWordCount, {
                         <url> : <documentCount>
                         ...
                     })
@@ -93,7 +97,7 @@ class TermFrequencyAnalysis(object):
             self.termFrequencyInvertedIndex = {}
             for url in self.termFrequencyIndex:
 
-                documentTermFrequencyIndex = self.termFrequencyIndex[url]
+                documentTermFrequencyIndex = self.termFrequencyIndex[url][1] # Grab the term index, not document length
 
                 for term in documentTermFrequencyIndex:
                     if term not in self.termFrequencyInvertedIndex:
@@ -111,7 +115,65 @@ class TermFrequencyAnalysis(object):
                         references[url] = documentTermFrequencyIndex[term]
                         
                         self.termFrequencyInvertedIndex[term] = (count, references)
+
                         
+    def getTotalWordCount(self, url = None):
+        """
+          Gets the number of total words in a document or in the collection
+
+            @param  url     Optional parameter specifying the document in which to find the word count. If it is not provided,
+                            the word count of the collection will be returned
+        """
+
+        if url is None or url not in self.termFrequencyIndex:
+
+            # Find the total word count of the collection if it doesn't already exist
+            if self.wordCount is None:
+                self.wordCount = 0
+                for url in self.termFrequencyIndex:
+                    self.wordCount += self.termFrequencyIndex[url][0]
+
+            return self.wordCount
+
+        else:
+
+            return self.termFrequencyIndex[url][0]
+
+
+    def getWordCount(self, term, url = None):
+        """
+          Gets the number of times the word (term) occurs in a given document or the collection of documents.
+
+            @param  term    The word for which to find the frequency
+            @param  url     Optional parameter specifying the document in which to determine the frequency, if
+                            it is not provided, the word frequency in the collection will be returned
+
+        """
+
+        wordCount = 0
+        if url is None:
+            if term in self.termFrequencyInvertedIndex:
+                wordCount = self.termFrequencyInvertedIndex[term][0]
+        else:
+            if term in self.termFrequencyIndex[url][1]:
+                wordCount = self.termFrequencyIndex[url][1][term]
+
+        return wordCount
+    
+
+    def getWordScore(self, term, url = None):
+        """
+          Gets the (unsmoothed) p(w|d) for a given term and a web page, calculated using simple (word count / document length)
+
+            @param  term    The term, the score of which we will determine
+            @param  url     The document in which to find the term's score (if it is not provided, it will be in the whole collection)
+        """
+
+        wordCount = self.getWordCount(term, url)
+        totalWordCount = self.getTotalWordCount(url)
+
+        return float(wordCount) / totalWordCount
+
 
     def cleanResults(self):
         """
@@ -133,7 +195,7 @@ class TermFrequencyAnalysis(object):
         """
 
         # Clean each result
-        for result in self.results:
+        for result in self.data:
 
             originalContent = result['content']
 
