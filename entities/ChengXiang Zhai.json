@@ -1,0 +1,30 @@
+{
+    "name" : "ChengXiang Zhai",
+    "title" : "Associate Professor ",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : null,
+    "graduate education" : [
+        "Caregie Mellon University"
+    ],
+    "research interests" : [
+        "information retrieval",
+        "text mining",
+        "natural language processing"
+    ],
+    "associations" : [
+        "TIMan",
+        "DAIS",
+        "SIGIR",
+        "LTI",
+        "SCS"
+    ],
+    "teaching" : [
+        "CS 598 Advanced Topics in Information Retrieval",
+        "Introduction to Text Information Systems"
+    ],
+    "keywords": [
+        "NSF career award",
+        "IBM",
+        "Lemur"
+    ]
+}

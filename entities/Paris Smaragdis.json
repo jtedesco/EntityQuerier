@@ -1,0 +1,27 @@
+{
+    "name" : "Paris Smaragdis",
+    "title" : "Assistant Professor",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : "",
+    "graduate education" : [
+        "Massachusetts Institute of Technology"
+    ],
+    "research interests" : [
+        "machine listening",
+        "machine learning",
+        "signal processing"
+    ],
+    "associations" : [
+        "Adobe Systems’ Advanced Technology Labs",
+        "MERL",
+        "Interval Research",
+        "Starlab"
+    ],
+    "teaching" : [
+        null
+    ],
+    "keywords": [
+        "top 30 under 35",
+        "Greek"
+    ]
+}

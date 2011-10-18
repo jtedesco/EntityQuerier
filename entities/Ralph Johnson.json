@@ -1,0 +1,30 @@
+{
+    "name" : "Ralph Johnson",
+    "title" : "Professor",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : "Knox College",
+    "graduate education" : [
+        "Cornell"
+    ],
+    "research interests" : [
+        "design patterns",
+        "object-oriented",
+        "frameworks"
+    ],
+    "research labs" : [
+    ],
+    "associations" : [
+        "Hillside",
+        "UPCRC",
+        "OOPSLA",
+        "SIGSOFT",
+        "ACM",
+        "IEEE"
+    ],
+    "teaching" : null,
+    "keywords": [
+        "Design Patterns",
+        "Gang of Four",
+        "Smalltalk"
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "name" : "Robin Kravets",
+    "title" : "Associate Professor",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : "University of Massachusetts at Amherst",
+    "graduate education" : [
+        "Georgia Institute of Technology",
+        "University of California at Los Angeles"
+    ],
+    "research interests" : [
+        "mobile computing",
+        "communications",
+        "networking"
+    ],
+    "associations" : [
+        "Mobius",
+        "Grace Project",
+        "GAIA Project",
+        "ICNP",
+        "InfoCom",
+        "MobiCom",
+        "BANFF",
+        "SECON",
+        "MobiHoc"
+    ],
+    "teaching" : [
+        "CS 241 Systems Programming",
+        "CS 598 Advanced Topics in Network Protocols, Architectures and Applications",
+        "CS 591 Seminar in Mobile Computing"
+    ],
+    "keywords": [
+        "travel",
+        "Stuyvesant High School"
+    ]
+}

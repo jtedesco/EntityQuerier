@@ -1,0 +1,32 @@
+{
+    "name" : "Danny Dig",
+    "title" : "Visiting Research Assistant Professor",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : "Politechnics University of Timisoara",
+    "graduate education" : [
+        "University of Illinois at Urbana-Champaign",
+        "Politechnics University of Timisoara"
+    ],
+    "research interests" : [
+        "refactoring",
+        "patterns",
+        "parallelism"
+    ],
+    "research labs" : [
+    ],
+    "associations" : [
+        "UPCRC",
+        "CSAIL",
+        "HotSWUp",
+        "Workshop on Refactoring Tools",
+        "ACM",
+        "OOPSLA"
+    ],
+    "teaching" : [
+        "CS 427 Software Engineering"
+    ],
+    "keywords": [
+        "MIT",
+        "guitar"
+    ]
+}

@@ -1,0 +1,30 @@
+{
+    "name" : "Kevin Chen-Chuan Chang",
+    "title" : "Associate Professor",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : "National Taiwan University",
+    "graduate education" : [
+        "Stanford University"
+    ],
+    "research interests" : [
+        "web search",
+        "data-aware search",
+        "databases"
+    ],
+    "associations" : [
+        "ICDE",
+        "DAIS",
+        "Stanford DB group"
+    ],
+    "teaching" : [
+        "CS 411 Database Systems",
+        "CS 511 Advanced Database Systems"
+    ],
+    "keywords": [
+        "Cazoodle",
+        "ARISE",
+        "WISDM",
+        "MetaQuerier",
+        "AIM"
+    ]
+}
