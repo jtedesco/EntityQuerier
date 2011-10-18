@@ -1,4 +1,5 @@
 from BeautifulSoup import BeautifulSoup
+import os
 import subprocess
 import threading
 from urllib2 import HTTPError
@@ -8,7 +9,7 @@ __author__ = 'jon'
 
 class GoogleResultParserThread(threading.Thread):
 
-    def __init__(self, resultDictionary):
+    def __init__(self, resultDictionary, pageRankScriptPath = "src/search/google/GetPageRank.py"):
         """
           Initialize this parser, given the dictionary into which the page's data is going to be placed
         """
@@ -16,6 +17,7 @@ class GoogleResultParserThread(threading.Thread):
 
         self.resultDictionary = resultDictionary
         self.url = resultDictionary['url']
+        self.pageRankScriptPath = pageRankScriptPath
 
     def run(self):
         """
@@ -25,7 +27,7 @@ class GoogleResultParserThread(threading.Thread):
             # Get the content from this page
             content = getPageContent(self.url).lower()
 
-            # Verify that this is binary data
+            # Verify that this is not binary data
             if isHTML(content):
 
                 # Extract data about this result
@@ -37,7 +39,7 @@ class GoogleResultParserThread(threading.Thread):
                 self.resultDictionary['keywords'] = keywords
                 self.resultDictionary['description'] = description
                 self.resultDictionary['pageRank'] = pageRank
-                self.resultDictionary['content'] = content
+                self.resultDictionary['content'] = '...'
 
             else:
                 print("Skipping binary file '%s'" % self.url)
@@ -58,7 +60,7 @@ class GoogleResultParserThread(threading.Thread):
 
         try:
             # Go to the pagerank page, enter this url, and hit 'submit' using Twill
-            pageRankHTML = subprocess.check_output(["python", "src/results/google/GetPageRank.py", url])
+            pageRankHTML = subprocess.check_output(["python", self.pageRankScriptPath, url])
             pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
 
             # Parse the output
@@ -78,7 +80,7 @@ class GoogleResultParserThread(threading.Thread):
                 domain = url[:url.find('/')]
 
                 # Go to the pagerank page, enter this url, and hit 'submit' using Twill
-                pageRankHTML = subprocess.check_output(["python", "src/results/google/GetPageRank.py", domain])
+                pageRankHTML = subprocess.check_output(["python", self.pageRankScriptPath, domain])
                 pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
 
                 # Parse the output
