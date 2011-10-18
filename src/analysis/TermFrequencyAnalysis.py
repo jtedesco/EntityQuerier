@@ -18,6 +18,7 @@ class TermFrequencyAnalysis(object):
         self.results = results
         self.termFrequencyIndex = None
         self.termFrequencyInvertedIndex = None
+        self.cleanResults()
 
         # Generate the word index (maps url -> terms and term frequencies)
         self.__buildTermFrequencyIndex()
@@ -59,7 +60,7 @@ class TermFrequencyAnalysis(object):
                     else:
                         documentTermFrequencyIndex[term] += 1
 
-                self.termFrequencyIndex['url'] = documentTermFrequencyIndex
+                self.termFrequencyIndex[result['url']] = documentTermFrequencyIndex
 
 
     def __buildTermFrequencyInvertedIndex(self):
@@ -83,9 +84,17 @@ class TermFrequencyAnalysis(object):
                             url : documentTermFrequencyIndex[term]
                         })
                     else:
-                        self.termFrequencyInvertedIndex[term][0] += documentTermFrequencyIndex[term]
-                        self.termFrequencyInvertedIndex[term][1][url] = documentTermFrequencyIndex[term]
 
+                        # Update total counts
+                        count = self.termFrequencyInvertedIndex[term][0]
+                        count += documentTermFrequencyIndex[term]
+
+                        # Update document specifics
+                        references = self.termFrequencyInvertedIndex[term][1]
+                        references[url] = documentTermFrequencyIndex[term]
+                        
+                        self.termFrequencyInvertedIndex[term] = (count, references)
+                        
 
     def cleanResults(self):
         """
@@ -110,5 +119,14 @@ class TermFrequencyAnalysis(object):
         for result in self.results:
 
             originalContent = result['content']
-            cleanContent = ' '.join(BeautifulSoup(originalContent).findAll(text=True))
+
+            # Extract <script> tags
+            soup = BeautifulSoup(originalContent.lower())
+            to_extract = soup.findAll('script')
+            for item in to_extract:
+                item.extract()
+
+            # Extract all other tags
+            cleanContent = ' '.join(soup.findAll(text=True))
+            
             result['cleanContent'] = cleanContent
