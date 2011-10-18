@@ -41,7 +41,16 @@ class TermFrequencyAnalysis(object):
 
     def __buildTermFrequencyIndex(self):
         """
-          Builds the term frequency index for the given results. The
+          Builds the term frequency index for the given results. The TF index will be constructed at <code>self.termFrequencyIndex</code>
+            and will look like this:
+
+                {
+                    <url> : {
+                       <term> : <count>
+                        ...
+                    }
+                    ...
+                }
         """
 
         # Only build this term frequency index 
@@ -65,7 +74,15 @@ class TermFrequencyAnalysis(object):
 
     def __buildTermFrequencyInvertedIndex(self):
         """
-          Builds the inverted index for the given results. This
+          Builds the inverted index for the given results. The inverted index will be constructed at <code>self.termFrequencyInvertedIndex</code>,
+            and will look like this:
+
+                {
+                    <term> : (totalCount, {
+                        <url> : <documentCount>
+                        ...
+                    })
+                }
         """
 
         if self.termFrequencyInvertedIndex is None:
