@@ -15,4 +15,7 @@ class QueryEvaluation(QueryEvaluation):
             @param  idealResults    The results that would be ideal, in the same format
         """
 
-        return -1
+        expectedNumberOfResults = len(idealResults)
+        relevantResults = set(results).intersection(set(idealResults))
+
+        return len(relevantResults) / expectedNumberOfResults
