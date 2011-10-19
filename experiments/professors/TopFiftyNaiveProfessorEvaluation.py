@@ -9,14 +9,18 @@ __author__ = 'jon'
 
 # The entities to test
 entityIds = [
-    'ChengXiang Zhai',
+    'Matthew Caesar'
+]
+
+"""
+    'ChengXiang Zhai', (works)
     'Ralph Johnson',
-    'Paris Smaragdis',
-    'Robin Kravets',
+    'Paris Smaragdis', (works)
+    'Robin Kravets', (works)
     'Matthew Caesar',
     'Kevin Chen-Chuan Chang',
     'Danny Dig'
-]
+"""
 
 # Interface with which to search google
 googleSearcher = GoogleSearch()
@@ -71,7 +75,7 @@ if __name__ == '__main__':
         for query in queries:
 
             # Get the results
-            results = googleSearcher.query(query, 50)
+            results = googleSearcher.query(query, 50, False)
             for result in results:
                 totalResults.add(result['url'])
 

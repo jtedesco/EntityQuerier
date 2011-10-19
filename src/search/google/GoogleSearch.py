@@ -83,37 +83,43 @@ class GoogleSearch(Search):
         # Add entries, and content for each
         for resultEntry in resultEntries:
 
-            # Extract all the data we can for this result from the main results page
-            url = str(resultEntry.find('a').attrs[0][1])
-            preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
+            try:
+                
+                # Extract all the data we can for this result from the main results page
+                url = str(resultEntry.find('a').attrs[0][1])
+                preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
 
-            # Add it to our results
-            results.append({
-                'url' : url,
-                'preview' : preview
-            })
+                # Add it to our results
+                results.append({
+                    'url' : url,
+                    'preview' : preview
+                })
 
-        if fetchContent:
+                if fetchContent:
 
-            # Create threads to process the pages for this set of results
-            threads = []
-            for resultData in results:
-                parserThread = GoogleResultParserThread(resultData)
-                threads.append(parserThread)
+                    # Create threads to process the pages for this set of results
+                    threads = []
+                    for resultData in results:
+                        parserThread = GoogleResultParserThread(resultData)
+                        threads.append(parserThread)
 
-            # Launch all threads
-            for thread in threads:
-                thread.start()
+                    # Launch all threads
+                    for thread in threads:
+                        thread.start()
 
-            # Wait for all the threads to finish
-            for thread in threads:
-                thread.join()
+                    # Wait for all the threads to finish
+                    for thread in threads:
+                        thread.join()
 
-        try:
-            nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
-        except AttributeError:
-            nextURL = None
-            
+                try:
+                    nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
+                except AttributeError:
+                    nextURL = None
+                
+            except Exception:
+
+                print "Error parsing basic results data from Google: '%s'" % str(sys.exc_info()[1])
+
         return results, nextURL
 
 
