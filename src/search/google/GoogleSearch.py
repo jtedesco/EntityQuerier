@@ -99,7 +99,11 @@ class GoogleSearch(Search):
         for thread in threads:
             thread.join()
 
-        nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
+        try:
+            nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
+        except AttributeError:
+            nextURL = None
+            
         return results, nextURL
 
 
