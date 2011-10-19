@@ -9,9 +9,9 @@ __author__ = 'jon'
 
 # The entities to test
 entityIds = [
+    'Kevin Chen-Chuan Chang',
     'Danny Dig',
     'ChengXiang Zhai',
-    'Kevin Chen-Chuan Chang',
     'Matthew Caesar',
     'Paris Smaragdis',
     'Ralph Johnson',

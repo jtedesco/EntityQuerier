@@ -21,7 +21,7 @@ def getPageContent(url):
     cachePath = cachePath[:cachePath.find('EntityQuerier') + len('EntityQuerier')]
     cachePath += '/cache/' + url.replace('/', '')
 
-    if os.path.exists(cachePath):
+    if os.path.exists(cachePath) and os.path.isfile(cachePath):
 
         content = open(cachePath).read()
 
@@ -37,10 +37,14 @@ def getPageContent(url):
 
         # Try to cache the result
         try:
+            
             cache = open(cachePath, 'w')
             cache.write(content)
             cache.close()
+
         except IOError:
+
+            # This frequently happens when the URL is too long to act as a filename
             pass
 
     return content
