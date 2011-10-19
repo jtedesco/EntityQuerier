@@ -2,7 +2,7 @@ from src.evaluation.QueryEvaluation import QueryEvaluation
 
 __author__ = 'jon'
 
-class QueryEvaluation(QueryEvaluation):
+class NaiveQueryEvaluation(QueryEvaluation):
     """
       Represents the high-level interface used to evaluate the completeness of results from a query.
     """
@@ -16,6 +16,11 @@ class QueryEvaluation(QueryEvaluation):
         """
 
         expectedNumberOfResults = len(idealResults)
-        relevantResults = set(results).intersection(set(idealResults))
 
-        return len(relevantResults) / expectedNumberOfResults
+        relevantResults = []
+        for result in results:
+            for idealResult in idealResults:
+                if idealResult['url'] == result['url']:
+                    relevantResults.append(result)
+
+        return len(relevantResults) / float(expectedNumberOfResults)

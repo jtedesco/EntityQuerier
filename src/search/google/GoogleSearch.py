@@ -1,4 +1,4 @@
-from src.search.SearchInterface import SearchInterface
+from src.search.Search import Search
 from BeautifulSoup import BeautifulSoup
 from src.search.SearchResultParsing import getPageContent
 from src.search.google.GoogleResultParserThread import GoogleResultParserThread
@@ -6,7 +6,7 @@ from src.search.google.GoogleResultParserThread import GoogleResultParserThread
 __author__ = 'jon'
 
 
-class GoogleSearchInterface(SearchInterface):
+class GoogleSearch(Search):
     """
       Implements the facade with which to query a specific search engine about the retrieved results
     """

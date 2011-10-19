@@ -1,5 +1,4 @@
 from BeautifulSoup import BeautifulSoup
-import os
 import subprocess
 import threading
 from urllib2 import HTTPError
@@ -42,7 +41,9 @@ class GoogleResultParserThread(threading.Thread):
                 self.resultDictionary['content'] = content
 
             else:
-                print("Skipping binary file '%s'" % self.url)
+
+                # Skip binary files
+                pass
 
         except HTTPError:
 

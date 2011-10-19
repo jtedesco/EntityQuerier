@@ -1,7 +1,7 @@
 __author__ = 'jon'
 
 
-class SearchInterface(object):
+class Search(object):
     """
       Represents an interface to a search engine. This contains methods that are not specific to any particular search
         engine, but rather ones that can be used for any.

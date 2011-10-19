@@ -36,27 +36,32 @@ def parseMetaDataFromContent(content):
             description: the meta description of the page or <code>None</code> if none was found
     """
 
-    # Parse this HTML content using 'beautiful soup'
-    soup = BeautifulSoup(content)
-
-    # Pull out the title via BeautifulSoup
-    title = soup.find('title').text.encode('ascii', 'ignore').strip('\n').lower()
-
-    # Pull out the meta data using beautiful soup
     try:
-        keywordResults = soup.findAll(attrs={"name":"keywords"})
-        keywords = str(keywordResults[0].attrs[0][1]).lower().split(',')
-        if len(keywords) == 0 or 'keywords' in keywords:
-            keywords = str(keywordResults[0].attrs[1][1]).lower().split(',')
-    except Exception:
+        # Parse this HTML content using 'beautiful soup'
+        soup = BeautifulSoup(content)
+
+        # Pull out the title via BeautifulSoup
+        title = soup.find('title').text.encode('ascii', 'ignore').strip('\n').lower()
+
+        # Pull out the meta data using beautiful soup
+        try:
+            keywordResults = soup.findAll(attrs={"name":"keywords"})
+            keywords = str(keywordResults[0].attrs[0][1]).lower().split(',')
+            if len(keywords) == 0 or 'keywords' in keywords:
+                keywords = str(keywordResults[0].attrs[1][1]).lower().split(',')
+        except Exception:
+            keywords = []
+        try:
+            descriptionResults = soup.findAll(attrs={"name":"description"})
+            description = str(descriptionResults[0].attrs[1][1]).lower()
+            if len(description) == 0 or 'description' in description:
+                description = str(descriptionResults[0].attrs[0][1]).lower()
+        except Exception:
+            description = None
+
+    except AttributeError:
+        title = description = ''
         keywords = []
-    try:
-        descriptionResults = soup.findAll(attrs={"name":"description"})
-        description = str(descriptionResults[0].attrs[1][1]).lower()
-        if len(description) == 0 or 'description' in description:
-            description = str(descriptionResults[0].attrs[0][1]).lower()
-    except Exception:
-        description = None
 
     # Return the parsed data
     return title, keywords, description
