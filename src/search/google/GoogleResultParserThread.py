@@ -2,6 +2,7 @@ from BeautifulSoup import BeautifulSoup
 import subprocess
 import threading
 from urllib2 import HTTPError
+import sys
 from src.search.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent
 
 __author__ = 'jon'
@@ -48,7 +49,8 @@ class GoogleResultParserThread(threading.Thread):
         except HTTPError:
 
             # Skip this element
-            print("Error accessing '%s', skipping" % self.url)
+#            print("Error accessing '%s', %s" % (self.url, sys.exc_info()[1]))
+            pass
 
 
     def __getPageRank(self, url):

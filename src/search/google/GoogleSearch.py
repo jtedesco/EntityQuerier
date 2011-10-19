@@ -1,3 +1,4 @@
+import sys
 from src.search.Search import Search
 from BeautifulSoup import BeautifulSoup
 from src.search.SearchResultParsing import getPageContent
@@ -26,19 +27,23 @@ class GoogleSearch(Search):
         self.fetchContent = fetchContent
 
         # Start on the first page of results
-        url = "http://google.com/search?q=" + self.__prepareGoogleQuery(query)
+        google_query = str(self.__prepareGoogleQuery(query))
+        url = "http://google.com/search?q=" + google_query
 
         # Parse the content of the results page
         results = []
-        while len(results) < numberOfResults:
+        while len(results) < numberOfResults and url is not None:
 
-            # Get the HTML content of the (next) results page
-            searchPage = getPageContent(url)
+            try:
+                # Get the HTML content of the (next) results page
+                searchPage = getPageContent(url)
 
-            # Add the results from this page
-            newResults, nextPageUrl = self.__parseResults(searchPage)
-            results.extend(newResults)
-            url = nextPageUrl
+                # Add the results from this page
+                newResults, nextPageUrl = self.__parseResults(searchPage)
+                results.extend(newResults)
+                url = nextPageUrl
+            except Exception:
+                pass
 
         # Trim the results down to the exact size we want
         results = results[:numberOfResults]

@@ -2,7 +2,7 @@
     "name" : "Paris Smaragdis",
     "title" : "Assistant Professor",
     "institution" : "University of Illinois at Urbana-Champaign",
-    "undergraduate education" : "",
+    "undergraduate education" : null,
     "graduate education" : [
         "Massachusetts Institute of Technology"
     ],
@@ -21,7 +21,7 @@
         null
     ],
     "keywords": [
-        "top 30 under 35",
+        "top thirty under thirty-five",
         "Greek"
     ]
 }
