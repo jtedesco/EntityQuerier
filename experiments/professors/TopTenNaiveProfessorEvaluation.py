@@ -8,8 +8,8 @@ __author__ = 'jon'
 
 # The entities to test
 entityIds = [
-    'ChengXiang Zhai',
     'Danny Dig',
+    'ChengXiang Zhai',
     'Kevin Chen-Chuan Chang',
     'Matthew Caesar',
     'Paris Smaragdis',
@@ -67,15 +67,18 @@ if __name__ == '__main__':
         queryScores = []
         for query in queries:
 
-            # Get the results
-            results = googleSearcher.query(query)
+            try:
+                # Get the results
+                results = googleSearcher.query(query, 50, False)
 
-            # Evaluate this query & add the query score to the list of query scores
-            queryEvaluator = NaiveQueryEvaluation(query)
-            queryScore = queryEvaluator.evaluate(results, idealResults)
-            queryScores.append(queryScore)
+                # Evaluate this query & add the query score to the list of query scores
+                queryEvaluator = NaiveQueryEvaluation(query)
+                queryScore = queryEvaluator.evaluate(results, idealResults)
+                queryScores.append(queryScore)
 
-            print  str(queryScore) + '  -  \'' + query + '\''
+                print  str(queryScore) + '  -  \'' + query + '\''
+            except Exception:
+                print 'Error running \'' + query + '\''
 
         print '\n'
 

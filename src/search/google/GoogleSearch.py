@@ -11,16 +11,19 @@ class GoogleSearch(Search):
       Implements the facade with which to query a specific search engine about the retrieved results
     """
 
-    def query(self, query, numberOfResults=10):
+    def query(self, query, numberOfResults=10, fetchContent=True):
         """
           Query the search interface and return a dictionary of results
 
             @param  query               The query to submit to Google
             @param  numberOfResults     The number of top results to retrieve. This is specifically the number of results
                                             to retrieve, excluding binary binary files if told to skip them
+            @param  fetchContent        Determines whether or not we should fill in information about each result's content
 
             @return A dictionary representing the search results
         """
+
+        self.fetchContent = fetchContent
 
         # Start on the first page of results
         url = "http://google.com/search?q=" + self.__prepareGoogleQuery(query)
@@ -85,19 +88,21 @@ class GoogleSearch(Search):
                 'preview' : preview
             })
 
-        # Create threads to process the pages for this set of results
-        threads = []
-        for resultData in results:
-            parserThread = GoogleResultParserThread(resultData)
-            threads.append(parserThread)
+        if self.fetchContent:
 
-        # Launch all threads
-        for thread in threads:
-            thread.start()
+            # Create threads to process the pages for this set of results
+            threads = []
+            for resultData in results:
+                parserThread = GoogleResultParserThread(resultData)
+                threads.append(parserThread)
 
-        # Wait for all the threads to finish
-        for thread in threads:
-            thread.join()
+            # Launch all threads
+            for thread in threads:
+                thread.start()
+
+            # Wait for all the threads to finish
+            for thread in threads:
+                thread.join()
 
         try:
             nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])

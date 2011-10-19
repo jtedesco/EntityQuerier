@@ -7,7 +7,7 @@ class Search(object):
         engine, but rather ones that can be used for any.
     """
 
-    def query(self, query, numberOfResults=10):
+    def query(self, query, numberOfResults=10, fetchContent=True):
         """
           Query the search interface and return a dictionary of results
         """
