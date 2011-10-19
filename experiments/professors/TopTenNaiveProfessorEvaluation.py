@@ -1,5 +1,6 @@
 from json import load
 from pprint import pprint
+from urllib2 import HTTPError
 from src.evaluation.NaiveQueryEvaluation import NaiveQueryEvaluation
 from src.search.google.GoogleSearch import GoogleSearch
 from util.GoogleResultsBuilder import buildResultsFromURLs
@@ -51,6 +52,7 @@ if __name__ == '__main__':
 
         # Build the queries for this entity
         queries = buildQueriesForEntity(entity)
+        queries = ["+\"%s\"" % entityId] + queries
         
         # Print the header
         title = 'Testing ' + entityId
@@ -65,20 +67,28 @@ if __name__ == '__main__':
 
         # Get the search results for each query
         queryScores = []
+        totalResults = set([])
         for query in queries:
 
-            try:
-                # Get the results
-                results = googleSearcher.query(query, 50, False)
+            # Get the results
+            results = googleSearcher.query(query, 50, False)
+            for result in results:
+                totalResults.add(result['url'])
 
-                # Evaluate this query & add the query score to the list of query scores
-                queryEvaluator = NaiveQueryEvaluation(query)
-                queryScore = queryEvaluator.evaluate(results, idealResults)
-                queryScores.append(queryScore)
+            # Evaluate this query & add the query score to the list of query scores
+            queryEvaluator = NaiveQueryEvaluation(query)
+            queryScore = queryEvaluator.evaluate(results, idealResults)
+            queryScores.append(queryScore)
 
-                print  str(queryScore) + '  -  \'' + query + '\''
-            except Exception:
-                print 'Error running \'' + query + '\''
+            print "%1.4f\t\t%s" % (queryScore, query)
+            
+
+        # Evaluate this query & add the query score to the list of query scores
+        relevantResultsRetrieved = totalResults.intersection(set(entityURLs))
+        overallScore = len(relevantResultsRetrieved) / float(len(entityURLs))
+
+        print
+        print "Overall:\t\t%1.4f" % overallScore
 
         print '\n'
 
