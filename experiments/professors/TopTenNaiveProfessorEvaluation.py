@@ -9,13 +9,13 @@ __author__ = 'jon'
 
 # The entities to test
 entityIds = [
-    'Kevin Chen-Chuan Chang',
-    'Danny Dig',
-    'ChengXiang Zhai',
-    'Matthew Caesar',
     'Paris Smaragdis',
     'Ralph Johnson',
-    'Robin Kravets'
+    'Robin Kravets',
+    'Matthew Caesar',
+    'Kevin Chen-Chuan Chang',
+    'Danny Dig',
+    'ChengXiang Zhai'
 ]
 
 # Interface with which to search google
@@ -33,13 +33,16 @@ def buildQueriesForEntity(entity):
 
         entityProperty = entity[property]
 
-        if property is not None:
-            if type(entityProperty) == type([]):
-                for property in entityProperty:
-                    queries.append('+"' + str(entityKey) + '" +"' + str(property) + '"')
-            else:
-                queries.append('+"' + str(entityKey) + '" +"' + str(entityProperty) + '"')
-
+        try:
+            if property is not None and property != "None":
+                if type(entityProperty) == type([]):
+                    for property in entityProperty:
+                        queries.append('+"' + str(entityKey) + '" +"' + str(property) + '"')
+                else:
+                    queries.append('+"' + str(entityKey) + '" +"' + str(entityProperty) + '"')
+        except:
+            pass
+        
     return queries
 
 
