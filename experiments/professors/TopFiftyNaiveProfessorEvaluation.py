@@ -33,16 +33,13 @@ def buildQueriesForEntity(entity):
 
         entityProperty = entity[property]
 
-        try:
-            if property is not None and property != "None":
-                if type(entityProperty) == type([]):
-                    for property in entityProperty:
-                        queries.append('+"' + str(entityKey) + '" +"' + str(property) + '"')
-                else:
-                    queries.append('+"' + str(entityKey) + '" +"' + str(entityProperty) + '"')
-        except:
-            pass
-        
+        if entityProperty is not None:
+            if type(entityProperty) == type([]):
+                for property in entityProperty:
+                    queries.append('+"' + str(entityKey) + '" +"' + str(property) + '"')
+            else:
+                queries.append('+"' + str(entityKey) + '" +"' + str(entityProperty) + '"')
+
     return queries
 
 
