@@ -1,4 +1,5 @@
 from BeautifulSoup import BeautifulSoup
+import os
 import subprocess
 import threading
 from urllib2 import HTTPError
@@ -9,7 +10,7 @@ __author__ = 'jon'
 
 class GoogleResultParserThread(threading.Thread):
 
-    def __init__(self, resultDictionary, pageRankScriptPath = "src/search/google/GetPageRank.py"):
+    def __init__(self, resultDictionary):
         """
           Initialize this parser, given the dictionary into which the page's data is going to be placed
         """
@@ -17,12 +18,19 @@ class GoogleResultParserThread(threading.Thread):
 
         self.resultDictionary = resultDictionary
         self.url = resultDictionary['url']
+
+        # Find the absolute path to the script to get the pagerank of a page
+        pageRankScriptPath = str(os.getcwd())
+        pageRankScriptPath = pageRankScriptPath[:pageRankScriptPath.find('EntityQuerier') + len('EntityQuerier')]
+        pageRankScriptPath += "/src/search/google/GetPageRank.py"
         self.pageRankScriptPath = pageRankScriptPath
 
+        
     def run(self):
         """
           Parse the content of this page, and update the given dictionary for this thread
         """
+
         try:
             # Get the content from this page
             content = getPageContent(self.url).lower()
@@ -41,16 +49,10 @@ class GoogleResultParserThread(threading.Thread):
                 self.resultDictionary['pageRank'] = pageRank
                 self.resultDictionary['content'] = content
 
-            else:
-
-                # Skip binary files
-                pass
-
         except HTTPError:
 
             # Skip this element
-#            print("Error accessing '%s', %s" % (self.url, sys.exc_info()[1]))
-            pass
+            print("Error accessing '%s', %s" % (self.url, sys.exc_info()[1]))
 
 
     def __getPageRank(self, url):

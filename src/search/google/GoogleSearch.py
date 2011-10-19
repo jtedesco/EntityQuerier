@@ -24,8 +24,6 @@ class GoogleSearch(Search):
             @return A dictionary representing the search results
         """
 
-        self.fetchContent = fetchContent
-
         # Start on the first page of results
         google_query = str(self.__prepareGoogleQuery(query))
         url = "http://google.com/search?q=" + google_query
@@ -39,11 +37,13 @@ class GoogleSearch(Search):
                 searchPage = getPageContent(url)
 
                 # Add the results from this page
-                newResults, nextPageUrl = self.__parseResults(searchPage)
+                newResults, nextPageUrl = self.__parseResults(searchPage, fetchContent)
                 results.extend(newResults)
                 url = nextPageUrl
+
             except Exception:
-                pass
+
+                print "Error searching Google: '%s'" % str(sys.exc_info()[1])
 
         # Trim the results down to the exact size we want
         results = results[:numberOfResults]
@@ -51,7 +51,7 @@ class GoogleSearch(Search):
         return results
 
 
-    def __parseResults(self, resultsContent):
+    def __parseResults(self, resultsContent, fetchContent):
         """
           Parse the results from the HTML content of Google's results page
 
@@ -93,7 +93,7 @@ class GoogleSearch(Search):
                 'preview' : preview
             })
 
-        if self.fetchContent:
+        if fetchContent:
 
             # Create threads to process the pages for this set of results
             threads = []
