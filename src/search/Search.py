@@ -7,7 +7,7 @@ class Search(object):
         engine, but rather ones that can be used for any.
     """
 
-    def __init__(self, numberOfResultsToRetrieve=10, verbose=False):
+    def __init__(self, numberOfResultsToRetrieve=20, verbose=False):
         """
           Initializes this search object,
         """

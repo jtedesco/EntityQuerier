@@ -5,7 +5,7 @@ from src.search.google.GoogleSearch import GoogleSearch
 
 __author__ = 'jon'
 
-class ProfessorsSimpleQueryEvaluationExperiment(Experiment):
+class SimpleQueryEvaluationExperiment(Experiment):
     """
       A basic experiment that evaluates queries by simply assigned the score as the fraction of relevant documents retrieved
         in the first five pages of the result.
@@ -18,13 +18,7 @@ class ProfessorsSimpleQueryEvaluationExperiment(Experiment):
 
         # The list of ids (corresponding JSON files are expected to be found in 'standard' and 'entities' folders)
         self.entityIds = [
-            'ChengXiang Zhai'
-#            'Paris Smaragdis',
-#            'Robin Kravets',
-#            'Matthew Caesar',
-#            'Kevin Chen-Chuan Chang',
-#            'Danny Dig',
-#            'Ralph Johnson'
+            'Kevin Chen-Chuan Chang'
         ]
 
         # The search engine to use
@@ -40,6 +34,6 @@ class ProfessorsSimpleQueryEvaluationExperiment(Experiment):
 
 
 if __name__ == '__main__':
-    experiment = ProfessorsSimpleQueryEvaluationExperiment()
+    experiment = SimpleQueryEvaluationExperiment()
     experiment.run()
     experiment.printResults()

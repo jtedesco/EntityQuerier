@@ -22,6 +22,8 @@ class GoogleSearch(Search):
             @return A dictionary representing the search results
         """
 
+        Search.__init__(self)
+
         # Start on the first page of results
         google_query = str(self.__prepareGoogleQuery(query))
         url = "http://google.com/search?q=" + google_query
