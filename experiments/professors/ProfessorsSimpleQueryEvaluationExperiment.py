@@ -17,18 +17,18 @@ class ProfessorsSimpleQueryEvaluationExperiment(Experiment):
         """
 
         # The list of ids (corresponding JSON files are expected to be found in 'standard' and 'entities' folders)
-        entityIds = [
-            'ChengXiang Zhai',
-            'Paris Smaragdis',
-            'Robin Kravets',
-            'Matthew Caesar',
-            'Kevin Chen-Chuan Chang',
-            'Danny Dig',
-            'Ralph Johnson'
+        self.entityIds = [
+            'ChengXiang Zhai'
+#            'Paris Smaragdis',
+#            'Robin Kravets',
+#            'Matthew Caesar',
+#            'Kevin Chen-Chuan Chang',
+#            'Danny Dig',
+#            'Ralph Johnson'
         ]
 
         # The search engine to use
-        searchInterface = GoogleSearch()
+        self.searchInterface = GoogleSearch()
 
         # The query evaluation metric to use
         self.queryEvaluator = SimpleQueryEvaluator()
@@ -36,7 +36,7 @@ class ProfessorsSimpleQueryEvaluationExperiment(Experiment):
         # The query builder for this experiment
         self.queryBuilder = SimpleQueryBuilder()
 
-        Experiment.__init__(self, entityIds, searchInterface)
+        Experiment.__init__(self, self.entityIds, self.searchInterface)
 
 
 if __name__ == '__main__':

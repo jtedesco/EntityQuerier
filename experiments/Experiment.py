@@ -16,7 +16,11 @@ class Experiment(object):
         self.entityIds = entityIds
         self.searchInterface = searchInterface
 
+        # Build the entities and queries for these entities
         self.buildEntities()
+        self.buildQueries()
+
+        # Build the 'golden standard', the ideal set of documents to be retrieved
         self.buildIdealResultURLs()
 
 
@@ -116,6 +120,8 @@ class Experiment(object):
 
         # The final results data
         self.results = {}
+        for entityId in self.entityIds:
+            self.results[entityId] = {}
 
         for entityId in self.entityIds:
 
@@ -137,7 +143,7 @@ class Experiment(object):
                     queryURLs.append(resultURL)
 
                 # Score this query
-                queryScore = self.queryEvaluator.evalute(queryURLs, self.idealURLs[entityId])
+                queryScore = self.queryEvaluator.evaluate(queryURLs, self.idealURLs[entityId])
 
                 # Get list of relevant documents not retrieved
                 relevantDocumentsNotRetrieved = list(set(self.idealURLs[entityId]).difference(set(queryURLs)))
@@ -162,7 +168,7 @@ class Experiment(object):
 
 
             # Score the set of queries
-            queryScore = self.queryEvaluator.evalute(totalURLs, self.idealURLs[entityId])
+            queryScore = self.queryEvaluator.evaluate(totalURLs, self.idealURLs[entityId])
 
             # Get list of relevant documents not retrieved
             relevantDocumentsNotRetrieved = list(set(self.idealURLs[entityId]).difference(set(totalURLs)))
@@ -181,9 +187,9 @@ class Experiment(object):
 
                 # Update lists of relevant results
                 if url in self.idealURLs[entityId]:
-                    self.results[entityId][query]['relevantDocumentsRetrieved'].append(url)
+                    self.results[entityId]['overall']['relevantDocumentsRetrieved'].append(url)
                 else:
-                    self.results[entityId][query]['nonRelevantDocumentsRetrieved'].append(url)
+                    self.results[entityId]['overall']['nonRelevantDocumentsRetrieved'].append(url)
 
 
     def printResults(self):

@@ -32,8 +32,8 @@ class SimpleQueryBuilder(QueryBuilder):
                     # Generate a query for each entry in a list
                     if type(entityProperty) == type([]):
                         for property in entityProperty:
-                            queries.append('+"' + str(entityKey) + '" +"' + str(property) + '"')
+                            queries.append('"' + str(entityKey) + '" "' + str(property) + '"')
                     else:
-                        queries.append('+"' + str(entityKey) + '" +"' + str(entityProperty) + '"')
+                        queries.append('"' + str(entityKey) + '" "' + str(entityProperty) + '"')
 
         return queries
