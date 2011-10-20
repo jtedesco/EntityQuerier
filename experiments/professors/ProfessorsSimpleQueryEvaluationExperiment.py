@@ -37,3 +37,9 @@ class ProfessorsSimpleQueryEvaluationExperiment(Experiment):
         self.queryBuilder = SimpleQueryBuilder()
 
         Experiment.__init__(self, entityIds, searchInterface)
+
+
+if __name__ == '__main__':
+    experiment = ProfessorsSimpleQueryEvaluationExperiment()
+    experiment.run()
+    experiment.printResults()
