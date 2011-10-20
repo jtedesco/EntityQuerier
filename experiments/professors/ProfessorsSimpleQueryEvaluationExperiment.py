@@ -1,5 +1,6 @@
 from experiments.Experiment import Experiment
 from src.evaluation.SimpleQueryEvaluator import SimpleQueryEvaluator
+from src.queries.SimpleQueryBuilder import SimpleQueryBuilder
 from src.search.google.GoogleSearch import GoogleSearch
 
 __author__ = 'jon'
@@ -31,5 +32,8 @@ class ProfessorsSimpleQueryEvaluationExperiment(Experiment):
 
         # The query evaluation metric to use
         self.queryEvaluator = SimpleQueryEvaluator()
+
+        # The query builder for this experiment
+        self.queryBuilder = SimpleQueryBuilder()
 
         Experiment.__init__(self, entityIds, searchInterface)

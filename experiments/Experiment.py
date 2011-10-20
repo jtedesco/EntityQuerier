@@ -1,7 +1,5 @@
 from json import load
 from pprint import pprint
-from src.queries.SimpleQueryBuilder import buildQueries
-from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
 
 __author__ = 'jon'
 
@@ -30,7 +28,7 @@ class Experiment(object):
         # Build the queries for this entity
         self.queries = {}
         for entityId in self.entityIds:
-            self.queries[entityId] = buildQueries(self.entities[entityId])
+            self.queries[entityId] = self.queryBuilder.buildQueries(self.entities[entityId])
 
 
     def buildEntities(self):
