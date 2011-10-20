@@ -49,7 +49,7 @@ class GoogleResultParserThread(threading.Thread):
                 self.resultDictionary['pageRank'] = pageRank
                 self.resultDictionary['content'] = content
 
-        except HTTPError:
+        except HTTPError, URLError:
 
             # Skip this element
             print("Error accessing '%s', %s" % (self.url, sys.exc_info()[1]))

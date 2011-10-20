@@ -1,5 +1,6 @@
 from BeautifulSoup import BeautifulSoup
 import os
+import socket
 import urllib2
 import sys
 
@@ -7,6 +8,11 @@ __author__ = 'jon'
 
 # Spoof the User-Agent so we don't get flagged as spam
 SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1"
+
+# Set a 1 second timeout for all pages
+timeout = 1
+socket.setdefaulttimeout(timeout)
+
 
 def getPageContent(url):
     """
@@ -37,14 +43,14 @@ def getPageContent(url):
 
         # Try to cache the result
         try:
-            
+
             cache = open(cachePath, 'w')
             cache.write(content)
             cache.close()
 
         except IOError:
 
-            # This frequently happens when the URL is too long to act as a filename
+            # This frequently happens when the URL is too long to act as a filename, just don't cache it
             pass
 
     return content

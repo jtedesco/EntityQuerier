@@ -43,7 +43,7 @@ class GoogleSearch(Search):
 
             except Exception:
 
-                print "Error searching Google: '%s'" % str(sys.exc_info()[1])
+                print "Error querying Google: '%s'" % str(sys.exc_info()[1])
 
         # Trim the results down to the exact size we want
         results = results[:numberOfResults]
@@ -81,6 +81,7 @@ class GoogleSearch(Search):
         resultEntries = parsedHTML.findAll('li', {'class' : 'g'})
 
         # Add entries, and content for each
+        nextURL = None
         for resultEntry in resultEntries:
 
             try:
@@ -111,11 +112,12 @@ class GoogleSearch(Search):
                     for thread in threads:
                         thread.join()
 
+                # Parse the next page's URL from the current results page, if it can be found
                 try:
                     nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
                 except AttributeError:
                     nextURL = None
-                
+
             except Exception:
 
                 print "Error parsing basic results data from Google: '%s'" % str(sys.exc_info()[1])
