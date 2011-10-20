@@ -2,7 +2,7 @@ from BeautifulSoup import BeautifulSoup
 import os
 import subprocess
 import threading
-from urllib2 import HTTPError
+from urllib2 import HTTPError, URLError
 import sys
 from src.search.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent
 
@@ -10,11 +10,12 @@ __author__ = 'jon'
 
 class GoogleResultParserThread(threading.Thread):
 
-    def __init__(self, resultDictionary):
+    def __init__(self, resultDictionary, verbose=False):
         """
           Initialize this parser, given the dictionary into which the page's data is going to be placed
         """
         threading.Thread.__init__(self)
+        self.verbose = verbose
 
         self.resultDictionary = resultDictionary
         self.url = resultDictionary['url']
@@ -49,10 +50,11 @@ class GoogleResultParserThread(threading.Thread):
                 self.resultDictionary['pageRank'] = pageRank
                 self.resultDictionary['content'] = content
 
-        except HTTPError, URLError:
+        except URLError:
 
             # Skip this element
-            print("Error accessing '%s', %s" % (self.url, sys.exc_info()[1]))
+            if self.verbose:
+                print("Error accessing '%s', %s" % (self.url, sys.exc_info()[1]))
 
 
     def __getPageRank(self, url):

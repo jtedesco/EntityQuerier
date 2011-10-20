@@ -9,16 +9,15 @@ __author__ = 'jon'
 
 # The entities to test
 entityIds = [
+    'ChengXiang Zhai',
+    'Paris Smaragdis',
+    'Robin Kravets',
+    'Matthew Caesar',
+    'Kevin Chen-Chuan Chang',
+    'Danny Dig',
     'Ralph Johnson'
 ]
-#
-#,
-#    'ChengXiang Zhai',
-#    'Paris Smaragdis',
-#    'Robin Kravets',
-#    'Matthew Caesar',
-#    'Kevin Chen-Chuan Chang',
-#    'Danny Dig'
+
 
 # Interface with which to search google
 googleSearcher = GoogleSearch()
@@ -54,7 +53,7 @@ if __name__ == '__main__':
 
         # Build the queries for this entity
         queries = buildQueriesForEntity(entity)
-        queries = ["+\"%s\"" % entityId] + queries
+        queries = ["\"%s\"" % entityId] + queries
         
         # Print the header
         title = 'Testing ' + entityId

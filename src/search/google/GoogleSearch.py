@@ -43,7 +43,8 @@ class GoogleSearch(Search):
 
             except Exception:
 
-                print "Error querying Google: '%s'" % str(sys.exc_info()[1])
+                if self.verbose:
+                    print "Error querying Google: '%s'" % str(sys.exc_info()[1])
 
         # Trim the results down to the exact size we want
         results = results[:numberOfResults]
@@ -120,7 +121,8 @@ class GoogleSearch(Search):
 
             except Exception:
 
-                print "Error parsing basic results data from Google: '%s'" % str(sys.exc_info()[1])
+                if self.verbose:
+                    print "Error parsing basic results data from Google: '%s'" % str(sys.exc_info()[1])
 
         return results, nextURL
 
