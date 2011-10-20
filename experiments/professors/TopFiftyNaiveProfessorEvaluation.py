@@ -1,9 +1,10 @@
 from json import load
 from pprint import pprint
 from urllib2 import HTTPError
-from src.evaluation.NaiveQueryEvaluation import NaiveQueryEvaluation
+from src.evaluation.SimpleQueryEvaluator import SimpleQueryEvaluator
+from src.queries.SimpleQueryBuilder import buildQueries
 from src.search.google.GoogleSearch import GoogleSearch
-from util.GoogleResultsBuilder import buildResultsFromURLs
+from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
 
 __author__ = 'jon'
 
@@ -23,27 +24,6 @@ entityIds = [
 googleSearcher = GoogleSearch()
 
 
-def buildQueriesForEntity(entity):
-
-    queries = []
-
-    entityKey = entity['name']
-    del entity['name']
-
-    for property in entity:
-
-        entityProperty = entity[property]
-
-        if entityProperty is not None:
-            if type(entityProperty) == type([]):
-                for property in entityProperty:
-                    queries.append('+"' + str(entityKey) + '" +"' + str(property) + '"')
-            else:
-                queries.append('+"' + str(entityKey) + '" +"' + str(entityProperty) + '"')
-
-    return queries
-
-
 if __name__ == '__main__':
 
     for entityId in entityIds:
@@ -52,7 +32,7 @@ if __name__ == '__main__':
         entity = load(open("../../entities/%s.json" % entityId))
 
         # Build the queries for this entity
-        queries = buildQueriesForEntity(entity)
+        queries = buildQueries(entity)
         queries = ["\"%s\"" % entityId] + queries
         
         # Print the header
@@ -64,7 +44,7 @@ if __name__ == '__main__':
 
         # Get the ideal set of results for each query
         entityURLs = load(open("../../standard/%s.json" % entityId))
-        idealResults = buildResultsFromURLs(entityURLs)
+        idealResults = buildGoogleResultsFromURLs(entityURLs)
 
         # Get the search results for each query
         queryScores = []
@@ -72,12 +52,12 @@ if __name__ == '__main__':
         for query in queries:
 
             # Get the results
-            results = googleSearcher.query(query, 50)
+            results = googleSearcher.query(query)
             for result in results:
                 totalResults.add(result['url'])
 
             # Evaluate this query & add the query score to the list of query scores
-            queryEvaluator = NaiveQueryEvaluation(query)
+            queryEvaluator = SimpleQueryEvaluator()
             queryScore = queryEvaluator.evaluate(results, idealResults)
             queryScores.append(queryScore)
 

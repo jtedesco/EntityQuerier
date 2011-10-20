@@ -4,7 +4,7 @@
 
 __author__ = 'jon'
 
-query = "Kevin Chang"
+experiment = "Kevin Chang"
 
 if __name__ == 'main':
     pass

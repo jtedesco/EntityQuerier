@@ -7,13 +7,15 @@ class Search(object):
         engine, but rather ones that can be used for any.
     """
 
-    def __init__(self, verbose=False):
+    def __init__(self, numberOfResultsToRetrieve=10, verbose=False):
         """
           Initializes this search object,
         """
         self.verbose = verbose
+        self.numberOfResultsToRetrieve = numberOfResultsToRetrieve
 
-    def query(self, query, numberOfResults=10, fetchContent=True):
+        
+    def query(self, query, fetchContent=True):
         """
           Query the search interface and return a dictionary of results
         """

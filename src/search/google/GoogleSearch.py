@@ -12,13 +12,11 @@ class GoogleSearch(Search):
       Implements the facade with which to query a specific search engine about the retrieved results
     """
 
-    def query(self, query, numberOfResults=10, fetchContent=True):
+    def query(self, query, fetchContent=True):
         """
           Query the search interface and return a dictionary of results
 
             @param  query               The query to submit to Google
-            @param  numberOfResults     The number of top results to retrieve. This is specifically the number of results
-                                            to retrieve, excluding binary binary files if told to skip them
             @param  fetchContent        Determines whether or not we should fill in information about each result's content
 
             @return A dictionary representing the search results
@@ -30,7 +28,7 @@ class GoogleSearch(Search):
 
         # Parse the content of the results page
         results = []
-        while len(results) < numberOfResults and url is not None:
+        while len(results) < self.numberOfResultsToRetrieve and url is not None:
 
             try:
                 # Get the HTML content of the (next) results page
@@ -47,7 +45,7 @@ class GoogleSearch(Search):
                     print "Error querying Google: '%s'" % str(sys.exc_info()[1])
 
         # Trim the results down to the exact size we want
-        results = results[:numberOfResults]
+        results = results[:self.numberOfResultsToRetrieve]
 
         return results
 

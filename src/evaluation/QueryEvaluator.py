@@ -1,8 +1,6 @@
-from src.evaluation.QueryEvaluation import QueryEvaluation
-
 __author__ = 'jon'
 
-class NaiveQueryEvaluation(QueryEvaluation):
+class QueryEvaluator(object):
     """
       Represents the high-level interface used to evaluate the completeness of results from a query.
     """
@@ -15,12 +13,8 @@ class NaiveQueryEvaluation(QueryEvaluation):
             @param  idealResults    The results that would be ideal, in the same format
         """
 
-        expectedNumberOfResults = len(idealResults)
+        raise NotImplementedError()
 
-        relevantResults = []
-        for result in results:
-            for idealResult in idealResults:
-                if idealResult['url'] == result['url']:
-                    relevantResults.append(result)
 
-        return len(relevantResults) / float(expectedNumberOfResults)
+
+        

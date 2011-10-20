@@ -2,7 +2,7 @@ from src.search.google.GoogleResultParserThread import GoogleResultParserThread
 
 __author__ = 'jon'
 
-def buildResultsFromURLs(urls, fetchContent=True):
+def buildGoogleResultsFromURLs(urls, fetchContent=True):
     """
       Builds a list of results in the same format as those retrieved from a search engine, using a list of URLs to populate
         the results.
