@@ -7,12 +7,12 @@
         "Stanford University"
     ],
     "research interests" : [
-        "web search",
-        "data-aware search",
+        "web",
+        "search",
+        "data-aware",
         "databases"
     ],
     "associations" : [
-        "ICDE",
         "DAIS",
         "Stanford DB group"
     ],
@@ -21,10 +21,13 @@
         "CS 511 Advanced Database Systems"
     ],
     "keywords": [
+        "publications",
         "Cazoodle",
         "ARISE",
         "WISDM",
         "MetaQuerier",
-        "AIM"
+        "AIM",
+        "ACM",
+        "DBLP"
     ]
 }

@@ -1,5 +1,6 @@
 from json import load
-from pprint import pprint
+import os
+from pprint import pprint, pformat
 
 __author__ = 'jon'
 
@@ -192,6 +193,16 @@ class Experiment(object):
                     self.results[entityId]['overall']['nonRelevantDocumentsRetrieved'].append(url)
 
 
-    def printResults(self):
-        pprint(self.results)
+    def printResults(self, outputPath = "output"):
+
+        # Format the results
+        output = pformat(self.results, 4)
+
+        # Write it out
+        if os.path.exists(outputPath):
+            os.remove(outputPath)
+        outputFile = open(outputPath, 'w')
+        outputFile.write(output)
+        outputFile.close()
+
             
