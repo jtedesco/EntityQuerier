@@ -26,5 +26,7 @@ class EntityAttributeNamesAndValuesQueryBuilder(QueryBuilder):
 
         nameQueries = self.entityNamesQueryBuilder.buildQueries(entity, idField)
         valueQueries = self.entityValuesQueryBuilder.buildQueries(entity, idField)
-        queries = nameQueries.append(valueQueries)
+        queries = nameQueries
+        queries.extend(valueQueries)
+
         return queries

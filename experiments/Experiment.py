@@ -192,7 +192,7 @@ class Experiment(object):
                 else:
                     self.results[entityId]['overall']['nonRelevantDocumentsRetrieved'].append(url)
 
-
+                    
     def printResults(self, outputPath = "output"):
 
         # Format the results

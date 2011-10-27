@@ -28,9 +28,11 @@ if __name__ == '__main__':
     experiment.run()
     experiment.printResults("results/KevinChang-EntityNamesAndValuesWithOperators")
 
+    # Attribute names & values + link crawling
+
     # Attribute names & values + top result keywords
 
-    # Attribute names & values + pageranks
+    # Attribute names & values + keywords + link crawling
 
 
     
