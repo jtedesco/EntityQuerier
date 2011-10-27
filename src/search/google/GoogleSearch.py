@@ -22,11 +22,12 @@ class GoogleSearch(Search):
             @return A dictionary representing the search results
         """
 
-        Search.__init__(self)
-
         # Start on the first page of results
-        google_query = str(self.__prepareGoogleQuery(query))
-        url = "http://google.com/search?q=" + google_query
+        googleQuery = str(self.__prepareGoogleQuery(query))
+        url = "http://google.com/search?q=" + googleQuery
+
+        if self.verbose:
+            print "Querying '%s'..." % query
 
         # Parse the content of the results page
         results = []
@@ -102,7 +103,7 @@ class GoogleSearch(Search):
                     # Create threads to process the pages for this set of results
                     threads = []
                     for resultData in results:
-                        parserThread = GoogleResultParserThread(resultData)
+                        parserThread = GoogleResultParserThread(resultData, self.verbose)
                         threads.append(parserThread)
 
                     # Launch all threads

@@ -34,6 +34,8 @@ class GoogleResultParserThread(threading.Thread):
 
         try:
             # Get the content from this page
+            if self.verbose:
+                print "Getting page content for '%s'" % self.url.strip()
             content = getPageContent(self.url).lower()
 
             # Verify that this is not binary data

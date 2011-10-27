@@ -16,7 +16,7 @@ class EntityAttributeValuesQueryBuilder(QueryBuilder):
             @param  idField The field that uniquely identifies this entity
         """
 
-        queries = ["\"%s\"" % entity[idField]]
+        queries = ["\"%s\"" % str(entity[idField])]
 
         # Get the uniquely identifying key for this entity
         entityKey = entity[idField]

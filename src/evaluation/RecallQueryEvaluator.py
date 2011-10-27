@@ -17,4 +17,12 @@ class RecallQueryEvaluator(QueryEvaluator):
 
         expectedNumberOfResults = len(idealResults)
         relevantResults = set(idealResults).intersection(set(results))
-        return len(relevantResults) / float(expectedNumberOfResults)
+
+        try:
+            recall = len(relevantResults) / float(expectedNumberOfResults)
+        except ZeroDivisionError:
+            recall = 0
+            
+        return {
+            'recall' : recall
+        }

@@ -17,6 +17,11 @@ class PrecisionQueryEvaluator(QueryEvaluator):
 
         # Get the precision of this query
         relevantResults = set(idealResults).intersection(set(results))
-        precision = len(relevantResults) / float(len(results))
+        try:
+            precision = len(relevantResults) / float(len(results))
+        except ZeroDivisionError:
+            precision = 0
 
-        return precision
+        return {
+            'precision' : precision
+        }

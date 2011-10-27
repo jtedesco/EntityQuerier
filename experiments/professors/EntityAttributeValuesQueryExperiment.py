@@ -1,11 +1,11 @@
 from experiments.Experiment import Experiment
-from src.evaluation.SimpleQueryEvaluator import RecallQueryEvaluator
-from src.queries.builder.SimpleQueryBuilder import SimpleQueryBuilder
+from src.evaluation.AverageRecallAndPrecisionQueryEvaluator import AverageRecallAndPrecisionQueryEvaluator
+from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
 from src.search.google.GoogleSearch import GoogleSearch
 
 __author__ = 'jon'
 
-class RecallQueryEvaluationExperiment(Experiment):
+class EntityAttributeValuesQueryExperiment(Experiment):
     """
       A basic experiment that evaluates queries by simply assigned the score as the fraction of relevant documents retrieved
         in the first five pages of the result.
@@ -22,18 +22,18 @@ class RecallQueryEvaluationExperiment(Experiment):
         ]
 
         # The search engine to use
-        self.searchInterface = GoogleSearch()
+        self.searchInterface = GoogleSearch(50, True)
 
         # The query evaluation metric to use
-        self.queryEvaluator = RecallQueryEvaluator()
+        self.queryEvaluator = AverageRecallAndPrecisionQueryEvaluator()
 
         # The query builder for this experiment
-        self.queryBuilder = SimpleQueryBuilder()
+        self.queryBuilder = EntityAttributeValuesQueryBuilder()
 
         Experiment.__init__(self, self.entityIds, self.searchInterface)
 
 
 if __name__ == '__main__':
-    experiment = RecallQueryEvaluationExperiment()
+    experiment = EntityAttributeValuesQueryExperiment()
     experiment.run()
-    experiment.printResults()
+    experiment.printResults("results/KevinChang-EntityValuesOnly")
