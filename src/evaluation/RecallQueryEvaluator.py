@@ -2,9 +2,9 @@ from src.evaluation.QueryEvaluator import QueryEvaluator
 
 __author__ = 'jon'
 
-class SimpleQueryEvaluator(QueryEvaluator):
+class RecallQueryEvaluator(QueryEvaluator):
     """
-      Represents the high-level interface used to evaluate the completeness of results from a query.
+      Returns the recall of a query as its score
     """
 
     def evaluate(self, results, idealResults):

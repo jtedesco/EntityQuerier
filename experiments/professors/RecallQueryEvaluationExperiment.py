@@ -1,11 +1,11 @@
 from experiments.Experiment import Experiment
-from src.evaluation.SimpleQueryEvaluator import SimpleQueryEvaluator
-from src.queries.SimpleQueryBuilder import SimpleQueryBuilder
+from src.evaluation.SimpleQueryEvaluator import RecallQueryEvaluator
+from src.queries.builder.SimpleQueryBuilder import SimpleQueryBuilder
 from src.search.google.GoogleSearch import GoogleSearch
 
 __author__ = 'jon'
 
-class SimpleQueryEvaluationExperiment(Experiment):
+class RecallQueryEvaluationExperiment(Experiment):
     """
       A basic experiment that evaluates queries by simply assigned the score as the fraction of relevant documents retrieved
         in the first five pages of the result.
@@ -25,7 +25,7 @@ class SimpleQueryEvaluationExperiment(Experiment):
         self.searchInterface = GoogleSearch()
 
         # The query evaluation metric to use
-        self.queryEvaluator = SimpleQueryEvaluator()
+        self.queryEvaluator = RecallQueryEvaluator()
 
         # The query builder for this experiment
         self.queryBuilder = SimpleQueryBuilder()
@@ -34,6 +34,6 @@ class SimpleQueryEvaluationExperiment(Experiment):
 
 
 if __name__ == '__main__':
-    experiment = SimpleQueryEvaluationExperiment()
+    experiment = RecallQueryEvaluationExperiment()
     experiment.run()
     experiment.printResults()

@@ -3,7 +3,7 @@ from src.queries.QueryBuilder import QueryBuilder
 __author__ = 'jon'
 
 
-class SimpleQueryBuilder(QueryBuilder):
+class EntityAttributeNamesQueryBuilder(QueryBuilder):
     """
       Builds a query by making a query for every facet of an entity
     """
@@ -24,16 +24,6 @@ class SimpleQueryBuilder(QueryBuilder):
         # Generate queries for each data entry
         for property in entity:
             if property is not idField:
-
-                # Get the property
-                entityProperty = entity[property]
-                if entityProperty is not None:
-
-                    # Generate a query for each entry in a list
-                    if type(entityProperty) == type([]):
-                        for property in entityProperty:
-                            queries.append('"' + str(entityKey) + '" "' + str(property) + '"')
-                    else:
-                        queries.append('"' + str(entityKey) + '" "' + str(entityProperty) + '"')
+                queries.append('"' + str(entityKey) + '" "' + str(property) + '"')
 
         return queries
