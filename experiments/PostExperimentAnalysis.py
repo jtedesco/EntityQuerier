@@ -2,6 +2,7 @@ from json import load, loads
 from pprint import pprint, pformat
 from PostExperimentQueryScorer import recallQueryScore, precisionQueryScore, combinedRecallAndPrecisionQueryScore
 import re
+import sys
 
 __author__ = 'jon'
 
@@ -30,6 +31,12 @@ class PostExperimentAnalysis(object):
         # Remove 'set' keywords
         resultsData = resultsData.replace("set([", "[")
         resultsData = resultsData.replace("])", "]")
+
+        # Remove 'u' for unicode data
+        resultsData = resultsData.replace(" u'", " '")
+        resultsData = resultsData.replace(" u\"", " \"")
+
+        open("/home/jon/Desktop/tmp", 'w').write(resultsData)
 
         # Load the data
         self.resultsData = loads(resultsData)
@@ -201,13 +208,13 @@ class PostExperimentAnalysis(object):
                 print repr(query).rjust(b), repr('{0:.3f}'.format(score)).center(a), repr('{0:.3f}'.format(recall)).center(a), repr('{0:.3f}'.format(precision)).center(a)
 
 
-
 if __name__ == '__main__':
+    file = sys.argv[1]
 
-    analysis = PostExperimentAnalysis('professors/results/SimpleQueryEvaluation-SimpleQueryBuilding-KevinChang-50ResultsPerPage')
+    analysis = PostExperimentAnalysis(file)
     print "Results-based scoring:"
-    analysis.printAnalysisResults(analysis.getQueryScoreBasedOrdering(combinedRecallAndPrecisionQueryScore))
-#    print "\nPrecision-based scoring"
-#    pprint(analysis.getQueryScoreBasedOrdering(precisionQueryScore))
-#    print "\nRecall & precision scoring"
-#    pprint(analysis.getQueryScoreBasedOrdering(combinedRecallAndPrecisionQueryScore))
+    analysis.printAnalysisResults(analysis.getQueryScoreBasedOrdering(recallQueryScore))
+    print "\nPrecision-based scoring"
+    pprint(analysis.getQueryScoreBasedOrdering(precisionQueryScore))
+    print "\nRecall & precision scoring"
+    pprint(analysis.getQueryScoreBasedOrdering(combinedRecallAndPrecisionQueryScore))

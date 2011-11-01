@@ -28,7 +28,7 @@ class AverageRecallAndPrecisionQueryEvaluator(QueryEvaluator):
         recall = self.recallEvaluator.evaluate(results, idealResults)
         average = (precision['precision'] + recall['recall']) / 2.0
         return {
-            'precision' : precision,
-            'recall' : recall,
+            'precision' : precision['precision'],
+            'recall' : recall['recall'],
             'average' : average
         }

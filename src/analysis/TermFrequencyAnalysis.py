@@ -1,5 +1,7 @@
 from BeautifulSoup import BeautifulSoup
+from pprint import pprint
 import re
+import operator
 
 __author__ = 'jon'
 
@@ -195,17 +197,47 @@ class TermFrequencyAnalysis(object):
         """
 
         # Clean each result
+        cleanData = []
         for result in self.data:
 
-            originalContent = result['content']
+            try:
+                originalContent = result['content']
 
-            # Extract <script> tags
-            soup = BeautifulSoup(originalContent.lower())
-            to_extract = soup.findAll('script')
-            for item in to_extract:
-                item.extract()
+                # Extract <script> tags
+                soup = BeautifulSoup(originalContent.lower())
+                to_extract = soup.findAll('script')
+                for item in to_extract:
+                    item.extract()
 
-            # Extract all other tags
-            cleanContent = ' '.join(soup.findAll(text=True))
-            
-            result['cleanContent'] = cleanContent
+                # Extract all other tags
+                cleanContent = ' '.join(soup.findAll(text=True))
+
+                # Add the clean content field in, and move it over the cleaned data
+                result['cleanContent'] = cleanContent
+                cleanData.append(result)
+
+            except KeyError:
+                print "Skipping text analysis of '%s'" % result['url']
+
+        self.data = cleanData
+
+
+    def getTopKWords(self, k = 10):
+        """
+          Get the list of most frequent words in this collection
+
+            @param  k   The number of top words to get
+        """
+
+        # Sort the dictionary by value
+        sortedWords = sorted(self.termFrequencyInvertedIndex.iteritems(), key=operator.itemgetter(1))
+
+        # Get the top k words
+        topWords = []
+        for i in xrange(0, k):
+            topWords.append(sortedWords[i][0])
+
+        return topWords
+
+
+        
