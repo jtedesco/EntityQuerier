@@ -36,8 +36,6 @@ class PostExperimentAnalysis(object):
         resultsData = resultsData.replace(" u'", " '")
         resultsData = resultsData.replace(" u\"", " \"")
 
-        open("/home/jon/Desktop/tmp", 'w').write(resultsData)
-
         # Load the data
         self.resultsData = loads(resultsData)
 

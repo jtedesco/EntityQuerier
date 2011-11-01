@@ -176,7 +176,11 @@ class TermFrequencyAnalysis(object):
         wordCount = self.getWordCount(term, url)
         totalWordCount = self.getTotalWordCount(url)
 
-        return float(wordCount) / totalWordCount
+        try:
+            score = float(wordCount) / totalWordCount
+        except ZeroDivisionError:
+            score = 0
+        return score
 
 
     def cleanResults(self):

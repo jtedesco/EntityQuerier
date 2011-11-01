@@ -140,9 +140,12 @@ class Experiment(object):
                     for result in queryResults:
 
                         # Add the new URL to our lists of URLs retrieved
-                        resultURL = result['url']
-                        totalURLs.add(resultURL)
-                        queryURLs.append(resultURL)
+                        try:
+                            resultURL = result['url']
+                            totalURLs.add(resultURL)
+                            queryURLs.append(resultURL)
+                        except TypeError:
+                            print "Something went very wrong..."
 
                 # Score this query
                 queryScore = self.queryEvaluator.evaluate(queryURLs, self.idealURLs[entityId])

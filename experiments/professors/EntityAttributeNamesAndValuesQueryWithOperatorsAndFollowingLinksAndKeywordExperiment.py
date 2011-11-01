@@ -1,14 +1,13 @@
-from pprint import pprint
 from experiments.Experiment import Experiment
-from src.analysis.TermFrequencyAnalysis import TermFrequencyAnalysis
 from src.evaluation.AverageRecallAndPrecisionQueryEvaluator import AverageRecallAndPrecisionQueryEvaluator
 from src.queries.EntityAttributeNamesAndValuesQueryWithOperatorsBuilder import EntityAttributeNamesAndValuesQueryWithOperatorsBuilder
 from src.search.google.GoogleSearch import GoogleSearch
+from src.search.wrappers.FollowLinksSearch import FollowLinksSearch
 from src.search.wrappers.TopKKeywordSearch import TopKKeywordSearch
 
 __author__ = 'jon'
 
-class EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment(Experiment):
+class EntityAttributeNamesAndValuesQueryWithOperatorsAndFollowingLinksAndKeywordExperiment(Experiment):
     """
       A basic experiment that evaluates queries by simply assigned the score as the fraction of relevant documents retrieved
         in the first five pages of the result.
@@ -25,8 +24,9 @@ class EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment(Experi
         ]
 
         # The search engine to use
+        k = 10
         resultsToRetrieve = 50
-        self.searchInterface = TopKKeywordSearch(GoogleSearch(resultsToRetrieve, True), resultsToRetrieve, True, 10)
+        self.searchInterface = FollowLinksSearch(TopKKeywordSearch(GoogleSearch(resultsToRetrieve, True), resultsToRetrieve, True, 10), resultsToRetrieve, True, k)
 
         # The query evaluation metric to use
         self.queryEvaluator = AverageRecallAndPrecisionQueryEvaluator()
@@ -38,6 +38,6 @@ class EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment(Experi
 
 
 if __name__ == '__main__':
-    experiment = EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment()
+    experiment = EntityAttributeNamesAndValuesQueryWithOperatorsAndFollowingLinksAndKeywordExperiment()
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityNamesAndValuesWithOperatorsAndKeywords")
+    experiment.printResults("results/KevinChang-EntityNamesAndValuesWithOperatorsAndFollowingLinksAndKeyword")
