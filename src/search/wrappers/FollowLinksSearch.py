@@ -12,7 +12,7 @@ class FollowLinksSearch(Search):
       This class allows us to augment results by retrieving links from the first pages of each query
     """
 
-    def __init__(self, searchScheme = GoogleSearch, numberOfResultsToRetrieve=50, verbose=True, topResultsToFollowLinks=5):
+    def __init__(self, searchScheme = GoogleSearch(), numberOfResultsToRetrieve=50, verbose=True, topResultsToFollowLinks=5):
         """
           Initializes this search object
         """
