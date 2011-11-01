@@ -25,11 +25,11 @@ class EntityAttributeNamesAndValuesQueryWithOperatorsBuilder(QueryBuilder):
         """
 
         # Get the basic name & values queries
-        oldQueries = []
+        oldQueries = set([])
         nameQueries = self.entityNamesQueryBuilder.buildQueries(entity, idField)
         valueQueries = self.entityValuesQueryBuilder.buildQueries(entity, idField)
-        oldQueries.extend(nameQueries)
-        oldQueries.extend(valueQueries)
+        oldQueries = oldQueries.union(set(nameQueries))
+        oldQueries = oldQueries.union(set(valueQueries))
 
         # Add '+' operators to the queries
         queries = []

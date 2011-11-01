@@ -1,13 +1,10 @@
 from pprint import pprint
 from experiments.Experiment import Experiment
-from experiments.PostExperimentAnalysis import PostExperimentAnalysis
 from src.analysis.TermFrequencyAnalysis import TermFrequencyAnalysis
 from src.evaluation.AverageRecallAndPrecisionQueryEvaluator import AverageRecallAndPrecisionQueryEvaluator
 from src.queries.EntityAttributeNamesAndValuesQueryWithOperatorsBuilder import EntityAttributeNamesAndValuesQueryWithOperatorsBuilder
 from src.search.google.GoogleSearch import GoogleSearch
 from src.search.wrappers.TopKKeywordSearch import TopKKeywordSearch
-from json import loads
-from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
 
 __author__ = 'jon'
 
@@ -28,7 +25,8 @@ class EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment(Experi
         ]
 
         # The search engine to use
-        self.searchInterface = TopKKeywordSearch(GoogleSearch(50, True), 50, True, 10)
+        resultsToRetrieve = 10
+        self.searchInterface = TopKKeywordSearch(GoogleSearch(resultsToRetrieve, True), resultsToRetrieve, True, 10)
 
         # The query evaluation metric to use
         self.queryEvaluator = AverageRecallAndPrecisionQueryEvaluator()
@@ -40,24 +38,6 @@ class EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment(Experi
 
 
 if __name__ == '__main__':
-
-    analysis = PostExperimentAnalysis("results/KevinChang-EntityNamesAndValues")
-    results = analysis.resultsData
-    for entityId in results:
-
-        urls = []
-        for category in results[entityId]:
-            for query in results[entityId][category]:
-                for url in results[entityId][category][query]:
-                    if 'http' in url:
-                        urls.append(url)
-        searchResults = buildGoogleResultsFromURLs(urls)
-
-        termFrequencyAnalysis = TermFrequencyAnalysis(searchResults)
-        topWords = termFrequencyAnalysis.getTopKWords(10)
-        pprint(topWords)
-
-
-#    experiment = EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment()
-#    experiment.run()
-#    experiment.printResults("results/KevinChang-EntityNamesAndValuesWithOperatorsAndKeywords")
+    experiment = EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment()
+    experiment.run()
+    experiment.printResults("results/KevinChang-EntityNamesAndValuesWithOperatorsAndKeywords")

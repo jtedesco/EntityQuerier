@@ -1,4 +1,6 @@
 from BeautifulSoup import BeautifulSoup
+from json import loads
+import os
 from pprint import pprint
 import re
 import operator
@@ -196,6 +198,12 @@ class TermFrequencyAnalysis(object):
             ]
         """
 
+        # Remove stop words from the cleaned content
+        stopWordsListPath = str(os.getcwd())
+        stopWordsListPath = stopWordsListPath[:stopWordsListPath.find('EntityQuerier') + len('EntityQuerier')]
+        stopWordsListPath += "/src/analysis/StopWordList.json"
+        stopWords = set(loads(open(stopWordsListPath).read()))
+
         # Clean each result
         cleanData = []
         for result in self.data:
@@ -209,8 +217,27 @@ class TermFrequencyAnalysis(object):
                 for item in to_extract:
                     item.extract()
 
+                # Extract <style> tags
+                to_extract = soup.findAll('style')
+                for item in to_extract:
+                    item.extract()
+
                 # Extract all other tags
                 cleanContent = ' '.join(soup.findAll(text=True))
+
+                # Add spaces for HTML spaces
+                cleanContent = cleanContent.replace('&nbsp;', ' ')
+
+                # Replace stop words & links
+                cleanWords = []
+                words = cleanContent.split()
+                for word in words:
+                    if word not in stopWords and 'http' not in word:
+                        charRegex = re.compile('[^a-zA-Z]')
+                        nonChars = charRegex.findall(word)
+                        if len(nonChars) == 0:
+                            cleanWords.append(word)
+                cleanContent = ' '.join(cleanWords)
 
                 # Add the clean content field in, and move it over the cleaned data
                 result['cleanContent'] = cleanContent
@@ -230,12 +257,15 @@ class TermFrequencyAnalysis(object):
         """
 
         # Sort the dictionary by value
-        sortedWords = sorted(self.termFrequencyInvertedIndex.iteritems(), key=operator.itemgetter(1))
+        sortedWords = sorted(self.termFrequencyInvertedIndex.iteritems(), key=operator.itemgetter(1), reverse=True)
 
         # Get the top k words
         topWords = []
         for i in xrange(0, k):
-            topWords.append(sortedWords[i][0])
+            try:
+                topWords.append(sortedWords[i][0])
+            except Exception:
+                pass
 
         return topWords
 

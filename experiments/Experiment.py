@@ -136,12 +136,13 @@ class Experiment(object):
                 queryResults = self.searchInterface.query(query)
 
                 # Add the retrieved results
-                for result in queryResults:
+                if queryResults is not None:
+                    for result in queryResults:
 
-                    # Add the new URL to our lists of URLs retrieved
-                    resultURL = result['url']
-                    totalURLs.add(resultURL)
-                    queryURLs.append(resultURL)
+                        # Add the new URL to our lists of URLs retrieved
+                        resultURL = result['url']
+                        totalURLs.add(resultURL)
+                        queryURLs.append(resultURL)
 
                 # Score this query
                 queryScore = self.queryEvaluator.evaluate(queryURLs, self.idealURLs[entityId])
@@ -191,6 +192,8 @@ class Experiment(object):
                     self.results[entityId]['overall']['relevantDocumentsRetrieved'].append(url)
                 else:
                     self.results[entityId]['overall']['nonRelevantDocumentsRetrieved'].append(url)
+
+        return self.results
 
                     
     def printResults(self, outputPath = "output"):

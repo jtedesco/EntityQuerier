@@ -1,4 +1,5 @@
 from experiments.professors.EntityAttributeNamesAndValuesQueryExperiment import EntityAttributeNamesAndValuesQueryExperiment
+from experiments.professors.EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment import EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment
 from experiments.professors.EntityAttributeNamesAndValuesQueryWithOperatorsExperiment import EntityAttributeNamesAndValuesQueryWithOperatorsExperiment
 from experiments.professors.EntityAttributeNamesQueryExperiment import EntityAttributeNamesQueryExperiment
 from experiments.professors.EntityAttributeValuesQueryExperiment import EntityAttributeValuesQueryExperiment
@@ -31,6 +32,9 @@ if __name__ == '__main__':
     # Attribute names & values + link crawling
 
     # Attribute names & values + top result keywords
+    experiment = EntityAttributeNamesAndValuesQueryWithOperatorsAndKeywordExperiment()
+    experiment.run()
+    experiment.printResults("results/KevinChang-EntityNamesAndValuesWithOperatorsAndKeywords")
 
     # Attribute names & values + keywords + link crawling
 
