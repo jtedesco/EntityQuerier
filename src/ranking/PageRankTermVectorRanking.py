@@ -10,7 +10,7 @@ class PageRankTermVectorRanking(TermVectorRanking):
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-    def score(self, searchResult):
+    def scoreResult(self, searchResult):
         """
           Score the result by summing word scores, then combining the total with the page's
             page rank.
