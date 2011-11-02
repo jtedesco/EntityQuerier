@@ -31,6 +31,19 @@ class TermVectorRanking(object):
         self.keywords = keywords
 
 
+    def scoreResult(self, searchResult):
+        """
+          Score the search result by summing the wrod scores of each keyword
+        """
+
+        # Get the TF information for the content
+        contentAnalysis = TermFrequencyAnalysis([searchResult])
+        searchResultScore = 0
+        for keyword in self.keywords:
+            searchResultScore += contentAnalysis.getWordScore(keyword)
+        return searchResultScore
+
+
     def rank(self):
         """
           Perform the ranking, using only the TF information from the content of the page.
@@ -42,13 +55,11 @@ class TermVectorRanking(object):
         scoredResults = {}
         for searchResult in self.searchResults:
 
-            # Get the TF information for the content
-            contentAnalysis = TermFrequencyAnalysis([searchResult])
-            searchResultScore = 0
-            for keyword in self.keywords:
-                searchResultScore += contentAnalysis.getWordScore(keyword)
-
-            scoredResults[searchResult['url']] = (searchResultScore, searchResult)
+            try:
+                searchResultScore = self.scoreResult(searchResult)
+                scoredResults[searchResult['url']] = (searchResultScore, searchResult)
+            except KeyError:
+                pass
 
         # Re-rank the urls
         reRankedResults = []

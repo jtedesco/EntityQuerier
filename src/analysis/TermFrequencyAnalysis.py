@@ -1,7 +1,6 @@
 from BeautifulSoup import BeautifulSoup
 from json import loads
 import os
-from pprint import pprint
 import re
 import operator
 

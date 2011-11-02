@@ -1,66 +1,27 @@
 import operator
 from pprint import pprint
 from src.analysis.TermFrequencyAnalysis import TermFrequencyAnalysis
+from src.ranking.TermVectorRanking import TermVectorRanking
 
 __author__ = 'jon'
 
-class PageRankTermVectorRanking(object):
+class PageRankTermVectorRanking(TermVectorRanking):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-    def __init__(self, searchResults, keywords):
+    def score(self, searchResult):
         """
-          Creates a ranking object with the necessary parameters
-
-            @param  searchResults   The list of search results, in the following format:
-                                        [
-                                            {
-                                                'url': <url>
-                                                'preview' : <preview snippet>
-                                                'title' : <title>
-                                                'description' : <meta description>
-                                                'pageRank' : <PageRank, between 0 and 10>
-                                                'content' : <page content>
-                                            },
-                                            ...
-                                        ]
-            @param  keywords        The keywords for these search results to use for scoring the results
+          Score the result by summing word scores, then combining the total with the page's
+            page rank.
         """
 
-        self.searchResults = searchResults
-        self.keywords = keywords
 
+        # Get the TF information for the content
+        contentAnalysis = TermFrequencyAnalysis([searchResult])
+        searchResultScore = 0
+        for keyword in self.keywords:
+            searchResultScore += contentAnalysis.getWordScore(keyword)
+        searchResultScore = searchResultScore + float(searchResult['pageRank']) / 10
 
-    def rank(self):
-        """
-          Perform the ranking, using only the TF information from the content of the page.
-
-            @return The reordered list of search results
-        """
-
-        # Score the results
-        scoredResults = {}
-        for searchResult in self.searchResults:
-
-            try:
-                # Get the TF information for the content
-                contentAnalysis = TermFrequencyAnalysis([searchResult])
-                searchResultScore = 0
-                for keyword in self.keywords:
-                    searchResultScore += contentAnalysis.getWordScore(keyword)
-                searchResultScore = searchResultScore + float(searchResult['pageRank']) / 10
-
-                scoredResults[searchResult['url']] = (searchResultScore, searchResult)
-                
-            except KeyError:
-                pass
-
-        # Re-rank the urls
-        reRankedResults = []
-        sortedResults = sorted(scoredResults.iteritems(), key=operator.itemgetter(1), reverse=True)
-        for result in sortedResults:
-            reRankedResults.append(result[1])
-
-        return reRankedResults
-        
+        return searchResultScore
