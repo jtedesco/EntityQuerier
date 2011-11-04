@@ -11,7 +11,7 @@ class RankingExperiment(object):
       Rank search results
     """
 
-    def __init__(self, resultsFilePath, entity, rankingScheme = PageRankTermVectorRanking):
+    def __init__(self, resultsFilePath, entity, rankingScheme = PageRankTermVectorRanking, includeOriginalResults = False):
 
         # Get the contents of the file
         resultsData = open(resultsFilePath).read()
@@ -43,14 +43,18 @@ class RankingExperiment(object):
             for query in self.resultsDump[entityId]:
                 for resultType in self.resultsDump[entityId][query]:
                     for url in self.resultsDump[entityId][query][resultType]:
-                        entityUrls.add(url)
+                        if url not in ['precision', 'recall', 'average']:
+                            entityUrls.add(url)
 
             # Assume we're only doing this for one entity
             self.results = buildGoogleResultsFromURLs(entityUrls)
 
         # Get the keywords & build the ranking scheme
         keywords = self.getKeywords(entity)
-        self.rankingScheme = rankingScheme(self.results, keywords)
+        if includeOriginalResults:
+            self.rankingScheme = rankingScheme(self.results, keywords, self.resultsDump)
+        else:
+            self.rankingScheme = rankingScheme(self.results, keywords)
 
         
     def rank(self):

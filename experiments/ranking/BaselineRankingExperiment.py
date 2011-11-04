@@ -10,17 +10,19 @@ __author__ = 'jon'
 
 if __name__ == '__main__':
 
-    # Find the project root & open the input entity
+
+   # Find the project root & open the input entity
     projectRoot = str(os.getcwd())
     projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
     entity = load(open(projectRoot + '/entities/Kevin Chen-Chuan Chang.json'))
 
     # Rank the results
-    rankingExperiment = RankingExperiment(projectRoot + '/experiments/retrieval/results/KevinChang-EntityValuesOnly', entity, PageRankTermVectorRanking)
+    rankingExperiment = RankingExperiment(projectRoot + '/experiments/retrieval/results/KevinChang-EntityValuesOnly', entity, BaselineResultsRanking, True)
     results = rankingExperiment.rank()
 
     # Output the ranking results
     entityId = 'Kevin Chen-Chuan Chang'
-    outputTitle = "PageRank Term Vector Ranking Results Summary (for top %d results):\n"
-    outputFile = 'KevinChang-PageRankTermVectorRanking'
-    outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
+    baselineTitle = "Baseline Ranking Results Summary (for top %d results):\n"
+    outputFile = 'KevinChang-BaselineRanking'
+    outputRankingResults(entityId, outputFile, baselineTitle, projectRoot, results)
+
