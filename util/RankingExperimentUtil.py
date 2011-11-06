@@ -22,14 +22,24 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
     recallAt50 = 0
     recallAt100 = 0
 
+    if len(results) > 0 and type(results[0]) == type({}):
+        includesScores = False
+    else:
+        includesScores = True
+
     for result in results:
         count += 1
         if count > cutoff:
             break
 
         # Record if this was a relevant result
-        if result[1]['url'] in relevantUrls:
-            relevantUrlsFound.append(result[1]['url'])
+        if includesScores:
+            if result[1]['url'] in relevantUrls:
+                relevantUrlsFound.append(result[1]['url'])
+        else:
+            if result['url'] in relevantUrls:
+                relevantUrlsFound.append(result['url'])
+
 
         # Gather precision & recall data
         if count == 10:
@@ -54,11 +64,18 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
     output += "Score         Url\n"
     output += "=====         ===\n"
     count = 0
-    for score, result in results:
-        count += 1
-        if count > cutoff:
-            break
-        output += "%1.5f       %s\n" % (score, result['url'])
+    if includesScores:
+        for score, result in results:
+            count += 1
+            if count > cutoff:
+                break
+            output += "%1.5f       %s\n" % (score, result['url'])
+    else:
+        for result in results:
+            count += 1
+            if count > cutoff:
+                break
+            output += "??????       %s\n" % result['url']
     output += "\n\n\n"
 
     # Write it out a file

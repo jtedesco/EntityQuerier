@@ -72,8 +72,8 @@ class RankingExperiment(object):
             keywords.extend(key.split())
             if type(entity[key]) == type([]):
                 for keyword in entity[key]:
-                    keywords.extend(keyword.split())
+                    keywords.append(keyword.lower())
             else:
-                keywords.extend(entity[key].split())
+                keywords.append(entity[key].lower())
 
         return keywords
