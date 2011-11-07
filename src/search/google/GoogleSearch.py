@@ -98,21 +98,33 @@ class GoogleSearch(Search):
                     'preview' : preview
                 })
 
-                if fetchContent:
+                if not url.endswith('.pdf') and not url.endswith('.ps') and not url.endswith('.doc') \
+                        and not url.endswith('.docx') and not url.endswith('.ppt') and not url.endswith('.pptx'):
+                    if fetchContent:
 
-                    # Create threads to process the pages for this set of results
-                    threads = []
-                    for resultData in results:
-                        parserThread = GoogleResultParserThread(resultData, self.verbose)
-                        threads.append(parserThread)
+                        # Create threads to process the pages for this set of results
+                        threads = []
+                        for resultData in results:
+                            parserThread = GoogleResultParserThread(resultData, self.verbose)
+                            threads.append(parserThread)
 
-                    # Launch all threads
-                    for thread in threads:
-                        thread.start()
+                        # Launch all threads
+                        for thread in threads:
+                            thread.start()
 
-                    # Wait for all the threads to finish
-                    for thread in threads:
-                        thread.join()
+                        # Wait for all the threads to finish
+                        for thread in threads:
+
+                            # Allow up to 5 seconds for this thread to respond, otherwise, kill it
+                            thread.join(5)
+
+                            # Kill it if it hung
+                            if thread.isAlive():
+                                try:
+                                    thread._Thread__stop()
+                                except:
+                                    print(str(thread.getName()) + ' could not be terminated')
+
 
                 # Parse the next page's URL from the current results page, if it can be found
                 try:
