@@ -18,7 +18,7 @@ class FollowLinksSearch(Search):
       This class allows us to augment results by retrieving links from the first pages of each query
     """
 
-    def __init__(self, searchScheme = GoogleSearch(), numberOfResultsToRetrieve=50, verbose=True, topResultsToFollowLinks=5):
+    def __init__(self, searchScheme = GoogleSearch(50, True), numberOfResultsToRetrieve=50, verbose=True, topResultsToFollowLinks=5):
         """
           Initializes this search object
         """
@@ -87,7 +87,7 @@ class FollowLinksSearch(Search):
             # Create threads to process the pages for this set of results
             threads = []
             for resultData in results:
-                parserThread = GoogleResultParserThread(resultData)
+                parserThread = GoogleResultParserThread(resultData, self.verbose)
                 threads.append(parserThread)
 
             # Launch all threads
@@ -96,7 +96,7 @@ class FollowLinksSearch(Search):
 
             # Wait for all the threads to finish
             for thread in threads:
-                thread.join()
+                thread.join(5)
 
         return results
 
