@@ -15,20 +15,22 @@ def buildGoogleResultsFromURLs(urls, fetchContent=True, verbose=False):
             'url' : url
         })
 
-    if fetchContent:
-
-        # Create threads to process the pages for this set of results
-        threads = []
-        for resultData in results:
+    # Create threads to process the pages for this set of results
+    threads = []
+    for resultData in results:
+        url = resultData['url']
+        dotLocation = url.rfind('.')
+        if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'} and fetchContent:
             parserThread = GoogleResultParserThread(resultData, verbose)
             threads.append(parserThread)
 
-        # Launch all threads
-        for thread in threads:
-            thread.start()
+    # Launch all threads
+    for thread in threads:
+        thread.start()
 
-        # Wait for all the threads to finish
-        for thread in threads:
-            thread.join()
+    # Wait for all the threads to finish
+    for thread in threads:
+        thread.join()
+
 
     return results

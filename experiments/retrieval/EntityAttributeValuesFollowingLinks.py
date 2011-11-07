@@ -1,6 +1,5 @@
 from experiments.RetrievalExperiment import RetrievalExperiment
 from src.evaluation.AverageRecallAndPrecisionQueryEvaluator import AverageRecallAndPrecisionQueryEvaluator
-from src.queries.EntityAttributeNamesValuesQueryAndOperatorsBuilder import EntityAttributeNamesValuesQueryAndOperatorsBuilder
 from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
 from src.search.google.GoogleSearch import GoogleSearch
 from src.search.wrappers.FollowLinksSearch import FollowLinksSearch
@@ -24,7 +23,7 @@ class EntityAttributeValuesFollowingLinks(RetrievalExperiment):
         ]
 
         # The search engine to use
-        self.searchInterface = FollowLinksSearch()
+        self.searchInterface = FollowLinksSearch(GoogleSearch(50, True), 50, True)
 
         # The query evaluation metric to use
         self.queryEvaluator = AverageRecallAndPrecisionQueryEvaluator()

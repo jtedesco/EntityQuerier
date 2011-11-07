@@ -14,27 +14,27 @@ if __name__ == '__main__':
     # Attribute names only
     experiment = EntityAttributeNames()
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityNamesOnly")
+    experiment.printResults("results/KevinChang-EntityAttributeNames")
 
     # Attribute values only
     experiment = EntityAttributeValues()
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityValuesOnly")
+    experiment.printResults("results/KevinChang-EntityAttributeValues")
 
     # Attribute names & values
     experiment = EntityAttributeNamesAndValues()
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityNamesAndValues")
+    experiment.printResults("results/KevinChang-EntityAttributeNamesAndValues")
 
     # Attribute names & values + query operators
     experiment = EntityAttributeNamesValuesAndOperators()
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityNamesAndValuesWithOperators")
+    experiment.printResults("results/KevinChang-EntityAttributeNamesValuesAndOperators")
 
     # Attribute names & values + link crawling
     experiment = EntityAttributeNamesValuesOperatorsAndFollowingLinks()
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityNamesAndValuesWithOperatorsAndFollowingLinks")
+    experiment.printResults("results/KevinChang-EntityAttributeNamesValuesOperatorsFollowingLinksAndKeywords")
 
     # Attribute names & values + top result keywords
     experiment = EntityAttributeNamesValuesOperatorsAndKeywords()

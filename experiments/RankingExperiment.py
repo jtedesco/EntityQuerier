@@ -11,7 +11,7 @@ class RankingExperiment(object):
       Rank search results
     """
 
-    def __init__(self, resultsFilePath, entity, rankingScheme = PageRankTermVectorRanking, includeOriginalResults = False):
+    def __init__(self, resultsFilePath, entity, rankingScheme = PageRankTermVectorRanking, includeOriginalResults = False, verbose = False):
 
         # Get the contents of the file
         resultsData = open(resultsFilePath).read()
@@ -47,7 +47,8 @@ class RankingExperiment(object):
                             entityUrls.add(url)
 
             # Assume we're only doing this for one entity
-            self.results = buildGoogleResultsFromURLs(entityUrls)
+            self.results = buildGoogleResultsFromURLs(entityUrls, True, verbose)
+        print "Retrieved all results from web!"
 
         # Get the keywords & build the ranking scheme
         keywords = self.getKeywords(entity)
@@ -56,6 +57,7 @@ class RankingExperiment(object):
         else:
             self.rankingScheme = rankingScheme(self.results, keywords)
         self.rankingScheme.entity = entity
+        self.rankingScheme.entityId = entity['name']
 
         
     def rank(self):

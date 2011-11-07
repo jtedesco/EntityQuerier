@@ -86,57 +86,57 @@ class GoogleSearch(Search):
         nextURL = None
         for resultEntry in resultEntries:
 
-            try:
+            # Extract all the data we can for this result from the main results page
+            url = str(resultEntry.find('a').attrs[0][1])
+            preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
+
+            # Add it to our results
+            results.append({
+                'url' : url,
+                'preview' : preview
+            })
+            
+        # Parse the next page's URL from the current results page, if it can be found
+        try:
+            nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
+        except AttributeError:
+            nextURL = None
+
+        try:
+            nextURL = None
+
+            # Create threads to process the pages for this set of results
+            threads = []
+            for resultData in results:
+                url = resultData['url']
+                dotLocation = url.rfind('.')
+                if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'} and fetchContent:
+                    parserThread = GoogleResultParserThread(resultData, self.verbose)
+                    threads.append(parserThread)
+
+            # Launch all threads
+            for thread in threads:
+                thread.start()
+
+            # Wait for all the threads to finish
+            for thread in threads:
+
+                # Allow up to 5 seconds for this thread to respond, otherwise, kill it
+                thread.join(5)
+
+                # Kill it if it hung
+                if thread.isAlive():
+                    try:
+                        thread._Thread__stop()
+                    except:
+                        print(str(thread.getName()) + ' could not be terminated')
+
+
+        except Exception:
+
+            if self.verbose:
+                print "Error parsing basic results data from Google: '%s'" % str(sys.exc_info()[1])
                 
-                # Extract all the data we can for this result from the main results page
-                url = str(resultEntry.find('a').attrs[0][1])
-                preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
-
-                # Add it to our results
-                results.append({
-                    'url' : url,
-                    'preview' : preview
-                })
-
-                if not url.endswith('.pdf') and not url.endswith('.ps') and not url.endswith('.doc') \
-                        and not url.endswith('.docx') and not url.endswith('.ppt') and not url.endswith('.pptx'):
-                    if fetchContent:
-
-                        # Create threads to process the pages for this set of results
-                        threads = []
-                        for resultData in results:
-                            parserThread = GoogleResultParserThread(resultData, self.verbose)
-                            threads.append(parserThread)
-
-                        # Launch all threads
-                        for thread in threads:
-                            thread.start()
-
-                        # Wait for all the threads to finish
-                        for thread in threads:
-
-                            # Allow up to 5 seconds for this thread to respond, otherwise, kill it
-                            thread.join(5)
-
-                            # Kill it if it hung
-                            if thread.isAlive():
-                                try:
-                                    thread._Thread__stop()
-                                except:
-                                    print(str(thread.getName()) + ' could not be terminated')
-
-
-                # Parse the next page's URL from the current results page, if it can be found
-                try:
-                    nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
-                except AttributeError:
-                    nextURL = None
-
-            except Exception:
-
-                if self.verbose:
-                    print "Error parsing basic results data from Google: '%s'" % str(sys.exc_info()[1])
-
         return results, nextURL
 
 
