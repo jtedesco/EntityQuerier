@@ -3,11 +3,12 @@ import os
 from pprint import pprint
 import re
 from whoosh import scoring
+import whoosh
 from whoosh.fields import Schema, TEXT
 from whoosh.index import create_in, exists_in
 from whoosh.qparser.default import QueryParser
 from whoosh.qparser.syntax import OrGroup
-from whoosh.query import Or
+from whoosh.query import Or, And, Query, CompoundQuery
 import sys
 from src.ranking.TermVectorRanking import TermVectorRanking
 
@@ -38,6 +39,7 @@ class TermFrequencyRanking(TermVectorRanking):
             @param  keywords        The keywords for these search results to use for scoring the results
         """
         TermVectorRanking.__init__(self, searchResults, keywords)
+
         self.createIndex()
 
 
@@ -94,9 +96,14 @@ class TermFrequencyRanking(TermVectorRanking):
         searcher = self.index.searcher(weighting=weightingMechanism)
 
         # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
-        queryParser = QueryParser('content', schema=self.indexSchema, phraseclass=Or, group=OrGroup)
-        query = ' '.join(self.keywords)
-        queryObject = queryParser.parse(query)
+        keywordsQueryParser = QueryParser('content', schema=self.indexSchema, phraseclass=Or, group=OrGroup)
+        entityId = self.entity['name']
+        query = ""
+        for keyword in self.keywords:
+            if keyword != entityId:
+                query += "(" + entityId + " AND " + keyword + ") OR "
+        query = query.rstrip(" OR ")
+        queryObject = keywordsQueryParser.parse(query)
 
         # Perform the query itself
         searchResults = searcher.search(queryObject, 1000)
@@ -115,7 +122,7 @@ class TermFrequencyRanking(TermVectorRanking):
 
         # Return the list of web pages along with the terms used in the search
         return results
-    
+
 
     def rank(self):
         """
@@ -126,4 +133,3 @@ class TermFrequencyRanking(TermVectorRanking):
 
         reRankedResults = self.queryIndex(scoring.Frequency)
         return reRankedResults
-        

@@ -55,6 +55,7 @@ class RankingExperiment(object):
             self.rankingScheme = rankingScheme(self.results, keywords, self.resultsDump)
         else:
             self.rankingScheme = rankingScheme(self.results, keywords)
+        self.rankingScheme.entity = entity
 
         
     def rank(self):
