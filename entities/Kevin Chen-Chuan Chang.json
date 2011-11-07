@@ -10,24 +10,40 @@
         "web",
         "search",
         "data-aware",
-        "databases"
+        "databases",
+        "large scale",
+        "information",
+        "integration",
+        "real world",
+        "mining",
+        "vertical web",
+        "deep web"
     ],
     "associations" : [
         "DAIS",
         "Stanford DB group"
     ],
     "teaching" : [
-        "CS 411 Database Systems",
-        "CS 511 Advanced Database Systems"
+        "database systems"
     ],
     "publications" : [],
     "keywords": [
         "Cazoodle",
+        "UIUC",
+        "classes",
+        "projects",
+        "teacher",
+        "professor",
         "ARISE",
         "WISDM",
+        "WSDM",
+        "VLDB",
+        "CIDR",
         "MetaQuerier",
         "AIM",
         "ACM",
-        "DBLP"
+        "DBLP",
+        "NSF",
+        "NSF career award"
     ]
 }
