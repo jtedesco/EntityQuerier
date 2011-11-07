@@ -1,14 +1,12 @@
 {
     "name" : "Kevin Chen-Chuan Chang",
-    "title" : "Associate Professor",
     "institution" : "University of Illinois at Urbana-Champaign",
     "undergraduate education" : "National Taiwan University",
     "graduate education" : [
         "Stanford University"
     ],
     "research interests" : [
-        "web",
-        "search",
+        "web search",
         "data-aware",
         "databases",
         "large scale",

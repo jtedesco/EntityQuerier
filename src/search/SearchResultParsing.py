@@ -7,10 +7,10 @@ import sys
 __author__ = 'jon'
 
 # Spoof the User-Agent so we don't get flagged as spam
-SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1"
+SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/6.3.1"
 
 # Set a 2 second timeout for all pages
-timeout = 2
+timeout = 5
 socket.setdefaulttimeout(timeout)
 
 
