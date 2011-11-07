@@ -15,12 +15,12 @@ if __name__ == '__main__':
     entity = load(open(projectRoot + '/entities/Kevin Chen-Chuan Chang.json'))
 
     # Rank the results
-    retrievalResults = '/experiments/retrieval/results/KevinChang-EntityValuesOnly'
-    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, TermFrequencyRanking)
+    retrievalResults = '/experiments/retrieval/results/KevinChang-EntityAttributeValues'
+    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, TermFrequencyRanking, False, True)
     results = rankingExperiment.rank()
 
     # Output the ranking results
     entityId = 'Kevin Chen-Chuan Chang'
     outputTitle = "Whoosh Frequency Ranking Results Summary (for top %d results):\n"
-    outputFile = 'KevinChang-WhooshFrequencyRanking'
+    outputFile = 'KevinChang-TermFrequencyFrequencyRanking'
     outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)

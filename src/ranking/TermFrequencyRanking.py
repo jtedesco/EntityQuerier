@@ -1,15 +1,13 @@
-import operator
+from IN import INT_MAX
 import os
-from pprint import pprint
-import re
-from whoosh import scoring
 import whoosh
-from whoosh.fields import Schema, TEXT
-from whoosh.index import create_in, exists_in
-from whoosh.qparser.default import QueryParser
-from whoosh.qparser.syntax import OrGroup
-from whoosh.query import Or, And, Query, CompoundQuery
-import sys
+from whoosh.analysis import StemmingAnalyzer
+from whoosh.fields import Schema, TEXT, ID, NUMERIC, KEYWORD
+from whoosh.index import create_in
+from whoosh.qparser.default import MultifieldParser, QueryParser
+from whoosh.qparser.syntax import AndGroup, Group, OrGroup
+from whoosh.query import Phrase, Or
+from whoosh.scoring import Frequency
 from src.ranking.TermVectorRanking import TermVectorRanking
 
 __author__ = 'jon'
@@ -50,7 +48,10 @@ class TermFrequencyRanking(TermVectorRanking):
         """
 
         # Create the schema for the index, which stores & scores the content, title, and description
-        self.indexSchema = Schema(content=TEXT(stored=True), title=TEXT(stored=True), description=TEXT(stored=True), url=TEXT(stored=True))
+        analyzer = StemmingAnalyzer()
+        self.indexSchema = Schema(content=TEXT(analyzer=analyzer, stored=True), title=TEXT(analyzer=analyzer, stored=True),
+                                  description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
+                                  keywords=KEYWORD(stored=True))
         indexDirectory = ".index"
 
         # Remove the index if it exists
@@ -72,14 +73,26 @@ class TermFrequencyRanking(TermVectorRanking):
                 unicodeContent = unicode(searchResult['content'], errors='ignore')
                 unicodeTitle = unicode(searchResult['title'], errors='ignore')
                 unicodeDescription = unicode(searchResult['description'], errors='ignore')
-
                 try:
                     unicodeUrl = unicode(searchResult['url'], errors='ignore')
                 except TypeError:
                     unicodeUrl = searchResult['url']
-                    
-                indexWriter.add_document(content=unicodeContent, title=unicodeTitle,
-                                     description=unicodeDescription, url=unicodeUrl)
+                unicodeKeywords = unicode(' '.join(searchResult['keywords']), errors='ignore')
+                pageRank = searchResult['pageRank']
+
+                if len(unicodeContent) == 0:
+                    unicodeContent = u'content'
+                if len(unicodeTitle) == 0:
+                    unicodeTitle = u'title'
+                if len(unicodeDescription) == 0:
+                    unicodeDescription = u'description'
+                if len(unicodeUrl) == 0:
+                    unicodeUrl = u'url'
+                if len(unicodeKeywords) == 0:
+                    unicodeKeywords = u'keywords'
+
+                indexWriter.add_document(content=unicodeContent, title=unicodeTitle, description=unicodeDescription,
+                                     pagerank=pageRank, url=unicodeUrl, keywords=unicodeKeywords)
             except KeyError:
                 pass
 
@@ -97,16 +110,19 @@ class TermFrequencyRanking(TermVectorRanking):
 
         # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
         keywordsQueryParser = QueryParser('content', schema=self.indexSchema, phraseclass=Or, group=OrGroup)
-        entityId = self.entity['name']
         query = ""
         for keyword in self.keywords:
-            if keyword != entityId:
-                query += "(" + entityId + " AND " + keyword + ") OR "
+            if keyword != self.entityId:
+                query += "(" + self.entityId + " AND " + keyword + ") OR "
         query = query.rstrip(" OR ")
         queryObject = keywordsQueryParser.parse(query)
 
         # Perform the query itself
-        searchResults = searcher.search(queryObject, 1000)
+        try:
+            searchResults = searcher.search(queryObject, INT_MAX)
+        except whoosh.reading.TermNotFound:
+            print "Term not found!"
+            searchResults = []
 
         # Format the results
         results = []
@@ -116,7 +132,9 @@ class TermFrequencyRanking(TermVectorRanking):
                 'url': searchResult['url'],
                 'content': searchResult['content'],
                 'title': searchResult['title'],
-                'description': searchResult['description']
+                'description': searchResult['description'],
+                'keywords': searchResult['keywords'],
+                'pageRank': searchResult['pagerank']
             }
             results.append(result)
 
@@ -131,5 +149,5 @@ class TermFrequencyRanking(TermVectorRanking):
             @return The reordered list of search results
         """
 
-        reRankedResults = self.queryIndex(scoring.Frequency)
+        reRankedResults = self.queryIndex(Frequency)
         return reRankedResults
