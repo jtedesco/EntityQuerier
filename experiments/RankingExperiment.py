@@ -73,8 +73,18 @@ class RankingExperiment(object):
             keywords.extend(key.split())
             if type(entity[key]) == type([]):
                 for keyword in entity[key]:
-                    keywords.append(keyword.lower())
+                    lowercaseKeyword = keyword.lower()
+                    if len(lowercaseKeyword.split()) > 1:
+                        keywords.append(lowercaseKeyword)
+                        keywords.extend(lowercaseKeyword.split())
+                    else:
+                        keywords.append(lowercaseKeyword)
             else:
-                keywords.append(entity[key].lower())
+                lowercaseKeyword = entity[key].lower()
+                if len(lowercaseKeyword.split()) > 1:
+                    keywords.append(lowercaseKeyword)
+                    keywords.extend(lowercaseKeyword.split())
+                else:
+                    keywords.append(lowercaseKeyword)
 
         return keywords

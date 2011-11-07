@@ -7,7 +7,7 @@ from src.search.wrappers.FollowLinksSearch import FollowLinksSearch
 
 __author__ = 'jon'
 
-class EntityAttributeNamesValuesOperatorsAndFollowingLinks(RetrievalExperiment):
+class EntityAttributeValuesFollowingLinks(RetrievalExperiment):
     """
       A basic experiment that evaluates queries by simply assigned the score as the fraction of relevant documents retrieved
         in the first five pages of the result.
@@ -30,12 +30,12 @@ class EntityAttributeNamesValuesOperatorsAndFollowingLinks(RetrievalExperiment):
         self.queryEvaluator = AverageRecallAndPrecisionQueryEvaluator()
 
         # The query builder for this experiment
-        self.queryBuilder = EntityAttributeNamesValuesQueryAndOperatorsBuilder()
+        self.queryBuilder = EntityAttributeValuesQueryBuilder()
 
         RetrievalExperiment.__init__(self, self.entityIds, self.searchInterface)
 
 
 if __name__ == '__main__':
-    experiment = EntityAttributeNamesValuesOperatorsAndFollowingLinks()
+    experiment = EntityAttributeValuesFollowingLinks()
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeNamesValuesOperatorsAndFollowingLinks")
+    experiment.printResults("results/KevinChang-EntityAttributeValuesFollowingLinks")
