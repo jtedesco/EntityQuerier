@@ -1,13 +1,5 @@
-import os
 from whoosh import scoring
-from whoosh.analysis import StemmingAnalyzer
-from whoosh.fields import Schema, TEXT, ID, NUMERIC, KEYWORD
-from whoosh.index import create_in
-from whoosh.qparser.default import QueryParser, MultifieldParser
-from whoosh.qparser.syntax import OrGroup
-from whoosh.query import Or
 from src.ranking.TermFrequencyRanking import TermFrequencyRanking
-from src.ranking.TermVectorRanking import TermVectorRanking
 
 __author__ = 'jon'
 
