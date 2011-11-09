@@ -13,5 +13,6 @@ class BM25FPageRank(BM25F):
         """
 
         pageRank = float(searcher.stored_fields(docnum)['pagerank'])
-        newScore = (score + 8.0 * pageRank) / 2
+        scale = (10 + pageRank) / 10
+        newScore = scale * score
         return newScore

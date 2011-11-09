@@ -1,13 +1,14 @@
 from IN import INT_MAX
 import os
 import whoosh
-from whoosh.analysis import StemmingAnalyzer
+from whoosh.analysis import StemmingAnalyzer, CharsetFilter
 from whoosh.fields import Schema, TEXT, ID, NUMERIC, KEYWORD
 from whoosh.index import create_in
 from whoosh.qparser.default import MultifieldParser, QueryParser
 from whoosh.qparser.syntax import AndGroup, Group, OrGroup
 from whoosh.query import Phrase, Or
 from whoosh.scoring import Frequency
+from whoosh.support.charset import accent_map
 from src.ranking.TermVectorRanking import TermVectorRanking
 
 __author__ = 'jon'
@@ -48,7 +49,7 @@ class TermFrequencyRanking(TermVectorRanking):
         """
 
         # Create the schema for the index, which stores & scores the content, title, and description
-        analyzer = StemmingAnalyzer()
+        analyzer = StemmingAnalyzer() | CharsetFilter(accent_map)
         self.indexSchema = Schema(content=TEXT(analyzer=analyzer, stored=True), title=TEXT(analyzer=analyzer, stored=True),
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
                                   keywords=KEYWORD(stored=True))
@@ -56,7 +57,7 @@ class TermFrequencyRanking(TermVectorRanking):
 
         # Remove the index if it exists
         if os.path.exists(indexDirectory):
-            os.rmdir(indexDirectory)
+            os.removedirs(indexDirectory)
 
         # Try to create the index directory
         os.mkdir(indexDirectory)
@@ -110,7 +111,7 @@ class TermFrequencyRanking(TermVectorRanking):
 
         # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
         keywordsQueryParser = QueryParser('content', schema=self.indexSchema, phraseclass=Or, group=OrGroup)
-        query = ""
+        query = self.entityId + " OR "
         for keyword in self.keywords:
             if keyword != self.entityId:
                 query += "(" + self.entityId + " AND " + keyword + ") OR "

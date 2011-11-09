@@ -1,4 +1,5 @@
 import re
+import sys
 from src.search.Search import Search
 
 
@@ -9,7 +10,7 @@ from src.search.Search import Search
 from src.search.google.GoogleResultParserThread import GoogleResultParserThread
 from src.search.google.GoogleSearch import GoogleSearch
 from BeautifulSoup import BeautifulSoup
-from pprint import pprint
+from pprint import pprint, pformat
 
 __author__ = 'jon'
 
@@ -28,22 +29,27 @@ class FollowLinksSearch(Search):
         self.topResultsToFollowLinks = topResultsToFollowLinks
 
 
-    def query(self, query, fetchContent=True):
+    def query(self, query, fetchContent=True, lastQuery=False):
+        """
+          Query the search interface and return a dictionary of results
+
+            @param  query           The query to search
+            @param  fetchContent    Whether or not to retrieve the content of pages as well as just summaries + urls from google
+            @param  lastQuery       Whether or not this query is the last that will be submitted for the search process
+        """
 
         # Get the search results from the 'concrete' scheme
         searchResults = self.searchScheme.query(query, fetchContent)
 
-        resultPages = list(searchResults)
+        resultPages = set(searchResults)
 
         # Follow the links on the top results
         for i in xrange(0, self.topResultsToFollowLinks):
 
             # Find the links from the top results
-            try:
-                theseResults = self.__getResultsFromPageLinks(resultPages[i]['content'], fetchContent, resultPages[i]['url'])
-                resultPages.extend(theseResults)
-            except KeyError:
-                pass
+            theseResults = self.__getResultsFromPageLinks(resultPages[i]['content'], fetchContent, resultPages[i]['url'])
+            for result in theseResults:
+                resultPages.add(result)
 
         return resultPages
 
@@ -215,6 +221,6 @@ class FollowLinksSearch(Search):
                 theseResults = self.__getResultsFromPageLinks(resultPages[i]['content'], fetchContent, resultPages[i]['url'])
                 resultPages.extend(theseResults)
             except Exception:
-                pass
+                print "Error getting results from page links: " + str(sys.exc_info()[1])
 
         return resultPages

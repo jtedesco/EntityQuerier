@@ -23,7 +23,7 @@ class EntityAttributeValuesFollowingLinks(RetrievalExperiment):
         ]
 
         # The search engine to use
-        self.searchInterface = FollowLinksSearch(GoogleSearch(50, True), 50, True)
+        self.searchInterface = FollowLinksSearch(GoogleSearch(50, True), 50, True, 5)
 
         # The query evaluation metric to use
         self.queryEvaluator = AverageRecallAndPrecisionQueryEvaluator()

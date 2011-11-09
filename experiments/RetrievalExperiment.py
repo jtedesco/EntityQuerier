@@ -141,7 +141,7 @@ class RetrievalExperiment(object):
 
                         # Add the new URL to our lists of URLs retrieved
                         try:
-                            resultURL = result['url']
+                            resultURL = str(result['url']).strip()
                             totalURLs.add(resultURL)
                             queryURLs.append(resultURL)
                         except TypeError:

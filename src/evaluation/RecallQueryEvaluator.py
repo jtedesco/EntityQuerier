@@ -15,7 +15,7 @@ class RecallQueryEvaluator(QueryEvaluator):
             @param  idealResults    The ideal list of URLs
         """
 
-        expectedNumberOfResults = len(idealResults)
+        expectedNumberOfResults = len(set(idealResults))
         relevantResults = set(idealResults).intersection(set(results))
 
         try:

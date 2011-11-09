@@ -4,9 +4,10 @@ from src.search.google.GoogleSearch import GoogleSearch
 
 __author__ = 'jon'
 
-class TopKKeywordSearch(Search):
+class TopYahooKeywordSearch(Search):
     """
-      This class allows us to augment results by re-querying with the top K keywords
+      This class allows us to augment results by re-querying with the top keywords from the entire search process
+        using Yahoo's YQL to extract t
     """
 
     def __init__(self, searchScheme = GoogleSearch(), numberOfResultsToRetrieve=50, verbose=True, k=10):
