@@ -42,7 +42,6 @@ class Cache(object):
                 content = None
 
         else:
-            print "Cache miss for '%s'" % url.strip()
             content = None
 
         return content
