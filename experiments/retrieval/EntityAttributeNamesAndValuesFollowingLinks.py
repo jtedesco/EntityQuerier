@@ -1,11 +1,12 @@
 from experiments.RetrievalExperiment import RetrievalExperiment
 from src.evaluation.AverageRecallAndPrecisionQueryEvaluator import AverageRecallAndPrecisionQueryEvaluator
-from src.queries.EntityAttributeNamesValuesQueryAndOperatorsBuilder import EntityAttributeNamesValuesQueryAndOperatorsBuilder
+from src.queries.EntityAttributeNamesAndValuesQueryBuilder import EntityAttributeNamesAndValuesQueryBuilder
 from src.search.google.GoogleSearch import GoogleSearch
+from src.search.wrappers.FollowLinksSearch import FollowLinksSearch
 
 __author__ = 'jon'
 
-class EntityAttributeNamesValuesAndOperators(RetrievalExperiment):
+class EntityAttributeNamesAndValuesFollowingLinks(RetrievalExperiment):
     """
       A basic experiment that evaluates queries by simply assigned the score as the fraction of relevant documents retrieved
         in the first five pages of the result.
@@ -22,18 +23,18 @@ class EntityAttributeNamesValuesAndOperators(RetrievalExperiment):
         ]
 
         # The search engine to use
-        self.searchInterface = GoogleSearch(50, True)
+        self.searchInterface = FollowLinksSearch(GoogleSearch(50, True), 50, True, 5)
 
         # The query evaluation metric to use
         self.queryEvaluator = AverageRecallAndPrecisionQueryEvaluator()
 
         # The query builder for this experiment
-        self.queryBuilder = EntityAttributeNamesValuesQueryAndOperatorsBuilder()
+        self.queryBuilder = EntityAttributeNamesAndValuesQueryBuilder()
 
         RetrievalExperiment.__init__(self, self.entityIds, self.searchInterface)
 
 
 if __name__ == '__main__':
-    experiment = EntityAttributeNamesValuesAndOperators()
+    experiment = EntityAttributeNamesAndValuesFollowingLinks()
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeNamesValuesAndOperators")
+    experiment.printResults("results/KevinChang-EntityAttributeNamesAndValuesFollowingLinks")
