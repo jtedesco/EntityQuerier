@@ -21,6 +21,8 @@ class PRCache(Cache):
           Initialize this PR cache object
         """
 
+        super(Cache, self)
+
         # Find where we expect this data to be cached
         self.cachePath = str(os.getcwd())
         self.cachePath = self.cachePath[:self.cachePath.find('EntityQuerier') + len('EntityQuerier')] + '/cachepr/'
@@ -45,6 +47,15 @@ class PRCache(Cache):
                 print "Error parsing cached pageRank: " + str(sys.exc_info()[1])
                 pageRank = -1
 
+                # Try to fetch it again if it failed
+                try:
+                    pageRank = getPageRank(url)
+                except Exception:
+                    print "Error retrieving pageRank: " + str(sys.exc_info()[1])
+                    pageRank = -1
+
+            # Write it to the cache
+            self.write(url, str(pageRank))
         else:
 
             try:
