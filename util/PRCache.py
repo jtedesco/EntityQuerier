@@ -1,6 +1,7 @@
 import os
 import hashlib
 import threading
+import sys
 from src.search.google.GetPageRank import getPageRank
 from util.Cache import Cache
 
@@ -33,7 +34,28 @@ class PRCache(Cache):
             @return An integer representing the PageRank
         """
 
-        pageRank = getPageRank(url)
+        # Try to read it from the cache
+        pageRankData = self.read(url)
+
+        if pageRankData is not None:
+
+            try:
+                pageRank = int(pageRankData)
+            except Exception:
+                print "Error parsing cached pageRank: " + str(sys.exc_info()[1])
+                pageRank = -1
+
+        else:
+
+            try:
+                pageRank = getPageRank(url)
+            except Exception:
+                print "Error retrieving pageRank: " + str(sys.exc_info()[1])
+                pageRank = -1
+
+            # Write it to the cache
+            self.write(url, str(pageRank))
+
         return pageRank
 
 

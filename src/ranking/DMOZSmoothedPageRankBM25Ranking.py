@@ -19,7 +19,7 @@ class DMOZSmoothedPageRankBM25Ranking(PageRankBM25Ranking):
         # Supplement the index with the DMOZ documents
         dmozResults = []
         for filename in os.listdir(self.dmozPath):
-            dmozResult = load(open(filename))
+            dmozResult = load(open(self.dmozPath + filename))
             dmozResults.append(dmozResult)
 
         # Create the index with both the traditional and new DMOZ search results
