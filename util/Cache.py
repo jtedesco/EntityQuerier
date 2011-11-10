@@ -93,6 +93,9 @@ class Cache(object):
         """
           Encode the URL to a filename to be stored in the cache
         """
-        hashedUrl = hashlib.sha256(url).hexdigest()
+        try:
+            hashedUrl = hashlib.sha256(url).hexdigest()
+        except UnicodeDecodeError:
+            hashedUrl = hashlib.sha256(url.decode(errors='ignore')).hexdigest()
         filename = self.cachePath + hashedUrl
         return filename

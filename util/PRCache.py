@@ -45,7 +45,10 @@ class PRCache(Cache):
 
         if pageRankData is not None:
 
-            pageRank = int(pageRankData)
+            try:
+                pageRank = int(pageRankData)
+            except:
+                pageRank = 0
 
         else:
             

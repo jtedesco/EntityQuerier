@@ -9,12 +9,28 @@ __author__ = 'jon'
 # Spoof the User-Agent so we don't get flagged as spam
 SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/6.3.1"
 
-# Set a 10 second timeout for all pages
-timeout = 10
+# Set a 5 second timeout for all pages
+timeout = 5
 socket.setdefaulttimeout(timeout)
 
 
-def getPageContent(url):
+def loadFromUrl(url):
+
+    # Build a request object to grab the content of the url
+    request = urllib2.Request(url)
+    request.add_header("User-Agent", SPOOFED_USER_AGENT)
+
+    # Open the URL and read the content
+    opener = urllib2.build_opener()
+    try:
+        content = opener.open(request).read()
+    except:
+        content = None
+
+    return content
+
+
+def getPageContent(url, cache=True):
     """
       Returns the text content of a single URL. (emulates Firefox 7 on Linux for the user-agent)
 
@@ -28,18 +44,14 @@ def getPageContent(url):
 
     if cachedContent is not None:
 
+        # Take the cached content
         content = cachedContent
 
     else:
 
         try:
-            # Build a request object to grab the content of the url
-            request = urllib2.Request(url)
-            request.add_header("User-Agent", SPOOFED_USER_AGENT)
-
-            # Open the URL and read the content
-            opener = urllib2.build_opener()
-            content = opener.open(request).read()
+            # Load the content from the web
+            content = loadFromUrl(url)
 
             # Cache this page
             cache.write(url, content)

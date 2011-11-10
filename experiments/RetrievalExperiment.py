@@ -146,6 +146,10 @@ class RetrievalExperiment(object):
                             queryURLs.append(resultURL)
                         except TypeError:
                             print "Something went very wrong..."
+                        except UnicodeDecodeError:
+                            pass
+
+
 
                 # Score this query
                 queryScore = self.queryEvaluator.evaluate(queryURLs, self.idealURLs[entityId])
