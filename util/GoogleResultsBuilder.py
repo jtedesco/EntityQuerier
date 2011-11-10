@@ -30,7 +30,16 @@ def buildGoogleResultsFromURLs(urls, fetchContent=True, verbose=False):
 
     # Wait for all the threads to finish
     for thread in threads:
-        thread.join()
+
+        # Allow up to 5 seconds for this thread to respond, otherwise, kill it
+        thread.join(5)
+
+        # Kill it if it hung
+        if thread.isAlive():
+            try:
+                thread._Thread__stop()
+            except:
+                print(str(thread.getName()) + ' could not be terminated')
 
 
     return results
