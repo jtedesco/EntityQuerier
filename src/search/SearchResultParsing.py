@@ -1,16 +1,16 @@
 from BeautifulSoup import BeautifulSoup
-import os
 import socket
 import urllib2
 import sys
+from util.Cache import Cache
 
 __author__ = 'jon'
 
 # Spoof the User-Agent so we don't get flagged as spam
 SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/6.3.1"
 
-# Set a 2 second timeout for all pages
-timeout = 5
+# Set a 10 second timeout for all pages
+timeout = 10
 socket.setdefaulttimeout(timeout)
 
 
@@ -22,36 +22,33 @@ def getPageContent(url):
         @return The contents of the page
     """
 
-    # Find where we expect this data to be cached
-    cachePath = str(os.getcwd())
-    cachePath = cachePath[:cachePath.find('EntityQuerier') + len('EntityQuerier')]
-    cachePath += '/cache/' + url.replace('/', '')
+    # Try to retrieve this url from the cache
+    cache = Cache()
+    cachedContent = cache.read(url)
 
-    if os.path.exists(cachePath) and os.path.isfile(cachePath):
+    if cachedContent is not None:
 
-        content = open(cachePath).read()
+        content = cachedContent
 
     else:
 
-        # Build a request object to grab the content of the url
-        request = urllib2.Request(url)
-        request.add_header("User-Agent", SPOOFED_USER_AGENT)
-
-        # Open the URL and read the content
-        opener = urllib2.build_opener()
-        content = opener.open(request).read()
-
-        # Try to cache the result
         try:
+            # Build a request object to grab the content of the url
+            request = urllib2.Request(url)
+            request.add_header("User-Agent", SPOOFED_USER_AGENT)
 
-            cache = open(cachePath, 'w')
-            cache.write(content)
-            cache.close()
+            # Open the URL and read the content
+            opener = urllib2.build_opener()
+            content = opener.open(request).read()
 
-        except IOError:
+            # Cache this page
+            cache.write(url, content)
 
-            # This frequently happens when the URL is too long to act as a filename, just don't cache it
-            pass
+        except Exception:
+
+            # Register this URL so that we don't try to fetch it again
+            cache.registerUrlError(url)
+            content = None
 
     return content
 
@@ -101,4 +98,5 @@ def isHTML(content):
       Check whether or not some content is HTML
     """
 
+    # TODO: Speed up HTML detection
     return '<html' in content or 'html>' in content

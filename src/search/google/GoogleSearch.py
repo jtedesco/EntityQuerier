@@ -27,7 +27,7 @@ class GoogleSearch(Search):
         url = "http://google.com/search?q=" + googleQuery
 
         if self.verbose:
-            print "Querying '%s'..." % query
+            print "Querying '%s'..." % query.strip()
 
         # Parse the content of the results page
         results = []
@@ -45,7 +45,7 @@ class GoogleSearch(Search):
             except Exception:
 
                 if self.verbose:
-                    print "Error querying Google: '%s'" % str(sys.exc_info()[1])
+                    print "Error querying Google: '%s'" % str(sys.exc_info()[1]).strip()
 
         # Trim the results down to the exact size we want
         results = results[:self.numberOfResultsToRetrieve]
@@ -135,7 +135,7 @@ class GoogleSearch(Search):
         except Exception:
 
             if self.verbose:
-                print "Error parsing basic results data from Google: '%s'" % str(sys.exc_info()[1])
+                print "Error parsing basic results from Google: '%s'" % str(sys.exc_info()[1]).strip()
                 
         return results, nextURL
 

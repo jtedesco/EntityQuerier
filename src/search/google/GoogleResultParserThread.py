@@ -10,6 +10,7 @@ __author__ = 'jon'
 
 class GoogleResultParserThread(threading.Thread):
 
+    
     def __init__(self, resultDictionary, verbose=False):
         """
           Initialize this parser, given the dictionary into which the page's data is going to be placed
@@ -36,12 +37,15 @@ class GoogleResultParserThread(threading.Thread):
             # Get the content from this page
             if self.verbose:
                 print "Getting page content for '%s'" % self.url.strip()
-            content = getPageContent(self.url).lower()
+                
+            content = getPageContent(self.url)
 
             # Verify that this is not binary data
-            if isHTML(content):
+            if content is not None and isHTML(content):
+
 
                 # Extract data about this result
+                content = content.lower()
                 title, keywords, description = parseMetaDataFromContent(content)
                 pageRank = self.__getPageRank(self.url)
 
@@ -54,9 +58,9 @@ class GoogleResultParserThread(threading.Thread):
 
         except URLError:
 
-            # Skip this element
+            # Skip this URL, and register it as an error on the cache
             if self.verbose:
-                print("Error accessing '%s', %s" % (self.url, sys.exc_info()[1]))
+                print("Error accessing '%s', %s" % (self.url.strip(), str(sys.exc_info()[1]).strip()))
 
 
     def __getPageRank(self, url):
