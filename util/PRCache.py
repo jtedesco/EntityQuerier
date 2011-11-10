@@ -1,9 +1,7 @@
-from BeautifulSoup import BeautifulSoup
-from json import load, dump
 import os
 import hashlib
-import subprocess
 import threading
+from src.search.google.GetPageRank import getPageRank
 from util.Cache import Cache
 
 __author__ = 'jon'
@@ -26,12 +24,6 @@ class PRCache(Cache):
         self.cachePath = str(os.getcwd())
         self.cachePath = self.cachePath[:self.cachePath.find('EntityQuerier') + len('EntityQuerier')] + '/cachepr/'
 
-        # Find the absolute path to the script to get the pagerank of a page
-        pageRankScriptPath = str(os.getcwd())
-        pageRankScriptPath = pageRankScriptPath[:pageRankScriptPath.find('EntityQuerier') + len('EntityQuerier')]
-        pageRankScriptPath += "/src/search/google/GetPageRank.py"
-        self.pageRankScriptPath = pageRankScriptPath
-
 
     def getPageRank(self, url):
         """
@@ -41,61 +33,7 @@ class PRCache(Cache):
             @return An integer representing the PageRank
         """
 
-        pageRankData = self.read(url)
-
-        if pageRankData is not None:
-
-            try:
-                pageRank = int(pageRankData)
-            except:
-                pageRank = 0
-
-        else:
-            
-            try:
-                # Go to the pagerank page, enter this url, and hit 'submit' using Twill
-                pageRankHTML = subprocess.check_output(["python", self.pageRankScriptPath, url])
-                pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
-
-                # Parse the output
-                parsedPageRankData = BeautifulSoup(pageRankHTML)
-                pageRankElementText = parsedPageRankData.find('ul', {'class' : 'prlist'}).text
-                try:
-
-                    if pageRankElementText[1] == '1':
-                        pageRank = int(pageRankElementText[0:2])
-                    else:
-                        pageRank = int(pageRankElementText[0])
-
-                except ValueError:
-
-                    # Try to extract the domain this time
-                    url = url.lstrip('http://')
-                    domain = url[:url.find('/')]
-
-                    # Go to the pagerank page, enter this url, and hit 'submit' using Twill
-                    pageRankHTML = subprocess.check_output(["python", self.pageRankScriptPath, domain])
-                    pageRankHTML = pageRankHTML[pageRankHTML.find('==DATA==')+len('==DATA=='):].strip()
-
-                    # Parse the output
-                    parsedPageRankData = BeautifulSoup(pageRankHTML)
-                    pageRankElementText = parsedPageRankData.find('ul', {'class' : 'prlist'}).text
-
-                    try:
-
-                        if pageRankElementText[1] == '1':
-                            pageRank = int(pageRankElementText[0:2])
-                        else:
-                            pageRank = int(pageRankElementText[0])
-
-                    except ValueError:
-                        pageRank = 0
-
-            except Exception:
-                pageRank = 0
-
-            self.write(url, str(pageRank))
-
+        pageRank = getPageRank(url)
         return pageRank
 
 
