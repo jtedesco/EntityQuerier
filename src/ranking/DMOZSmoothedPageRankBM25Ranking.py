@@ -58,3 +58,6 @@ class DMOZSmoothedPageRankBM25Ranking(PageRankBM25Ranking):
         super(DMOZSmoothedPageRankBM25Ranking, self).__init__(searchResults, keywords)
 
 
+    def getIndexLocation(self):
+        indexLocation = ".index-bm25-pr-dmoz"
+        return indexLocation

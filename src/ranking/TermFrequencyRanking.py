@@ -43,6 +43,10 @@ class TermFrequencyRanking(TermVectorRanking):
         self.createIndex()
 
 
+    def getIndexLocation(self):
+        indexDirectory = ".index"
+        return indexDirectory
+
 
     def createIndex(self):
         """
@@ -54,7 +58,7 @@ class TermFrequencyRanking(TermVectorRanking):
         self.indexSchema = Schema(content=TEXT(analyzer=analyzer, stored=True), title=TEXT(analyzer=analyzer, stored=True),
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
                                   keywords=KEYWORD(stored=True))
-        indexDirectory = ".index"
+        indexDirectory = self.getIndexLocation()
 
         # Remove the index if it exists
         if os.path.exists(indexDirectory):

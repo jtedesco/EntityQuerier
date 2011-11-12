@@ -1,5 +1,3 @@
-import operator
-from pprint import pprint
 from src.analysis.TermFrequencyAnalysis import TermFrequencyAnalysis
 from src.ranking.TermVectorRanking import TermVectorRanking
 
