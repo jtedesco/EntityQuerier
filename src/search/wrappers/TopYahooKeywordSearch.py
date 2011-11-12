@@ -10,17 +10,16 @@ class TopYahooKeywordSearch(Search):
         using Yahoo's YQL to extract t
     """
 
-    def __init__(self, searchScheme = GoogleSearch(), numberOfResultsToRetrieve=50, verbose=True, k=10):
+    def __init__(self, searchScheme = GoogleSearch(), numberOfResultsToRetrieve=50, verbose=True):
         """
           Initializes this search object
         """
 
         Search.__init__(self, numberOfResultsToRetrieve, verbose)
         self.searchScheme = searchScheme
-        self.k = k
 
 
-    def query(self, query, fetchContent=True, lastQuery=False):
+    def query(self, query, fetchContent=True):
         """
           Query the search interface and return a dictionary of results
 

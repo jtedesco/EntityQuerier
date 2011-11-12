@@ -148,6 +148,8 @@ class RetrievalExperiment(object):
                             print "Something went very wrong..."
                         except UnicodeDecodeError:
                             pass
+                        except UnicodeEncodeError:
+                            pass
 
 
 

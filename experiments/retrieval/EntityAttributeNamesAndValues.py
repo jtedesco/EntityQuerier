@@ -1,6 +1,6 @@
 from experiments.RetrievalExperiment import RetrievalExperiment
 from src.evaluation.AverageRecallAndPrecisionQueryEvaluator import AverageRecallAndPrecisionQueryEvaluator
-from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
+from src.queries.EntityAttributeNamesAndValuesQueryBuilder import EntityAttributeNamesAndValuesQueryBuilder
 from src.search.google.GoogleSearch import GoogleSearch
 
 __author__ = 'jon'
@@ -28,7 +28,7 @@ class EntityAttributeNamesAndValues(RetrievalExperiment):
         self.queryEvaluator = AverageRecallAndPrecisionQueryEvaluator()
 
         # The query builder for this experiment
-        self.queryBuilder = EntityAttributeValuesQueryBuilder()
+        self.queryBuilder = EntityAttributeNamesAndValuesQueryBuilder()
 
         RetrievalExperiment.__init__(self, self.entityIds, self.searchInterface)
 

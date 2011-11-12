@@ -36,7 +36,9 @@ class Cache(object):
         # Read the data from the cache, if it exists
         if os.path.exists(filename) and os.path.isfile(filename):
 
-            content = open(filename).read()
+            fileToRead = open(filename)
+            content = fileToRead.read()
+            fileToRead.close()
 
             if content == "ERROR":
                 content = None

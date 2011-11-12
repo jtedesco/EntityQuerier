@@ -1,5 +1,6 @@
 from json import load, loads
 import os
+from pprint import pformat
 import re
 from src.ranking.PageRankBM25Ranking import PageRankBM25Ranking
 
@@ -21,29 +22,36 @@ class DMOZSmoothedPageRankBM25Ranking(PageRankBM25Ranking):
         dmozResults = []
         for filename in os.listdir(self.dmozPath):
 
-            # Get the contents of the file
-            dmozResultData = open(self.dmozPath + filename).read()
+            try:
 
-            # Parse it out
-            dmozResultData = dmozResultData.replace("\"", "\\\"")
-            dmozResultData = dmozResultData.replace("'", "\"")
-            dmozResultData = dmozResultData.replace("\n", " ")
+                # Get the contents of the file
+                originalDmozResultData = open(self.dmozPath + filename).read()
 
-            # Remove extra whitespace
-            removeExtraWhitespaceRegex = re.compile(r'\s+')
-            dmozResultData = re.sub(removeExtraWhitespaceRegex, ' ', dmozResultData)
+                # Parse it out
+                dmozResultData = originalDmozResultData.replace("\"", "\\\"")
+                dmozResultData = dmozResultData.replace("'", "\"")
+                dmozResultData = dmozResultData.replace("\n", " ")
 
-            # Remove 'set' keywords
-            dmozResultData = dmozResultData.replace("set([", "[")
-            dmozResultData = dmozResultData.replace("])", "]")
-
-            # Remove 'u' for unicode data
-            dmozResultData = dmozResultData.replace(" u'", " '")
-            dmozResultData = dmozResultData.replace(" u\"", " \"")
+                # Remove extra whitespace
+                removeExtraWhitespaceRegex = re.compile(r'\s+')
+                dmozResultData = re.sub(removeExtraWhitespaceRegex, ' ', dmozResultData)
 
 
-            dmozResult = loads(dmozResultData)
-            dmozResults.append(dmozResult)
+                # Remove 'u' for unicode data
+                dmozResultData = dmozResultData.replace(" u'", " '")
+                dmozResultData = dmozResultData.replace(" u\"", " \"")
+
+                dmozResult = loads(dmozResultData)
+                dmozResults.append(dmozResult)
+
+            except ValueError:
+
+                # Do something awful...
+                try:
+                    dmozResult = eval(originalDmozResultData)
+                    dmozResults.append(dmozResult)
+                except:
+                    print "Something went very wrong reading a DMOZ document!"
 
         # Create the index with both the traditional and new DMOZ search results
         searchResults.extend(dmozResults)

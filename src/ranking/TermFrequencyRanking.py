@@ -5,6 +5,7 @@ from whoosh.analysis import StemmingAnalyzer, CharsetFilter
 from whoosh.fields import Schema, TEXT, ID, NUMERIC, KEYWORD
 from whoosh.index import create_in
 from whoosh.qparser.default import MultifieldParser, QueryParser
+from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import AndGroup, Group, OrGroup
 from whoosh.query import Phrase, Or
 from whoosh.scoring import Frequency
@@ -71,9 +72,18 @@ class TermFrequencyRanking(TermVectorRanking):
         # Walk the pages folder for content
         for searchResult in self.searchResults:
             try:
-                unicodeContent = unicode(searchResult['content'], errors='ignore')
-                unicodeTitle = unicode(searchResult['title'], errors='ignore')
-                unicodeDescription = unicode(searchResult['description'], errors='ignore')
+                try:
+                    unicodeContent = unicode(searchResult['content'], errors='ignore')
+                except TypeError:
+                    unicodeContent = searchResult['content']
+                try:
+                    unicodeTitle = unicode(searchResult['title'], errors='ignore')
+                except TypeError:
+                    unicodeTitle = searchResult['title']
+                try:
+                    unicodeDescription = unicode(searchResult['description'], errors='ignore')
+                except TypeError:
+                    unicodeDescription = searchResult['description']
                 try:
                     unicodeUrl = unicode(searchResult['url'], errors='ignore')
                 except TypeError:
@@ -110,12 +120,13 @@ class TermFrequencyRanking(TermVectorRanking):
         searcher = self.index.searcher(weighting=weightingMechanism)
 
         # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
-        keywordsQueryParser = QueryParser('content', schema=self.indexSchema, phraseclass=Or, group=OrGroup)
-        query = self.entityId + " OR "
+        keywordsQueryParser = QueryParser('content', schema=self.indexSchema, group=OrGroup)
+        keywordsQueryParser.add_plugin(PlusMinusPlugin)
+        query = "+\"" + self.entityId + "\" "
         for keyword in self.keywords:
             if keyword != self.entityId:
-                query += "(" + self.entityId + " AND " + keyword + ") OR "
-        query = query.rstrip(" OR ")
+                query += "\"" + keyword + "\" "
+        query = query.rstrip()
         queryObject = keywordsQueryParser.parse(query)
 
         # Perform the query itself

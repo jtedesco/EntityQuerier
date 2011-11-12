@@ -2,7 +2,6 @@ from json import load
 import os
 from experiments.RankingExperiment import RankingExperiment
 from src.ranking.BaselineResultsRanking import BaselineResultsRanking
-from src.ranking.PageRankTermVectorRanking import PageRankTermVectorRanking
 from util.RankingExperimentUtil import outputRankingResults
 
 __author__ = 'jon'
@@ -17,7 +16,7 @@ if __name__ == '__main__':
     entity = load(open(projectRoot + '/entities/Kevin Chen-Chuan Chang.json'))
 
     # Rank the results
-    rankingExperiment = RankingExperiment(projectRoot + '/experiments/retrieval/results/KevinChang-EntityAttributeValues', entity, BaselineResultsRanking, True, True)
+    rankingExperiment = RankingExperiment(projectRoot + '/experiments/retrieval/results/KevinChang-EntityAttributeNamesAndValuesFollowingLinks', entity, BaselineResultsRanking, True, True)
     results = rankingExperiment.rank()
 
     # Output the ranking results

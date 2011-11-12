@@ -1,4 +1,5 @@
 from json import loads
+from pprint import pformat, pprint
 import re
 from src.ranking.PageRankTermVectorRanking import PageRankTermVectorRanking
 from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
@@ -34,7 +35,10 @@ class RankingExperiment(object):
         resultsData = resultsData.replace(" u\"", " \"")
 
         # Load the data dumped from the first stage
-        self.resultsDump = loads(resultsData)
+        try:
+            self.resultsDump = loads(resultsData)
+        except ValueError:
+            self.resultsDump = eval(open(resultsFilePath).read())
 
         # Build the data structure that will map entity id -> urls
         self.results = []

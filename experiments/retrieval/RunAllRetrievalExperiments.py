@@ -19,15 +19,15 @@ if __name__ == '__main__':
     experiment.run()
     experiment.printResults("results/KevinChang-EntityAttributeValues")
 
-    # Attribute values  & following links
-    experiment = EntityAttributeValuesFollowingLinks()
-    experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeValuesFollowingLinks")
-
     # Attribute names & values
     experiment = EntityAttributeNamesAndValues()
     experiment.run()
     experiment.printResults("results/KevinChang-EntityAttributeNamesAndValues")
+
+    # Attribute values  & following links
+    experiment = EntityAttributeValuesFollowingLinks()
+    experiment.run()
+    experiment.printResults("results/KevinChang-EntityAttributeValuesFollowingLinks")
 
     # Attribute names & values + link crawling
     experiment = EntityAttributeNamesAndValuesFollowingLinks()
