@@ -15,7 +15,7 @@ if __name__ == '__main__':
     entity = load(open(projectRoot + '/entities/Kevin Chen-Chuan Chang.json'))
 
     # Rank the results
-    rankingExperiment = RankingExperiment(projectRoot + '/experiments/retrieval/results/KevinChang-EntityAttributeValues', entity, TermVectorRanking)
+    rankingExperiment = RankingExperiment(projectRoot + '/experiments/retrieval/results/KevinChang-EntityAttributeNamesAndValuesFollowingLinks', entity, TermVectorRanking)
     results = rankingExperiment.rank()
 
     # Output the ranking results
