@@ -4,7 +4,7 @@ import subprocess
 import threading
 from urllib2 import HTTPError, URLError
 import sys
-from src.search.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent
+from src.search.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent, parseHeaderInformationFromContent
 from util.PRCache import PRCache
 
 __author__ = 'jon'
@@ -44,6 +44,7 @@ class GoogleResultParserThread(threading.Thread):
                 # Extract data about this result
                 content = content.lower()
                 title, keywords, description = parseMetaDataFromContent(content)
+                headers = parseHeaderInformationFromContent(content)
                 pageRank = self.prCache.getPageRank(self.url)
 
                 # Add this result data
@@ -52,6 +53,7 @@ class GoogleResultParserThread(threading.Thread):
                 self.resultDictionary['description'] = description
                 self.resultDictionary['pageRank'] = pageRank
                 self.resultDictionary['content'] = content
+                self.resultDictionary['headers'] = headers
 
         except URLError:
 

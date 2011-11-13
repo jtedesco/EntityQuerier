@@ -1,4 +1,5 @@
 from BeautifulSoup import BeautifulSoup
+from pprint import pprint
 import socket
 import urllib2
 import sys
@@ -105,10 +106,43 @@ def parseMetaDataFromContent(content):
     return title, keywords, description
 
 
+def parseYahooKeywordsFromContent(content):
+    """
+      Retrieves the list of keywords (or keyword phrases) for this page from the Yahoo YQL interface.
+      
+    """
+
+
+def parseHeaderInformationFromContent(content):
+    """
+      Parses text from all header tags, and returns
+
+        @param  content The HTML content to parse
+        @return The list of header text
+    """
+
+    # Parse this HTML content using 'beautiful soup'
+    soup = BeautifulSoup(content)
+
+    # Find all header blocks
+    headersTags = []
+    headersTags.extend(soup.findAll('h1'))
+    headersTags.extend(soup.findAll('h2'))
+    headersTags.extend(soup.findAll('h3'))
+    headersTags.extend(soup.findAll('h4'))
+    headersTags.extend(soup.findAll('h5'))
+
+    # Get the text
+    headerText = []
+    for headerTag in headersTags:
+        headerText.append(headerTag.text.encode('ascii', 'ignore').strip('\n').lower())
+
+    return headerText
+
+
 def isHTML(content):
     """
       Check whether or not some content is HTML
     """
 
-    # TODO: Speed up HTML detection
     return '<html' in content or 'html>' in content

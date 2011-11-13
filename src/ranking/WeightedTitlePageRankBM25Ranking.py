@@ -80,6 +80,7 @@ class WeightedTitlePageRankBM25Ranking(BM25Ranking):
                 'title': searchResult['title'],
                 'description': searchResult['description'],
                 'keywords': searchResult['keywords'],
+                'headers': searchResult['headers'],
                 'pageRank': searchResult['pagerank']
             }
             results.append(result)

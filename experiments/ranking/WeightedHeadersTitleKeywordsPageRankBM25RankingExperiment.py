@@ -1,7 +1,8 @@
 from json import load
 import os
 from experiments.RankingExperiment import RankingExperiment
-from src.ranking.PL2Ranking import PL2Ranking
+from src.ranking.WeightedHeadersPageRankBM25Ranking import WeightedHeadersPageRankBM25Ranking
+from src.ranking.WeightedHeadersTitleKeywordsPageRankBM25Ranking import WeightedHeadersTitleKeywordsPageRankBM25Ranking
 from util.RankingExperimentUtil import outputRankingResults
 
 __author__ = 'jon'
@@ -15,12 +16,12 @@ if __name__ == '__main__':
     entity = load(open(projectRoot + '/entities/Kevin Chen-Chuan Chang.json'))
 
     # Rank the results
-    retrievalResults = '/experiments/retrieval/results/KevinChang-EntityAttributeNamesAndValuesFollowingLinks'
-    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, PL2Ranking, False, True)
+    retrievalResults = '/experiments/retrieval/results/KevinChang-EntityAttributeNamesAndValues'
+    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, WeightedHeadersTitleKeywordsPageRankBM25Ranking, False, True)
     results = rankingExperiment.rank()
 
     # Output the ranking results
     entityId = 'Kevin Chen-Chuan Chang'
-    outputTitle = "Whoosh PL2 Ranking Results Summary (for top %d results):\n"
-    outputFile = 'KevinChang-PL2Ranking'
+    outputTitle = "Whoosh Frequency Ranking Results Summary (for top %d results):\n"
+    outputFile = 'KevinChang-WeightedHeadersTitleKeywordsPageRankBM25Ranking'
     outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)

@@ -4,10 +4,9 @@ import whoosh
 from whoosh.analysis import StemmingAnalyzer, CharsetFilter
 from whoosh.fields import Schema, TEXT, ID, NUMERIC, KEYWORD
 from whoosh.index import create_in
-from whoosh.qparser.default import MultifieldParser, QueryParser
+from whoosh.qparser.default import QueryParser
 from whoosh.qparser.plugins import PlusMinusPlugin
-from whoosh.qparser.syntax import AndGroup, Group, OrGroup
-from whoosh.query import Phrase, Or
+from whoosh.qparser.syntax import OrGroup
 from whoosh.scoring import Frequency
 from whoosh.support.charset import accent_map
 from src.ranking.TermVectorRanking import TermVectorRanking
@@ -57,7 +56,7 @@ class TermFrequencyRanking(TermVectorRanking):
         analyzer = StemmingAnalyzer() | CharsetFilter(accent_map)
         self.indexSchema = Schema(content=TEXT(analyzer=analyzer, stored=True), title=TEXT(analyzer=analyzer, stored=True),
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
-                                  keywords=KEYWORD(stored=True))
+                                  keywords=TEXT(stored=True), headers=TEXT(stored=True))
         indexDirectory = self.getIndexLocation()
 
         # Remove the index if it exists
@@ -92,22 +91,32 @@ class TermFrequencyRanking(TermVectorRanking):
                     unicodeUrl = unicode(searchResult['url'], errors='ignore')
                 except TypeError:
                     unicodeUrl = searchResult['url']
-                unicodeKeywords = unicode(' '.join(searchResult['keywords']), errors='ignore')
+                try:
+                    unicodeKeywords = unicode(' '.join(searchResult['keywords']), errors='ignore')
+                except TypeError:
+                    unicodeKeywords = ', '.join(searchResult['keywords'])
+                try:
+                    unicodeHeaders = unicode(' '.join(searchResult['headers']), errors='ignore')
+                except TypeError:
+                    unicodeHeaders = ', '.join(searchResult['headers'])
+
                 pageRank = searchResult['pageRank']
 
                 if len(unicodeContent) == 0:
-                    unicodeContent = u'content'
+                    unicodeContent = u'?'
                 if len(unicodeTitle) == 0:
-                    unicodeTitle = u'title'
+                    unicodeTitle = u'?'
                 if len(unicodeDescription) == 0:
-                    unicodeDescription = u'description'
+                    unicodeDescription = u'?'
                 if len(unicodeUrl) == 0:
-                    unicodeUrl = u'url'
+                    unicodeUrl = u'?'
                 if len(unicodeKeywords) == 0:
-                    unicodeKeywords = u'keywords'
+                    unicodeKeywords = u'?'
+                if len(unicodeHeaders) == 0:
+                    unicodeHeaders = u'?'
 
                 indexWriter.add_document(content=unicodeContent, title=unicodeTitle, description=unicodeDescription,
-                                     pagerank=pageRank, url=unicodeUrl, keywords=unicodeKeywords)
+                                     pagerank=pageRank, url=unicodeUrl, keywords=unicodeKeywords, headers=unicodeHeaders)
             except KeyError:
                 pass
 
@@ -150,6 +159,7 @@ class TermFrequencyRanking(TermVectorRanking):
                 'title': searchResult['title'],
                 'description': searchResult['description'],
                 'keywords': searchResult['keywords'],
+                'headers': searchResult['headers'],
                 'pageRank': searchResult['pagerank']
             }
             results.append(result)

@@ -1,7 +1,7 @@
 from json import load
 import os
 from experiments.RankingExperiment import RankingExperiment
-from src.ranking.DMOZSmoothedPageRankBM25Ranking import DMOZSmoothedPageRankBM25Ranking
+from src.ranking.WeightedHeadersPageRankBM25Ranking import WeightedHeadersPageRankBM25Ranking
 from util.RankingExperimentUtil import outputRankingResults
 
 __author__ = 'jon'
@@ -16,11 +16,11 @@ if __name__ == '__main__':
 
     # Rank the results
     retrievalResults = '/experiments/retrieval/results/KevinChang-EntityAttributeNamesAndValues'
-    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, DMOZSmoothedPageRankBM25Ranking, False, True)
+    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, WeightedHeadersPageRankBM25Ranking, False, True)
     results = rankingExperiment.rank()
 
     # Output the ranking results
     entityId = 'Kevin Chen-Chuan Chang'
-    outputTitle = "Whoosh PageRank + BM25 + DMOZ Ranking Results Summary (for top %d results):\n"
-    outputFile = 'KevinChang-DMOZSmoothedPageRankBM25Ranking'
+    outputTitle = "Whoosh Frequency Ranking Results Summary (for top %d results):\n"
+    outputFile = 'KevinChang-WeightedHeadersPageRankBM25Ranking'
     outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)

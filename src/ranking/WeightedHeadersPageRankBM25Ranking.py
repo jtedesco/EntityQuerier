@@ -7,13 +7,13 @@ from src.ranking.BM25Ranking import BM25Ranking
 
 __author__ = 'jon'
 
-class WeightedTitleKeywordsDescriptionPageRankBM25Ranking(BM25Ranking):
+class WeightedHeadersPageRankBM25Ranking(BM25Ranking):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
 
-    def __init__(self, searchResults, keywords, titleWeight=5.0, keywordsWeight=3.0):
+    def __init__(self, searchResults, keywords, headersWeight=2.0):
         """
           Creates a ranking object with the necessary parameters
 
@@ -33,11 +33,11 @@ class WeightedTitleKeywordsDescriptionPageRankBM25Ranking(BM25Ranking):
             @param  titleWeight     The boost factor to be applied to the title field for ranking (no boost is 1.0)
         """
         BM25Ranking.__init__(self, searchResults, keywords)
-        self.titleWeight = titleWeight
-        self.keywordsDescriptionWeight = keywordsWeight
+        self.headersWeight = headersWeight
 
+        
     def getIndexLocation(self):
-        indexLocation = ".index-bm25-pr-weightedtitlekeywordsdescription"
+        indexLocation = ".index-bm25-pr-weightedheaders"
         return indexLocation
 
 
@@ -51,12 +51,10 @@ class WeightedTitleKeywordsDescriptionPageRankBM25Ranking(BM25Ranking):
 
         # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
         termBoosts = {
-            'title' : self.titleWeight,
-            'keywords' : self.keywordsDescriptionWeight,
-            'description' : self.keywordsDescriptionWeight,
+            'headers' : self.headersWeight,
             'content' : 1.0
         }
-        keywordsQueryParser = MultifieldParser(['title', 'content', 'keywords', 'description'], self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
+        keywordsQueryParser = MultifieldParser(['content', 'headers'], self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
         keywordsQueryParser.add_plugin(PlusMinusPlugin)
         query = "+\"" + self.entityId + "\" "
         for keyword in self.keywords:
@@ -82,6 +80,7 @@ class WeightedTitleKeywordsDescriptionPageRankBM25Ranking(BM25Ranking):
                 'title': searchResult['title'],
                 'description': searchResult['description'],
                 'keywords': searchResult['keywords'],
+                'headers': searchResult['headers'],
                 'pageRank': searchResult['pagerank']
             }
             results.append(result)

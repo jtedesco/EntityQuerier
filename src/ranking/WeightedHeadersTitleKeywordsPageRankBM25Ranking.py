@@ -7,13 +7,13 @@ from src.ranking.BM25Ranking import BM25Ranking
 
 __author__ = 'jon'
 
-class WeightedTitleKeywordsDescriptionPageRankBM25Ranking(BM25Ranking):
+class WeightedHeadersTitleKeywordsPageRankBM25Ranking(BM25Ranking):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
 
-    def __init__(self, searchResults, keywords, titleWeight=5.0, keywordsWeight=3.0):
+    def __init__(self, searchResults, keywords, titleWeight=5.0, keywordsDescriptionWeight=3.0, headersWeight=2.0):
         """
           Creates a ranking object with the necessary parameters
 
@@ -34,10 +34,12 @@ class WeightedTitleKeywordsDescriptionPageRankBM25Ranking(BM25Ranking):
         """
         BM25Ranking.__init__(self, searchResults, keywords)
         self.titleWeight = titleWeight
-        self.keywordsDescriptionWeight = keywordsWeight
+        self.keywordsDescriptionWeight = keywordsDescriptionWeight
+        self.headersWeight = headersWeight
 
+        
     def getIndexLocation(self):
-        indexLocation = ".index-bm25-pr-weightedtitlekeywordsdescription"
+        indexLocation = ".index-bm25-pr-weightedheaderstitlekeywordsdescription"
         return indexLocation
 
 
@@ -54,9 +56,10 @@ class WeightedTitleKeywordsDescriptionPageRankBM25Ranking(BM25Ranking):
             'title' : self.titleWeight,
             'keywords' : self.keywordsDescriptionWeight,
             'description' : self.keywordsDescriptionWeight,
+            'headers' : self.headersWeight,
             'content' : 1.0
         }
-        keywordsQueryParser = MultifieldParser(['title', 'content', 'keywords', 'description'], self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
+        keywordsQueryParser = MultifieldParser(['title', 'content', 'keywords', 'description', 'headers'], self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
         keywordsQueryParser.add_plugin(PlusMinusPlugin)
         query = "+\"" + self.entityId + "\" "
         for keyword in self.keywords:
@@ -82,6 +85,7 @@ class WeightedTitleKeywordsDescriptionPageRankBM25Ranking(BM25Ranking):
                 'title': searchResult['title'],
                 'description': searchResult['description'],
                 'keywords': searchResult['keywords'],
+                'headers': searchResult['headers'],
                 'pageRank': searchResult['pagerank']
             }
             results.append(result)
