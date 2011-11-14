@@ -2,7 +2,6 @@ import threading
 from urllib2 import URLError
 import sys
 from src.search.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent, parseHeaderInformationFromContent
-from util.PRCache import PRCache
 
 __author__ = 'jon'
 
@@ -17,7 +16,6 @@ class ResultParserThread(threading.Thread):
         self.verbose = verbose
         self.resultDictionary = resultDictionary
         self.url = resultDictionary['url']
-        self.prCache = PRCache()
         self.extensions = extensions
 
         
@@ -41,13 +39,11 @@ class ResultParserThread(threading.Thread):
                 content = content.lower()
                 title, keywords, description = parseMetaDataFromContent(content)
                 headers = parseHeaderInformationFromContent(content)
-                pageRank = self.prCache.getPageRank(self.url)
 
                 # Add this result data
                 self.resultDictionary['title'] = title
                 self.resultDictionary['keywords'] = keywords
                 self.resultDictionary['description'] = description
-                self.resultDictionary['pageRank'] = pageRank
                 self.resultDictionary['content'] = content
                 self.resultDictionary['headers'] = headers
 

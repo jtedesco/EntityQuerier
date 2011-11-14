@@ -2,9 +2,9 @@ import hashlib
 import os
 from pprint import pformat
 import threading
-from urllib2 import HTTPError, URLError
+from urllib2 import URLError
 import sys
-from src.search.SearchResultParsing import isHTML, getPageContent, loadFromUrl, parseMetaDataFromContent
+from src.search.SearchResultParsing import isHTML, loadFromUrl, parseMetaDataFromContent
 from util.PRCache import PRCache
 
 __author__ = 'jon'

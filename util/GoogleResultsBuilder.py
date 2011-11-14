@@ -1,4 +1,4 @@
-from src.search.google.GoogleResultParserThread import GoogleResultParserThread
+from src.search.ResultParserThread import ResultParserThread
 
 __author__ = 'jon'
 
@@ -21,7 +21,7 @@ def buildGoogleResultsFromURLs(urls, fetchContent=True, verbose=False):
         url = resultData['url']
         dotLocation = url.rfind('.')
         if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'} and fetchContent:
-            parserThread = GoogleResultParserThread(resultData, verbose)
+            parserThread = ResultParserThread(resultData, verbose)
             threads.append(parserThread)
 
     # Launch all threads

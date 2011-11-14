@@ -2,7 +2,6 @@ from BeautifulSoup import BeautifulSoup
 from pprint import pprint
 import socket
 import urllib2
-import sys
 from util.Cache import Cache
 
 __author__ = 'jon'
@@ -23,15 +22,12 @@ def loadFromUrl(url):
 
     # Open the URL and read the content
     opener = urllib2.build_opener()
-    try:
-        content = opener.open(request).read()
-    except:
-        content = None
+    content = opener.open(request).read()
 
     return content
 
 
-def getPageContent(url, cache=True):
+def getPageContent(url):
     """
       Returns the text content of a single URL. (emulates Firefox 7 on Linux for the user-agent)
 
