@@ -21,7 +21,7 @@ class PRCache(Cache):
           Initialize this PR cache object
         """
 
-        super(Cache, self)
+        Cache.__init__(self)
 
         # Find where we expect this data to be cached
         self.cachePath = str(os.getcwd())

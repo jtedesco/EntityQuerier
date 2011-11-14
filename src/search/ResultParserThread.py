@@ -1,28 +1,24 @@
-from BeautifulSoup import BeautifulSoup
-import os
-import subprocess
 import threading
-from urllib2 import HTTPError, URLError
+from urllib2 import URLError
 import sys
 from src.search.SearchResultParsing import parseMetaDataFromContent, isHTML, getPageContent, parseHeaderInformationFromContent
 from util.PRCache import PRCache
 
 __author__ = 'jon'
 
-class GoogleResultParserThread(threading.Thread):
+class ResultParserThread(threading.Thread):
 
     
-    def __init__(self, resultDictionary, verbose=False):
+    def __init__(self, resultDictionary, verbose=False, extensions=[]):
         """
           Initialize this parser, given the dictionary into which the page's data is going to be placed
         """
         threading.Thread.__init__(self)
         self.verbose = verbose
-
         self.resultDictionary = resultDictionary
         self.url = resultDictionary['url']
-
         self.prCache = PRCache()
+        self.extensions = extensions
 
         
     def run(self):
@@ -41,7 +37,7 @@ class GoogleResultParserThread(threading.Thread):
             if content is not None and isHTML(content):
 
 
-                # Extract data about this result
+                # Extract basic data about this result
                 content = content.lower()
                 title, keywords, description = parseMetaDataFromContent(content)
                 headers = parseHeaderInformationFromContent(content)
@@ -54,6 +50,11 @@ class GoogleResultParserThread(threading.Thread):
                 self.resultDictionary['pageRank'] = pageRank
                 self.resultDictionary['content'] = content
                 self.resultDictionary['headers'] = headers
+
+                # Run the extensions
+                for extension in self.extensions:
+                    extension.run(self.resultDictionary)
+
 
         except URLError:
 

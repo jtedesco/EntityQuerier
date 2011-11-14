@@ -1,8 +1,8 @@
 import sys
+from src.search.ResultParserThread import ResultParserThread
 from src.search.Search import Search
 from BeautifulSoup import BeautifulSoup
 from src.search.SearchResultParsing import getPageContent
-from src.search.google.GoogleResultParserThread import GoogleResultParserThread
 
 __author__ = 'jon'
 
@@ -111,7 +111,7 @@ class GoogleSearch(Search):
                 url = resultData['url']
                 dotLocation = url.rfind('.')
                 if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'} and fetchContent:
-                    parserThread = GoogleResultParserThread(resultData, self.verbose)
+                    parserThread = ResultParserThread(resultData, self.verbose)
                     threads.append(parserThread)
 
             # Launch all threads
@@ -128,7 +128,7 @@ class GoogleSearch(Search):
                 if thread.isAlive():
                     try:
                         thread._Thread__stop()
-                    except:
+                    except Exception:
                         print(str(thread.getName()) + ' could not be terminated')
 
 
