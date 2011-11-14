@@ -1,6 +1,8 @@
-from json import load
+from json import load, dumps
 import os
-from pprint import pprint, pformat
+from pprint import pformat
+from src.evaluation.RecallAndPrecisionQueryEvaluator import RecallAndPrecisionQueryEvaluator
+from src.search.extension.PageRankExtension import PageRankExtension
 
 __author__ = 'jon'
 
@@ -9,13 +11,23 @@ class RetrievalExperiment(object):
       A generic experiment to be run
     """
 
-    def __init__(self, entityIds, searchInterface):
+    def __init__(self, entityIds, searchInterface, queryBuilder, numberOfResults=50):
         """
           Put the search interface and entity ids on this object, and load entity data
         """
 
+        # The list of ids (corresponding JSON files are expected to be found in 'standard' and 'entities' folders)
         self.entityIds = entityIds
+
+        # The search framework to use
         self.searchInterface = searchInterface
+        self.numberOfResults = numberOfResults
+
+        # The query evaluation metric to use
+        self.queryEvaluator = RecallAndPrecisionQueryEvaluator()
+
+        # The query builder to use
+        self.queryBuilder = queryBuilder
 
         # Build the entities and queries for these entities
         self.buildEntities()
@@ -151,8 +163,6 @@ class RetrievalExperiment(object):
                         except UnicodeEncodeError:
                             pass
 
-
-
                 # Score this query
                 queryScore = self.queryEvaluator.evaluate(queryURLs, self.idealURLs[entityId])
 
@@ -186,7 +196,7 @@ class RetrievalExperiment(object):
 
             # Allocate space in the new results data structure
             self.results[entityId]['overall'] = {
-                'documentsRetrieved' : totalURLs,
+                'documentsRetrieved' : list(totalURLs),
                 'relevantDocumentsRetrieved' : [],
                 'nonRelevantDocumentsRetrieved' : [],
                 'relevantDocumentsNotRetrieved' : relevantDocumentsNotRetrieved,
@@ -207,14 +217,25 @@ class RetrievalExperiment(object):
                     
     def printResults(self, outputPath = "output"):
 
+        # Summarize the results\
+        summaryOutput = "Results Summary\n"
+        summaryOutput += "===============\n\n"
+        for entityId in self.entityIds:
+            summaryOutput += entityId + ":\n"
+            summaryOutput += len(entityId) * '~' + '\n'
+            for metric in self.results[entityId]['overall']['score']:
+                summaryOutput += metric.title() + ": %1.5f\n" % self.results[entityId]['overall']['score'][metric]
+            summaryOutput += '\n'
+
         # Format the results
-        output = pformat(self.results, 4)
+        resultsOutput = dumps(self.results, indent=4)
 
         # Write it out
         if os.path.exists(outputPath):
             os.remove(outputPath)
         outputFile = open(outputPath, 'w')
-        outputFile.write(output)
+        outputFile.write(summaryOutput)
+        outputFile.write(resultsOutput)
         outputFile.close()
 
             

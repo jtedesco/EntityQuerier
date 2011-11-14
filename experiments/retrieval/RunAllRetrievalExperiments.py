@@ -1,36 +1,36 @@
 from experiments.retrieval.EntityAttributeNames import EntityAttributeNames
 from experiments.retrieval.EntityAttributeNamesAndValues import EntityAttributeNamesAndValues
-from experiments.retrieval.EntityAttributeNamesAndValuesFollowingLinks import EntityAttributeNamesAndValuesFollowingLinks
 from experiments.retrieval.EntityAttributeValues import EntityAttributeValues
-from experiments.retrieval.EntityAttributeValuesFollowingLinks import EntityAttributeValuesFollowingLinks
+from src.queries.EntityAttributeNamesAndValuesQueryBuilder import EntityAttributeNamesAndValuesQueryBuilder
+from src.queries.EntityAttributeNamesQueryBuilder import EntityAttributeNamesQueryBuilder
+from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
+from src.search.extension.PageRankExtension import PageRankExtension
+from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
+from src.search.google.GoogleSearch import GoogleSearch
 
-_author__ = 'jon'
-
+__author__ = 'jon'
 
 if __name__ == '__main__':
 
+    numberOfSearchResults = 50
+    entityIds = ['Kevin Chen-Chuan Chang']
+    extensions = [
+        PageRankExtension(),
+        YQLKeywordExtension(),
+    ]
+    searchInterface = GoogleSearch(numberOfSearchResults, True, extensions)
+
     # Attribute names only
-    experiment = EntityAttributeNames()
+    experiment = EntityAttributeNames(entityIds, searchInterface, EntityAttributeNamesQueryBuilder(), numberOfSearchResults)
     experiment.run()
     experiment.printResults("results/KevinChang-EntityAttributeNames")
 
     # Attribute values only
-    experiment = EntityAttributeValues()
+    experiment = EntityAttributeValues(entityIds, searchInterface, EntityAttributeValuesQueryBuilder(), numberOfSearchResults)
     experiment.run()
     experiment.printResults("results/KevinChang-EntityAttributeValues")
 
     # Attribute names & values
-    experiment = EntityAttributeNamesAndValues()
+    experiment = EntityAttributeNamesAndValues(entityIds, searchInterface, EntityAttributeNamesAndValuesQueryBuilder(), numberOfSearchResults)
     experiment.run()
     experiment.printResults("results/KevinChang-EntityAttributeNamesAndValues")
-
-    # Attribute values  & following links
-    experiment = EntityAttributeValuesFollowingLinks()
-    experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeValuesFollowingLinks")
-
-    # Attribute names & values + link crawling
-    experiment = EntityAttributeNamesAndValuesFollowingLinks()
-    experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeNamesAndValuesFollowingLinks")
-    

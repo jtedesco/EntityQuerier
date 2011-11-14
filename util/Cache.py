@@ -3,6 +3,7 @@ import os
 import hashlib
 from pprint import pprint
 import threading
+import sys
 
 __author__ = 'jon'
 
@@ -74,21 +75,24 @@ class Cache(object):
           Register that there was an error fetching some URL
         """
 
-        # Lock & read the list of erroneous urls
-        errorLock.acquire()
-        errorUrls = list(load(open(self.cachePath + errorsFilename)))
+        try:
+            # Lock & read the list of erroneous urls
+            errorLock.acquire()
+            errorUrls = list(load(open(self.cachePath + errorsFilename)))
 
-        # If this url is not already in the list, add it to the error list and dump it out to file
-        if url not in errorUrls:
-            errorUrls.append(url)
-            dump(errorUrls, open(self.cachePath + errorsFilename, 'w'), indent=4)
+            # If this url is not already in the list, add it to the error list and dump it out to file
+            if url not in errorUrls:
+                errorUrls.append(url)
+                dump(errorUrls, open(self.cachePath + errorsFilename, 'w'), indent=4)
 
-        # Allow other threads to register this URL
-        errorLock.release()
+            # Allow other threads to register this URL
+            errorLock.release()
 
-        # Write a dummy file in the cache for this URL
-        filename = self.__encodeCacheFilename(url)
-        open(filename, 'w').write("ERROR")
+            # Write a dummy file in the cache for this URL
+            filename = self.__encodeCacheFilename(url)
+            open(filename, 'w').write("ERROR")
+        except Exception:
+            print "Error registering URL error: " + str(sys.exc_info()[1])
 
 
     def __encodeCacheFilename(self, url):

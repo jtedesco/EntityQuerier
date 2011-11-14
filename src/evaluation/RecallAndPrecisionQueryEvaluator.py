@@ -4,7 +4,7 @@ from src.evaluation.RecallQueryEvaluator import RecallQueryEvaluator
 
 __author__ = 'jon'
 
-class AverageRecallAndPrecisionQueryEvaluator(QueryEvaluator):
+class RecallAndPrecisionQueryEvaluator(QueryEvaluator):
     """
       Returns the precision of a query as its score.
     """
@@ -20,15 +20,13 @@ class AverageRecallAndPrecisionQueryEvaluator(QueryEvaluator):
           Score the effectiveness of this query, given the results retrieved and the ideal results
 
             @param  results         The list of URLs retrieved
-            @param  idealResults    The ideal list of URLs
+            @param  idealResults    The list of ideal URLs
         """
 
         # Get the recall & precision
         precision = self.precisionEvaluator.evaluate(results, idealResults)
         recall = self.recallEvaluator.evaluate(results, idealResults)
-        average = (precision['precision'] + recall['recall']) / 2.0
         return {
             'precision' : precision['precision'],
             'recall' : recall['recall'],
-            'average' : average
         }

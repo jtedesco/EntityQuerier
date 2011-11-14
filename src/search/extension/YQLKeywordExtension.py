@@ -1,15 +1,18 @@
 from BeautifulSoup import BeautifulSoup
 from json import loads
 import os
-from pprint import pprint
 import re
 from src.search.SearchResultParsing import loadFromUrl
+from src.search.extension.Extension import Extension
 from util.YQLCache import YQLCache
 
 __author__ = 'jon'
 
-class YQLKeywordWrapper(object):
-    
+class YQLKeywordExtension(Extension):
+    """
+      An extension that allows keyword detection through Yahoo's YQL web interface.
+    """
+
     def __init__(self):
 
         # The template information for querying the Yahoo keyword service
@@ -47,7 +50,7 @@ class YQLKeywordWrapper(object):
                 self.cache.write(url, keywordJson)
             keywordData = loads(keywordJson)
             fetchedKeywords = keywordData['query']['results'].values()
-            
+
             keywords = keywords.union(set(fetchedKeywords[0]))
 
         return list(keywords)
@@ -106,9 +109,13 @@ class YQLKeywordWrapper(object):
                     cleanWords.append(word)
         cleanContent = ' '.join(cleanWords)
 
-
         return cleanContent
 
 
     def __group(self, content, groupSize):
         return [content[i : i + groupSize] for i in xrange(0, len(content), groupSize)]
+
+
+    def run(self, resultDictionary):
+        resultDictionary['yqlKeywords'] = self.getKeywordsFromContent(resultDictionary['content'])
+

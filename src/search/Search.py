@@ -1,3 +1,5 @@
+from util.Cache import Cache
+
 __author__ = 'jon'
 
 
@@ -7,12 +9,13 @@ class Search(object):
         engine, but rather ones that can be used for any.
     """
 
-    def __init__(self, numberOfResultsToRetrieve=10, verbose=False):
+    def __init__(self, numberOfResultsToRetrieve, verbose=False, extensions=[]):
         """
           Initializes this search object,
         """
         self.verbose = verbose
         self.numberOfResultsToRetrieve = numberOfResultsToRetrieve
+        self.extensions = extensions
 
         
     def query(self, query, fetchContent=True):

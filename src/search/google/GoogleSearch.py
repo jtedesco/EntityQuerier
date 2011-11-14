@@ -77,6 +77,7 @@ class GoogleSearch(Search):
         """
 
         results = []
+        resultsToRetrieve = []
 
         # Get the result entries (the list of results)
         parsedHTML = BeautifulSoup(resultsContent)
@@ -91,10 +92,11 @@ class GoogleSearch(Search):
             preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
 
             # Add it to our results
-            results.append({
-                'url' : url,
-                'preview' : preview
-            })
+            result = {
+                'url': url,
+                'preview': preview
+            }
+            results.append(result)
             
         # Parse the next page's URL from the current results page, if it can be found
         try:
@@ -103,15 +105,13 @@ class GoogleSearch(Search):
             nextURL = None
 
         try:
-            nextURL = None
-
             # Create threads to process the pages for this set of results
             threads = []
             for resultData in results:
                 url = resultData['url']
                 dotLocation = url.rfind('.')
                 if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'} and fetchContent:
-                    parserThread = ResultParserThread(resultData, self.verbose)
+                    parserThread = ResultParserThread(resultData, self.verbose, self.extensions)
                     threads.append(parserThread)
 
             # Launch all threads
