@@ -23,14 +23,14 @@ if __name__ == '__main__':
     # Attribute names only
     experiment = EntityAttributeNames(entityIds, searchInterface, EntityAttributeNamesQueryBuilder(), numberOfSearchResults)
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeNames")
+    experiment.printResults("results/KevinChenChuanChang-EntityAttributeNames")
 
     # Attribute values only
     experiment = EntityAttributeValues(entityIds, searchInterface, EntityAttributeValuesQueryBuilder(), numberOfSearchResults)
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeValues")
+    experiment.printResults("results/KevinChenChuanChang-EntityAttributeValues")
 
     # Attribute names & values
     experiment = EntityAttributeNamesAndValues(entityIds, searchInterface, EntityAttributeNamesAndValuesQueryBuilder(), numberOfSearchResults)
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeNamesAndValues")
+    experiment.printResults("results/KevinChenChuanChang-EntityAttributeNamesAndValues")

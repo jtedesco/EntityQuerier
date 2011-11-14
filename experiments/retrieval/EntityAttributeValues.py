@@ -16,4 +16,4 @@ class EntityAttributeValues(RetrievalExperiment):
 if __name__ == '__main__':
     experiment = EntityAttributeValues(['Kevin Chen-Chuan Chang'], GoogleSearch(50, True, [PageRankExtension(), YQLKeywordExtension()]), EntityAttributeValuesQueryBuilder())
     experiment.run()
-    experiment.printResults("results/KevinChang-EntityAttributeValues")
+    experiment.printResults("results/KevinChenChuanChang-EntityAttributeValues")
