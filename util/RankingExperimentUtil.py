@@ -21,46 +21,62 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
     recallAt20 = 0
     recallAt50 = 0
     recallAt100 = 0
+    averagePrecisionAt10 = 0
+    averagePrecisionAt20 = 0
+    averagePrecisionAt50 = 0
+    averagePrecisionAt100 = 0
 
     if len(results) > 0 and type(results[0]) == type({}):
         includesScores = False
     else:
         includesScores = True
 
+    averagePrecisionRunningTotal = 0.0
     for result in results:
         count += 1
         if count > cutoff:
             break
 
         # Record if this was a relevant result
+        wasRelevant = False
         if includesScores:
             if result[1]['url'] in relevantUrls:
+                wasRelevant = True
                 relevantUrlsFound.append(result[1]['url'])
         else:
             if result['url'] in relevantUrls:
+                wasRelevant = True
                 relevantUrlsFound.append(result['url'])
 
+
+        # Update running total for average precision
+        if wasRelevant:
+            averagePrecisionRunningTotal += float(len(relevantUrlsFound)) / count
 
         # Gather precision & recall data
         if count == 10:
             precisionAt10 = float(len(relevantUrlsFound)) / 10
             recallAt10 = float(len(relevantUrlsFound)) / len(relevantUrls)
+            averagePrecisionAt10 = averagePrecisionRunningTotal / len(relevantUrlsFound)
         elif count == 20:
             precisionAt20 = float(len(relevantUrlsFound)) / 20
             recallAt20 = float(len(relevantUrlsFound)) / len(relevantUrls)
+            averagePrecisionAt20 = averagePrecisionRunningTotal / len(relevantUrlsFound)
         elif count == 50:
             precisionAt50 = float(len(relevantUrlsFound)) / 50
             recallAt50 = float(len(relevantUrlsFound)) / len(relevantUrls)
+            averagePrecisionAt50 = averagePrecisionRunningTotal / len(relevantUrlsFound)
         elif count == 100:
             precisionAt100 = float(len(relevantUrlsFound)) / 100
             recallAt100 = float(len(relevantUrlsFound)) / len(relevantUrls)
+            averagePrecisionAt100 = averagePrecisionRunningTotal / len(relevantUrlsFound)
 
     # Build the output
     output = outputTitle % cutoff
-    output += "Precision @ 10:  %1.5f | Recall @ 10:  %1.5f\n" % (precisionAt10, recallAt10)
-    output += "Precision @ 20:  %1.5f | Recall @ 20:  %1.5f\n" % (precisionAt20, recallAt20)
-    output += "Precision @ 50:  %1.5f | Recall @ 50:  %1.5f\n" % (precisionAt50, recallAt50)
-    output += "Precision @ 100: %1.5f | Recall @ 100: %1.5f\n\n" % (precisionAt100, recallAt100)
+    output += "Precision @ 10:  %1.5f | Recall @ 10:  %1.5f | Average Precision @ 10:  %1.5f\n" % (precisionAt10, recallAt10, averagePrecisionAt10)
+    output += "Precision @ 20:  %1.5f | Recall @ 20:  %1.5f | Average Precision @ 20:  %1.5f\n" % (precisionAt20, recallAt20, averagePrecisionAt20)
+    output += "Precision @ 50:  %1.5f | Recall @ 50:  %1.5f | Average Precision @ 50:  %1.5f\n" % (precisionAt50, recallAt50, averagePrecisionAt50)
+    output += "Precision @ 100: %1.5f | Recall @ 100: %1.5f | Average Precision @ 100:  %1.5f\n\n" % (precisionAt100, recallAt100, averagePrecisionAt100)
     output += "Score         Url\n"
     output += "=====         ===\n"
     count = 0

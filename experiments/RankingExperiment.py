@@ -17,28 +17,18 @@ class RankingExperiment(object):
         # Get the contents of the file
         resultsData = open(resultsFilePath).read()
 
-        # Parse it out
-        resultsData = resultsData.replace("\"", "\\\"")
-        resultsData = resultsData.replace("'", "\"")
-        resultsData = resultsData.replace("\n", " ")
-
-        # Remove extra whitespace
-        removeExtraWhitespaceRegex = re.compile(r'\s+')
-        resultsData = re.sub(removeExtraWhitespaceRegex, ' ', resultsData)
-
-        # Remove 'set' keywords
-        resultsData = resultsData.replace("set([", "[")
-        resultsData = resultsData.replace("])", "]")
-
-        # Remove 'u' for unicode data
-        resultsData = resultsData.replace(" u'", " '")
-        resultsData = resultsData.replace(" u\"", " \"")
+        # Strip off the header
+        dataToBeJoined = []
+        recordData = False
+        for dataLine in resultsData.split('\n'):
+            if not recordData and len(dataLine) > 0 and dataLine[0] == '{':
+                recordData = True
+            if recordData:
+                dataToBeJoined.append(dataLine)
+        resultsData = '\n'.join(dataToBeJoined)
 
         # Load the data dumped from the first stage
-        try:
-            self.resultsDump = loads(resultsData)
-        except ValueError:
-            self.resultsDump = eval(open(resultsFilePath).read())
+        self.resultsDump = loads(resultsData)
 
         # Build the data structure that will map entity id -> urls
         self.results = []
@@ -47,7 +37,7 @@ class RankingExperiment(object):
             for query in self.resultsDump[entityId]:
                 for resultType in self.resultsDump[entityId][query]:
                     for url in self.resultsDump[entityId][query][resultType]:
-                        if url not in ['precision', 'recall', 'average']:
+                        if url not in ['precision', 'recall', 'averagePrecision']:
                             entityUrls.add(url)
 
             # Assume we're only doing this for one entity

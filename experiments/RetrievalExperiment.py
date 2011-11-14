@@ -1,8 +1,6 @@
 from json import load, dumps
 import os
-from pprint import pformat
-from src.evaluation.RecallAndPrecisionQueryEvaluator import RecallAndPrecisionQueryEvaluator
-from src.search.extension.PageRankExtension import PageRankExtension
+from src.evaluation.CompositeQueryEvaluator import CompositeQueryEvaluator
 
 __author__ = 'jon'
 
@@ -24,7 +22,7 @@ class RetrievalExperiment(object):
         self.numberOfResults = numberOfResults
 
         # The query evaluation metric to use
-        self.queryEvaluator = RecallAndPrecisionQueryEvaluator()
+        self.queryEvaluator = CompositeQueryEvaluator()
 
         # The query builder to use
         self.queryBuilder = queryBuilder
@@ -140,6 +138,7 @@ class RetrievalExperiment(object):
 
             # The URLs retrieved using all the queries for this entity
             totalURLs = set([])
+            otherPrecisions = []
             for query in self.queries[entityId]:
 
                 queryURLs = []
@@ -177,6 +176,10 @@ class RetrievalExperiment(object):
                     'relevantDocumentsNotRetrieved' : relevantDocumentsNotRetrieved,
                     'score' : queryScore
                 }
+                try:
+                    otherPrecisions.append(queryScore['precision'])
+                except Exception:
+                    pass
 
                 # Score the query & gather results
                 for url in queryURLs:
@@ -189,7 +192,10 @@ class RetrievalExperiment(object):
 
 
             # Score the set of queries
-            queryScore = self.queryEvaluator.evaluate(totalURLs, self.idealURLs[entityId])
+            try:
+                queryScore = self.queryEvaluator.evaluate(totalURLs, self.idealURLs[entityId], otherPrecisions)
+            except Exception:
+                queryScore = self.queryEvaluator.evaluate(totalURLs, self.idealURLs[entityId])
 
             # Get list of relevant documents not retrieved
             relevantDocumentsNotRetrieved = list(set(self.idealURLs[entityId]).difference(set(totalURLs)))
@@ -221,10 +227,11 @@ class RetrievalExperiment(object):
         summaryOutput = "Results Summary\n"
         summaryOutput += "===============\n\n"
         for entityId in self.entityIds:
-            summaryOutput += entityId + ":\n"
-            summaryOutput += len(entityId) * '~' + '\n'
+            summaryOutput += '\t' + entityId + ":\n"
+            summaryOutput += '\t' + len(entityId) * '~' + '\n'
             for metric in self.results[entityId]['overall']['score']:
-                summaryOutput += metric.title() + ": %1.5f\n" % self.results[entityId]['overall']['score'][metric]
+                summaryOutput += '\t' + metric.title() + ": %1.5f\n" % self.results[entityId]['overall']['score'][metric]
+            summaryOutput += '\t' + (len(entityId) * '~') + '\n'
             summaryOutput += '\n'
 
         # Format the results
