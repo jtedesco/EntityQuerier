@@ -5,7 +5,8 @@ from pprint import pformat
 import threading
 from urllib2 import URLError
 import sys
-from src.search.SearchResultParsing import isHTML, loadFromUrl, parseMetaDataFromContent
+from src.search.SearchResultParsing import isHTML, loadFromUrl, parseMetaDataFromContent, parseHeaderInformationFromContent
+from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
 from util.PRCache import PRCache
 
 __author__ = 'jon'
@@ -54,20 +55,27 @@ class DMOZCrawlerThread(threading.Thread):
                 # Extract the content from this page
                 if content is not None and isHTML(content):
 
+                    self.resultDictionary['content'] = content
+
                     # Get the information about this url
                     content = content.lower()
                     if self.saveData:
                         title, keywords, description = parseMetaDataFromContent(content)
                         pageRank = self.prCache.getPageRank(self.url)
+                        headers = parseHeaderInformationFromContent(content)
 
-                    self.resultDictionary['content'] = content
-
-
-                    if self.saveData:
+                        # Get the YQL keywords for this DMOZ document
+                        try:
+                            yqlKeywordsExtension = YQLKeywordExtension()
+                            yqlKeywords = yqlKeywordsExtension.getKeywordsFromContent(content)
+                        except Exception:
+                            yqlKeywords = []
 
                         # Store the extra data
                         self.resultDictionary['keywords'] = keywords
+                        self.resultDictionary['headers'] = headers
                         self.resultDictionary['description'] = description
+                        self.resultDictionary['yqlKeywords'] = yqlKeywords
                         self.resultDictionary['pageRank'] = pageRank
                         self.resultDictionary['title'] = title
 
