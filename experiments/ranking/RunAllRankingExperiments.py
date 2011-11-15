@@ -33,17 +33,17 @@ if __name__ == '__main__':
 
         # The experiments to run
         experiments = [
-#            ('Baseline', BaselineResultsRanking),
-#            ('BM25Ranking', BM25Ranking),
-#            ('DMOZSmoothedPageRankBM25Ranking', DMOZSmoothedPageRankBM25Ranking),
-#            ('PageRankBM25Ranking', PageRankBM25Ranking),
-#            ('TermFrequencyRanking', TermFrequencyRanking),
-#            ('TFIDFRanking', TFIDFRanking),
-#            ('WeightedHeadersPageRankBM25Ranking', WeightedHeadersPageRankBM25Ranking),
-#            ('WeightedHeadersTitleKeywordsPageRankBM25Ranking', WeightedHeadersTitleKeywordsPageRankBM25Ranking),
-#            ('WeightedHeadersTitlePageRankBM25Ranking', WeightedHeadersTitlePageRankBM25Ranking),
-#            ('WeightedTitleKeywordsDescriptionPageRankBM25Ranking', WeightedTitleKeywordsDescriptionPageRankBM25Ranking),
-#            ('WeightedTitlePageRankBM25Ranking', WeightedTitlePageRankBM25Ranking),
+            ('Baseline', BaselineResultsRanking),
+            ('BM25Ranking', BM25Ranking),
+            ('DMOZSmoothedPageRankBM25Ranking', DMOZSmoothedPageRankBM25Ranking),
+            ('PageRankBM25Ranking', PageRankBM25Ranking),
+            ('TermFrequencyRanking', TermFrequencyRanking),
+            ('TFIDFRanking', TFIDFRanking),
+            ('WeightedHeadersPageRankBM25Ranking', WeightedHeadersPageRankBM25Ranking),
+            ('WeightedHeadersTitleKeywordsPageRankBM25Ranking', WeightedHeadersTitleKeywordsPageRankBM25Ranking),
+            ('WeightedHeadersTitlePageRankBM25Ranking', WeightedHeadersTitlePageRankBM25Ranking),
+            ('WeightedTitleKeywordsDescriptionPageRankBM25Ranking', WeightedTitleKeywordsDescriptionPageRankBM25Ranking),
+            ('WeightedTitlePageRankBM25Ranking', WeightedTitlePageRankBM25Ranking),
             ('WeightedTitleYQLKeywordsPageRankBM25Ranking', WeightedTitleYQLKeywordsPageRankBM25Ranking)
         ]
 
