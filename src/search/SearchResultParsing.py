@@ -102,13 +102,6 @@ def parseMetaDataFromContent(content):
     return title, keywords, description
 
 
-def parseYahooKeywordsFromContent(content):
-    """
-      Retrieves the list of keywords (or keyword phrases) for this page from the Yahoo YQL interface.
-      
-    """
-
-
 def parseHeaderInformationFromContent(content):
     """
       Parses text from all header tags, and returns
