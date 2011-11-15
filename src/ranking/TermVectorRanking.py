@@ -30,42 +30,6 @@ class TermVectorRanking(object):
         self.searchResults = searchResults
         self.keywords = keywords
 
-
-    def scoreResult(self, searchResult):
-        """
-          Score the search result by summing the wrod scores of each keyword
-        """
-
-        # Get the TF information for the content
-        contentAnalysis = TermFrequencyAnalysis([searchResult])
-        searchResultScore = 0
-        for keyword in self.keywords:
-            searchResultScore += contentAnalysis.getWordScore(keyword)
-        return searchResultScore
-
-
     def rank(self):
-        """
-          Perform the ranking, using only the TF information from the content of the page.
-
-            @return The reordered list of search results
-        """
-
-        # Score the results
-        scoredResults = {}
-        for searchResult in self.searchResults:
-
-            try:
-                searchResultScore = self.scoreResult(searchResult)
-                scoredResults[searchResult['url']] = (searchResultScore, searchResult)
-            except KeyError:
-                pass
-
-        # Re-rank the urls
-        reRankedResults = []
-        sortedResults = sorted(scoredResults.iteritems(), key=operator.itemgetter(1), reverse=True)
-        for result in sortedResults:
-            reRankedResults.append(result[1])
-
-        return reRankedResults
+        raise NotImplementedError
         

@@ -8,11 +8,6 @@ class BM25Ranking(TermFrequencyRanking):
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-    def getIndexLocation(self):
-        indexLocation = ".index-bm25"
-        return indexLocation
-
-
     def rank(self):
         """
           Perform the ranking, using only the TF information from the content of the page.

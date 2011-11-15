@@ -1,7 +1,6 @@
 import hashlib
-from json import dumps, dump, load
+from json import dump
 import os
-from pprint import pformat
 import threading
 from urllib2 import URLError
 import sys
@@ -60,29 +59,32 @@ class DMOZCrawlerThread(threading.Thread):
                     # Get the information about this url
                     content = content.lower()
                     if self.saveData:
-                        title, keywords, description = parseMetaDataFromContent(content)
-                        pageRank = self.prCache.getPageRank(self.url)
-                        headers = parseHeaderInformationFromContent(content)
 
-                        # Get the YQL keywords for this DMOZ document
                         try:
-                            yqlKeywordsExtension = YQLKeywordExtension()
-                            yqlKeywords = yqlKeywordsExtension.getKeywordsFromContent(content)
-                        except Exception:
-                            yqlKeywords = []
+                            title, keywords, description = parseMetaDataFromContent(content)
+                            pageRank = self.prCache.getPageRank(self.url)
+                            headers = parseHeaderInformationFromContent(content)
 
-                        # Store the extra data
-                        self.resultDictionary['keywords'] = keywords
-                        self.resultDictionary['headers'] = headers
-                        self.resultDictionary['description'] = description
-                        self.resultDictionary['yqlKeywords'] = yqlKeywords
-                        self.resultDictionary['pageRank'] = pageRank
-                        self.resultDictionary['title'] = title
+                            # Get the YQL keywords for this DMOZ document
+                            try:
+                                yqlKeywordsExtension = YQLKeywordExtension()
+                                yqlKeywords = yqlKeywordsExtension.getKeywordsFromContent(content)
+                            except Exception:
+                                yqlKeywords = []
 
-                        # Save the result file
-                        dump(self.resultDictionary, open(filename, 'w'))
-            else:
-                self.resultDictionary = load(open(filename))
+                            # Store the extra data
+                            self.resultDictionary['keywords'] = keywords
+                            self.resultDictionary['headers'] = headers
+                            self.resultDictionary['description'] = description
+                            self.resultDictionary['yqlKeywords'] = yqlKeywords
+                            self.resultDictionary['pageRank'] = pageRank
+                            self.resultDictionary['title'] = title
+
+                            # Save the result file
+                            dump(self.resultDictionary, open(filename, 'w'))
+                        except UnicodeDecodeError:
+                            print "Failed to save DMOZ document: " + self.url
+
 
         except URLError:
             print("Error accessing '%s', %s" % (self.url.strip(), str(sys.exc_info()[1]).strip()))

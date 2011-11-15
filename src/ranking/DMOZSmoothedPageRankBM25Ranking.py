@@ -1,4 +1,4 @@
-from json import loads
+from json import loads, load
 import os
 import re
 from src.ranking.PageRankBM25Ranking import PageRankBM25Ranking
@@ -24,39 +24,19 @@ class DMOZSmoothedPageRankBM25Ranking(PageRankBM25Ranking):
             try:
 
                 # Get the contents of the file
-                originalDmozResultData = open(self.dmozPath + filename).read()
-
-                # Parse it out
-                dmozResultData = originalDmozResultData.replace("\"", "\\\"")
-                dmozResultData = dmozResultData.replace("'", "\"")
-                dmozResultData = dmozResultData.replace("\n", " ")
-
-                # Remove extra whitespace
-                removeExtraWhitespaceRegex = re.compile(r'\s+')
-                dmozResultData = re.sub(removeExtraWhitespaceRegex, ' ', dmozResultData)
-
-
-                # Remove 'u' for unicode data
-                dmozResultData = dmozResultData.replace(" u'", " '")
-                dmozResultData = dmozResultData.replace(" u\"", " \"")
-
-                dmozResult = loads(dmozResultData)
+                dmozResultFile = open(self.dmozPath + filename)
+                dmozResult = load(dmozResultFile)
                 dmozResults.append(dmozResult)
 
             except ValueError:
 
                 # Do something awful...
                 try:
-                    dmozResult = eval(originalDmozResultData)
+                    dmozResult = eval(dmozResultFile.read())
                     dmozResults.append(dmozResult)
-                except:
-                    print "Something went very wrong reading a DMOZ document!"
+                except Exception:
+                    pass
 
         # Create the index with both the traditional and new DMOZ search results
         searchResults.extend(dmozResults)
-        super(DMOZSmoothedPageRankBM25Ranking, self).__init__(searchResults, keywords)
-
-
-    def getIndexLocation(self):
-        indexLocation = ".index-bm25-pr-dmoz"
-        return indexLocation
+        PageRankBM25Ranking.__init__(self, searchResults, keywords)

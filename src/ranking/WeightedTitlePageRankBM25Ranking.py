@@ -36,11 +36,6 @@ class WeightedTitlePageRankBM25Ranking(BM25Ranking):
         BM25Ranking.__init__(self, searchResults, keywords)
         self.titleWeight = titleWeight
 
-    def getIndexLocation(self):
-        indexLocation = ".index-bm25-pr-weightedtitle"
-        return indexLocation
-
-
     def queryIndex(self, weightingMechanism):
         """
           Retrieve the results matching the given keywords

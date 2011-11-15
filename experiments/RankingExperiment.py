@@ -1,7 +1,8 @@
 from json import loads
+import os
 from pprint import pformat, pprint
 import re
-from src.ranking.PageRankTermVectorRanking import PageRankTermVectorRanking
+from src.ranking.BM25Ranking import BM25Ranking
 from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
 
 __author__ = 'jon'
@@ -12,37 +13,43 @@ class RankingExperiment(object):
       Rank search results
     """
 
-    def __init__(self, resultsFilePath, entity, rankingScheme = PageRankTermVectorRanking, extensions = [], includeOriginalResults = False, verbose = False):
+    def __init__(self, resultsFilePath, entity, rankingScheme = BM25Ranking, extensions = [], includeOriginalResults = False, verbose = False):
 
-        # Get the contents of the file
-        resultsData = open(resultsFilePath).read()
+        if not os.path.exists('.index'):
 
-        # Strip off the header
-        dataToBeJoined = []
-        recordData = False
-        for dataLine in resultsData.split('\n'):
-            if not recordData and len(dataLine) > 0 and dataLine[0] == '{':
-                recordData = True
-            if recordData:
-                dataToBeJoined.append(dataLine)
-        resultsData = '\n'.join(dataToBeJoined)
+            # Get the contents of the file
+            resultsData = open(resultsFilePath).read()
 
-        # Load the data dumped from the first stage
-        self.resultsDump = loads(resultsData)
+            # Strip off the header
+            dataToBeJoined = []
+            recordData = False
+            for dataLine in resultsData.split('\n'):
+                if not recordData and len(dataLine) > 0 and dataLine[0] == '{':
+                    recordData = True
+                if recordData:
+                    dataToBeJoined.append(dataLine)
+            resultsData = '\n'.join(dataToBeJoined)
 
-        # Build the data structure that will map entity id -> urls
-        self.results = []
-        for entityId in self.resultsDump:
-            entityUrls = set([])
-            for query in self.resultsDump[entityId]:
-                for resultType in self.resultsDump[entityId][query]:
-                    for url in self.resultsDump[entityId][query][resultType]:
-                        if url not in ['precision', 'recall', 'averagePrecision']:
-                            entityUrls.add(url)
+            # Load the data dumped from the first stage
+            self.resultsDump = loads(resultsData)
 
-            # Assume we're only doing this for one entity
-            self.results = buildGoogleResultsFromURLs(entityUrls, True, verbose, extensions)
-        print "Retrieved all results from web!"
+            # Build the data structure that will map entity id -> urls
+            self.results = []
+            for entityId in self.resultsDump:
+                entityUrls = set([])
+                for query in self.resultsDump[entityId]:
+                    for resultType in self.resultsDump[entityId][query]:
+                        for url in self.resultsDump[entityId][query][resultType]:
+                            if url not in ['precision', 'recall', 'averagePrecision']:
+                                entityUrls.add(url)
+
+                # Assume we're only doing this for one entity
+                self.results = buildGoogleResultsFromURLs(entityUrls, True, verbose, extensions)
+            print "Retrieved all results from web!"
+
+        else:
+            self.results = []
+            self.resultsDump = []
 
         # Get the keywords & build the ranking scheme
         keywords = self.getKeywords(entity)

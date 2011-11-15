@@ -2,10 +2,7 @@ from json import load
 import os
 from experiments.RankingExperiment import RankingExperiment
 from src.ranking.BM25Ranking import BM25Ranking
-from src.ranking.BaselineResultsRanking import BaselineResultsRanking
-from src.ranking.DMOZSmoothedPageRankBM25Ranking import DMOZSmoothedPageRankBM25Ranking
 from src.ranking.PageRankBM25Ranking import PageRankBM25Ranking
-from src.ranking.PageRankTermVectorRanking import PageRankTermVectorRanking
 from src.ranking.TFIDFRanking import TFIDFRanking
 from src.ranking.TermFrequencyRanking import TermFrequencyRanking
 from src.ranking.WeightedHeadersPageRankBM25Ranking import WeightedHeadersPageRankBM25Ranking
@@ -33,9 +30,7 @@ if __name__ == '__main__':
 
         # The experiments to run
         experiments = [
-            ('Baseline', BaselineResultsRanking),
             ('BM25Ranking', BM25Ranking),
-            ('DMOZSmoothedPageRankBM25Ranking', DMOZSmoothedPageRankBM25Ranking),
             ('PageRankBM25Ranking', PageRankBM25Ranking),
             ('TermFrequencyRanking', TermFrequencyRanking),
             ('TFIDFRanking', TFIDFRanking),

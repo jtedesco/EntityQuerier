@@ -57,19 +57,32 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
         if count == 10:
             precisionAt10 = float(len(relevantUrlsFound)) / 10
             recallAt10 = float(len(relevantUrlsFound)) / len(relevantUrls)
-            averagePrecisionAt10 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+            try:
+                averagePrecisionAt10 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+            except ZeroDivisionError:
+                averagePrecisionAt10 = 0
         elif count == 20:
             precisionAt20 = float(len(relevantUrlsFound)) / 20
             recallAt20 = float(len(relevantUrlsFound)) / len(relevantUrls)
-            averagePrecisionAt20 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+            try:
+                averagePrecisionAt20 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+            except ZeroDivisionError:
+                averagePrecisionAt20 = 0
         elif count == 50:
             precisionAt50 = float(len(relevantUrlsFound)) / 50
             recallAt50 = float(len(relevantUrlsFound)) / len(relevantUrls)
-            averagePrecisionAt50 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+            try:
+                averagePrecisionAt50 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+            except ZeroDivisionError:
+                averagePrecisionAt50 = 0
         elif count == 100:
             precisionAt100 = float(len(relevantUrlsFound)) / 100
             recallAt100 = float(len(relevantUrlsFound)) / len(relevantUrls)
-            averagePrecisionAt100 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+            try:
+                averagePrecisionAt100 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+            except ZeroDivisionError:
+                averagePrecisionAt100 = 0
+
 
     # Build the output
     output = outputTitle % cutoff

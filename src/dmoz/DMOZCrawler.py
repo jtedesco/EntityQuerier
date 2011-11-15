@@ -134,20 +134,22 @@ class DMOZCrawler(object):
             for url in crawlData:
 
                 # Get the relevant links from this page (to other pages to crawl)
-                content = crawlData[url]['content']
-                linksFromPage = self.__getLinksFromPage(content)
+                try:
+                    content = crawlData[url]['content']
+                    linksFromPage = self.__getLinksFromPage(content)
 
-                # Add all links from this page that haven't been crawled
-                for linkFromPage in linksFromPage:
-                    if linkFromPage not in self.urlsCrawled:
-                        self.urlsToCrawl.append(linkFromPage)
+                    # Add all links from this page that haven't been crawled
+                    for linkFromPage in linksFromPage:
+                        if linkFromPage not in self.urlsCrawled:
+                            self.urlsToCrawl.append(linkFromPage)
 
-                # Get all web links from this page
-                urlsFromPage = self.__getUrlsFromPage(content)
-                for url in urlsFromPage:
-                    if url not in self.urlsCrawled:
-                        urlsFound.add(url)
-
+                    # Get all web links from this page
+                    urlsFromPage = self.__getUrlsFromPage(content)
+                    for url in urlsFromPage:
+                        if url not in self.urlsCrawled:
+                            urlsFound.add(url)
+                except KeyError:
+                    print "Error getting URL content for '%s': %s" % (url, crawlData[url])
 
             # Crawl all actual links from the web
             webData = {}

@@ -10,8 +10,8 @@ __author__ = 'jon'
 SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/6.3.1"
 
 # Set a 5 second timeout for all pages
-timeout = 5
-socket.setdefaulttimeout(timeout)
+#timeout = 5
+#socket.setdefaulttimeout(timeout)
 
 
 def loadFromUrl(url):
@@ -22,7 +22,9 @@ def loadFromUrl(url):
 
     # Open the URL and read the content
     opener = urllib2.build_opener()
-    content = opener.open(request).read()
+    openSocket = opener.open(request)
+    content = openSocket.read()
+    openSocket.close()
 
     return content
 

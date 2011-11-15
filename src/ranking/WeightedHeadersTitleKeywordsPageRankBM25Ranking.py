@@ -37,11 +37,6 @@ class WeightedHeadersTitleKeywordsPageRankBM25Ranking(BM25Ranking):
         self.keywordsDescriptionWeight = keywordsDescriptionWeight
         self.headersWeight = headersWeight
 
-        
-    def getIndexLocation(self):
-        indexLocation = ".index-bm25-pr-weightedheaderstitlekeywordsdescription"
-        return indexLocation
-
 
     def queryIndex(self, weightingMechanism):
         """
