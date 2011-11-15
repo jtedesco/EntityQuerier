@@ -1,5 +1,4 @@
 from BeautifulSoup import BeautifulSoup
-import re
 from src.dmoz.DMOZCrawlerThread import DMOZCrawlerThread
 
 __author__ = 'jon'
@@ -84,7 +83,7 @@ class DMOZCrawler(object):
             if thread.isAlive():
                 try:
                     thread._Thread__stop()
-                except:
+                except Exception:
                     print(str(thread.getName()) + ' could not be terminated')
 
 
@@ -108,12 +107,6 @@ class DMOZCrawler(object):
             # Take care of absolute links
             elif link not in absoluteLinks and link.startswith('http'):
                 absoluteLinks.append(link)
-
-            # Rewrite relative links
-            elif not link.startswith('http'):
-                link = parentUrl + '/' + link
-                if link not in absoluteLinks:
-                    absoluteLinks.append(link)
 
         return absoluteLinks
 

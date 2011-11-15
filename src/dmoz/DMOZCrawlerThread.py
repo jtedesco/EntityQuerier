@@ -1,4 +1,5 @@
 import hashlib
+from json import dumps, dump, load
 import os
 from pprint import pformat
 import threading
@@ -43,35 +44,37 @@ class DMOZCrawlerThread(threading.Thread):
 
             filename = self.__encodeCacheFilename(self.url)
 
-            try:
-                content = loadFromUrl(self.url)
-            except ValueError:
-                content = None
-                print "Error with URL: " + self.url
+            if not os.path.exists(filename):
+                try:
+                    content = loadFromUrl(self.url)
+                except ValueError:
+                    content = None
+                    print "Error with URL: " + self.url
 
-            # Extract the content from this page
-            if content is not None and isHTML(content):
+                # Extract the content from this page
+                if content is not None and isHTML(content):
 
-                # Get the information about this url
-                content = content.lower()
-                if self.saveData:
-                    title, keywords, description = parseMetaDataFromContent(content)
-                    pageRank = self.prCache.getPageRank(self.url)
+                    # Get the information about this url
+                    content = content.lower()
+                    if self.saveData:
+                        title, keywords, description = parseMetaDataFromContent(content)
+                        pageRank = self.prCache.getPageRank(self.url)
 
-                self.resultDictionary['content'] = content
+                    self.resultDictionary['content'] = content
 
-                
-                if self.saveData:
 
-                    # Store the extra data
-                    self.resultDictionary['keywords'] = keywords
-                    self.resultDictionary['description'] = description
-                    self.resultDictionary['pageRank'] = pageRank
-                    self.resultDictionary['title'] = title
+                    if self.saveData:
 
-                    # Save the result file
-                    open(filename, 'w').write(pformat(self.resultDictionary))
+                        # Store the extra data
+                        self.resultDictionary['keywords'] = keywords
+                        self.resultDictionary['description'] = description
+                        self.resultDictionary['pageRank'] = pageRank
+                        self.resultDictionary['title'] = title
 
+                        # Save the result file
+                        dump(self.resultDictionary, open(filename, 'w'))
+            else:
+                self.resultDictionary = load(open(filename))
 
         except URLError:
             print("Error accessing '%s', %s" % (self.url.strip(), str(sys.exc_info()[1]).strip()))
