@@ -13,6 +13,7 @@ from src.ranking.WeightedHeadersTitleKeywordsPageRankBM25Ranking import Weighted
 from src.ranking.WeightedHeadersTitlePageRankBM25Ranking import WeightedHeadersTitlePageRankBM25Ranking
 from src.ranking.WeightedTitleKeywordsDescriptionPageRankBM25Ranking import WeightedTitleKeywordsDescriptionPageRankBM25Ranking
 from src.ranking.WeightedTitlePageRankBM25Ranking import WeightedTitlePageRankBM25Ranking
+from src.ranking.WeightedTitleYQLKeywordsPageRankBM25Ranking import WeightedTitleYQLKeywordsPageRankBM25Ranking
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
 from util.RankingExperimentUtil import outputRankingResults
@@ -32,17 +33,18 @@ if __name__ == '__main__':
 
         # The experiments to run
         experiments = [
-            ('Baseline', BaselineResultsRanking),
-            ('BM25Ranking', BM25Ranking),
-            ('DMOZSmoothedPageRankBM25Ranking', DMOZSmoothedPageRankBM25Ranking),
-            ('PageRankBM25Ranking', PageRankBM25Ranking),
-            ('TermFrequencyRanking', TermFrequencyRanking),
-            ('TFIDFRanking', TFIDFRanking),
-            ('WeightedHeadersPageRankBM25Ranking', WeightedHeadersPageRankBM25Ranking),
-            ('WeightedHeadersTitleKeywordsPageRankBM25Ranking', WeightedHeadersTitleKeywordsPageRankBM25Ranking),
-            ('WeightedHeadersTitlePageRankBM25Ranking', WeightedHeadersTitlePageRankBM25Ranking),
-            ('WeightedTitleKeywordsDescriptionPageRankBM25Ranking', WeightedTitleKeywordsDescriptionPageRankBM25Ranking),
-            ('WeightedTitlePageRankBM25Ranking', WeightedTitlePageRankBM25Ranking)
+#            ('Baseline', BaselineResultsRanking),
+#            ('BM25Ranking', BM25Ranking),
+#            ('DMOZSmoothedPageRankBM25Ranking', DMOZSmoothedPageRankBM25Ranking),
+#            ('PageRankBM25Ranking', PageRankBM25Ranking),
+#            ('TermFrequencyRanking', TermFrequencyRanking),
+#            ('TFIDFRanking', TFIDFRanking),
+#            ('WeightedHeadersPageRankBM25Ranking', WeightedHeadersPageRankBM25Ranking),
+#            ('WeightedHeadersTitleKeywordsPageRankBM25Ranking', WeightedHeadersTitleKeywordsPageRankBM25Ranking),
+#            ('WeightedHeadersTitlePageRankBM25Ranking', WeightedHeadersTitlePageRankBM25Ranking),
+#            ('WeightedTitleKeywordsDescriptionPageRankBM25Ranking', WeightedTitleKeywordsDescriptionPageRankBM25Ranking),
+#            ('WeightedTitlePageRankBM25Ranking', WeightedTitlePageRankBM25Ranking),
+            ('WeightedTitleYQLKeywordsPageRankBM25Ranking', WeightedTitleYQLKeywordsPageRankBM25Ranking)
         ]
 
         for experiment in experiments:
