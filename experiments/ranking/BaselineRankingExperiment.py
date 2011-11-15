@@ -16,12 +16,12 @@ if __name__ == '__main__':
     entity = load(open(projectRoot + '/entities/Kevin Chen-Chuan Chang.json'))
 
     # Rank the results
-    rankingExperiment = RankingExperiment(projectRoot + '/experiments/retrieval/results/KevinChang-EntityAttributeNamesAndValues', entity, BaselineResultsRanking, True, True)
+    rankingExperiment = RankingExperiment(projectRoot + '/experiments/retrieval/results/KevinChenChuanChang-EntityAttributeNamesAndValues', entity, BaselineResultsRanking, True, True)
     results = rankingExperiment.rank()
 
     # Output the ranking results
     entityId = 'Kevin Chen-Chuan Chang'
     baselineTitle = "Baseline Ranking Results Summary (for top %d results):\n"
-    outputFile = 'KevinChang-BaselineRanking'
+    outputFile = 'KevinChenChuanChang-BaselineRanking'
     outputRankingResults(entityId, outputFile, baselineTitle, projectRoot, results)
 
