@@ -2,7 +2,7 @@ from src.search.ResultParserThread import ResultParserThread
 
 __author__ = 'jon'
 
-def buildGoogleResultsFromURLs(urls, fetchContent=True, verbose=False):
+def buildGoogleResultsFromURLs(urls, fetchContent=True, verbose=False, extensions=[]):
     """
       Builds a list of results in the same format as those retrieved from a search engine, using a list of URLs to populate
         the results.
@@ -21,7 +21,7 @@ def buildGoogleResultsFromURLs(urls, fetchContent=True, verbose=False):
         url = resultData['url']
         dotLocation = url.rfind('.')
         if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'} and fetchContent:
-            parserThread = ResultParserThread(resultData, verbose)
+            parserThread = ResultParserThread(resultData, verbose, extensions)
             threads.append(parserThread)
 
     # Launch all threads

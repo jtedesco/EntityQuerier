@@ -1,5 +1,5 @@
 from whoosh import scoring
-from src.ranking.TFIDFRanking import TermFrequencyRanking
+from src.ranking.TermFrequencyRanking import TermFrequencyRanking
 
 __author__ = 'jon'
 

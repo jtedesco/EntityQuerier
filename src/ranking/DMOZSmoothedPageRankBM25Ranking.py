@@ -1,6 +1,5 @@
-from json import load, loads
+from json import loads
 import os
-from pprint import pformat
 import re
 from src.ranking.PageRankBM25Ranking import PageRankBM25Ranking
 

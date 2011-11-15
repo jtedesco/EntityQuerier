@@ -1,5 +1,6 @@
 from IN import INT_MAX
 import os
+from pprint import pprint
 import whoosh
 from whoosh.analysis import StemmingAnalyzer, CharsetFilter
 from whoosh.fields import Schema, TEXT, ID, NUMERIC, KEYWORD
@@ -56,7 +57,7 @@ class TermFrequencyRanking(TermVectorRanking):
         analyzer = StemmingAnalyzer() | CharsetFilter(accent_map)
         self.indexSchema = Schema(content=TEXT(analyzer=analyzer, stored=True), title=TEXT(analyzer=analyzer, stored=True),
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
-                                  keywords=TEXT(stored=True), headers=TEXT(stored=True))
+                                  keywords=TEXT(stored=True), yqlKeywords=TEXT(stored=True), headers=TEXT(stored=True))
         indexDirectory = self.getIndexLocation()
 
         # Remove the index if it exists
@@ -74,6 +75,7 @@ class TermFrequencyRanking(TermVectorRanking):
 
         # Walk the pages folder for content
         for searchResult in self.searchResults:
+
             try:
                 try:
                     unicodeContent = unicode(searchResult['content'], errors='ignore')
@@ -96,6 +98,10 @@ class TermFrequencyRanking(TermVectorRanking):
                 except TypeError:
                     unicodeKeywords = ', '.join(searchResult['keywords'])
                 try:
+                    unicodeYqlKeywords = unicode(' '.join(searchResult['yqlKeywords']), errors='ignore')
+                except TypeError:
+                    unicodeYqlKeywords = ', '.join(searchResult['yqlKeywords'])
+                try:
                     unicodeHeaders = unicode(' '.join(searchResult['headers']), errors='ignore')
                 except TypeError:
                     unicodeHeaders = ', '.join(searchResult['headers'])
@@ -112,11 +118,14 @@ class TermFrequencyRanking(TermVectorRanking):
                     unicodeUrl = u'?'
                 if len(unicodeKeywords) == 0:
                     unicodeKeywords = u'?'
+                if len(unicodeYqlKeywords) == 0:
+                    unicodeYqlKeywords = u'?'
                 if len(unicodeHeaders) == 0:
                     unicodeHeaders = u'?'
 
-                indexWriter.add_document(content=unicodeContent, title=unicodeTitle, description=unicodeDescription,
+                indexWriter.add_document(content=unicodeContent, title=unicodeTitle, description=unicodeDescription, yqlKeywords=unicodeYqlKeywords,
                                      pagerank=pageRank, url=unicodeUrl, keywords=unicodeKeywords, headers=unicodeHeaders)
+
             except KeyError:
                 pass
 
@@ -160,6 +169,7 @@ class TermFrequencyRanking(TermVectorRanking):
                 'description': searchResult['description'],
                 'keywords': searchResult['keywords'],
                 'headers': searchResult['headers'],
+                'yqlKeywords': searchResult['yqlKeywords'],
                 'pageRank': searchResult['pagerank']
             }
             results.append(result)
