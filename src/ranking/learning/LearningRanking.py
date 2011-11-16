@@ -50,7 +50,14 @@ class LearningRanking(BM25Ranking):
             'pageRank' : 1.0,           # A constant offset based on PR
             'pageRankScaling' : 1.0     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
         }
-        self.testValues = deepcopy(self.values)
+        self.testValues = {'content': 0.40000000000000013,
+         'description': 0.40000000000000013,
+         'headers': -0.2999999999999999,
+         'keywords': -0.4999999999999999,
+         'pageRank': 2.300000000000001,
+         'pageRankScaling': 3.100000000000002,
+         'title': 1.9000000000000008,
+         'yqlKeywords': 3.0000000000000018}
 
         # Find the project root
         projectRoot = str(os.getcwd())
@@ -164,14 +171,14 @@ class LearningRanking(BM25Ranking):
 
                 # Evaluate effect of increase in weight of this features
                 testValues = deepcopy(newValues)
-                testValues[feature] += self.stepSizes[feature]
+                testValues[feature] = round(testValues[feature] + self.stepSizes[feature], 2)
                 self.testValues = testValues
                 rankingResults = self.actuallyRank()
                 increaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
 
                 # Evaluate effect of decrease in weight of this features
                 testValues = deepcopy(newValues)
-                testValues[feature] -= self.stepSizes[feature]
+                testValues[feature] = round(testValues[feature] - self.stepSizes[feature], 2)
                 self.testValues = testValues
                 rankingResults = self.actuallyRank()
                 decreaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
@@ -179,10 +186,10 @@ class LearningRanking(BM25Ranking):
                 # Update the weighting vector if one of these was an improvement
                 if increaseFeatureWeightResultScoring > currentWeightingScoring:
                     complete = False
-                    newValues[feature] += self.stepSizes[feature]
+                    newValues[feature] = round(testValues[feature] + self.stepSizes[feature], 2)
                 elif decreaseFeatureWeightResultScoring > currentWeightingScoring:
                     complete = False
-                    newValues[feature] -= self.stepSizes[feature]
+                    newValues[feature] = round(testValues[feature] - self.stepSizes[feature], 2)
                 else:
                     # If no change was made, don't update anything
                     pass
@@ -209,7 +216,7 @@ if __name__ == '__main__':
 
     # Rank the results
     entityName = entityId.replace(' ', '').replace('-', '')
-    retrievalResults = '/experiments/retrieval/results/%s-EntityAttributeValues' % entityName
+    retrievalResults = '/experiments/retrieval/results/%s-EntityAttributeNamesAndValues' % entityName
     extensions = [
         PageRankExtension(),
         YQLKeywordExtension()
