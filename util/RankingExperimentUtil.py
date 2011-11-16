@@ -7,6 +7,11 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
       Give nice formatted output of some search results
     """
 
+    if len(results) > 0 and type(results[0]) == type({}):
+        includesScores = False
+    else:
+        includesScores = True
+
     # Find the 'standard' for this entity -- the true list of relevant results
     relevantUrls = load(open(projectRoot + '/standard/' + entityId + '.json'))
 
