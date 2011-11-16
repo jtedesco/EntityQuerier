@@ -10,6 +10,41 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
     # Find the 'standard' for this entity -- the true list of relevant results
     relevantUrls = load(open(projectRoot + '/standard/' + entityId + '.json'))
 
+    recallAt10, recallAt20, recallAt50, recallAt100, precisionAt10, precisionAt20, precisionAt50, precisionAt100, \
+        averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, averagePrecisionAt100 = getRankingResults(results, relevantUrls, cutoff)
+
+    # Build the output
+    output = outputTitle % cutoff
+    output += "Precision @ 10:  %1.5f | Recall @ 10:  %1.5f | Average Precision @ 10:  %1.5f\n" % (precisionAt10, recallAt10, averagePrecisionAt10)
+    output += "Precision @ 20:  %1.5f | Recall @ 20:  %1.5f | Average Precision @ 20:  %1.5f\n" % (precisionAt20, recallAt20, averagePrecisionAt20)
+    output += "Precision @ 50:  %1.5f | Recall @ 50:  %1.5f | Average Precision @ 50:  %1.5f\n" % (precisionAt50, recallAt50, averagePrecisionAt50)
+    output += "Precision @ 100: %1.5f | Recall @ 100: %1.5f | Average Precision @ 100:  %1.5f\n\n" % (precisionAt100, recallAt100, averagePrecisionAt100)
+    output += "Score         Url\n"
+    output += "=====         ===\n"
+    count = 0
+    if includesScores:
+        for score, result in results:
+            count += 1
+            if count > cutoff:
+                break
+            output += "%1.5f       %s\n" % (score, result['url'])
+    else:
+        for result in results:
+            count += 1
+            if count > cutoff:
+                break
+            output += "??????       %s\n" % result['url']
+    output += "\n\n\n"
+
+    # Write it out a file
+    if append:
+        open(projectRoot + '/experiments/ranking/results/' + outputFile, 'a').write(output)
+    else:
+        open(projectRoot + '/experiments/ranking/results/' + outputFile, 'w').write(output)
+
+
+def getRankingResults(results, relevantUrls, cutoff):
+
     # Prepare vars & data structs
     relevantUrlsFound = []
     count = 0
@@ -83,34 +118,5 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
             except ZeroDivisionError:
                 averagePrecisionAt100 = 0
 
-
-    # Build the output
-    output = outputTitle % cutoff
-    output += "Precision @ 10:  %1.5f | Recall @ 10:  %1.5f | Average Precision @ 10:  %1.5f\n" % (precisionAt10, recallAt10, averagePrecisionAt10)
-    output += "Precision @ 20:  %1.5f | Recall @ 20:  %1.5f | Average Precision @ 20:  %1.5f\n" % (precisionAt20, recallAt20, averagePrecisionAt20)
-    output += "Precision @ 50:  %1.5f | Recall @ 50:  %1.5f | Average Precision @ 50:  %1.5f\n" % (precisionAt50, recallAt50, averagePrecisionAt50)
-    output += "Precision @ 100: %1.5f | Recall @ 100: %1.5f | Average Precision @ 100:  %1.5f\n\n" % (precisionAt100, recallAt100, averagePrecisionAt100)
-    output += "Score         Url\n"
-    output += "=====         ===\n"
-    count = 0
-    if includesScores:
-        for score, result in results:
-            count += 1
-            if count > cutoff:
-                break
-            output += "%1.5f       %s\n" % (score, result['url'])
-    else:
-        for result in results:
-            count += 1
-            if count > cutoff:
-                break
-            output += "??????       %s\n" % result['url']
-    output += "\n\n\n"
-
-    # Write it out a file
-    if append:
-        open(projectRoot + '/experiments/ranking/results/' + outputFile, 'a').write(output)
-    else:
-        open(projectRoot + '/experiments/ranking/results/' + outputFile, 'w').write(output)
-
-
+    return recallAt10, recallAt20, recallAt50, recallAt100, precisionAt10, precisionAt20, precisionAt50,\
+           precisionAt100, averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, averagePrecisionAt100

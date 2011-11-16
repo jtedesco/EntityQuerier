@@ -133,7 +133,6 @@ class TermFrequencyRanking(TermVectorRanking):
 
         else:
             if exists_in(indexDirectory):
-                print "Opening index..."
                 self.index = open_dir(indexDirectory)
             else:
                 raise Exception("Could not open index directory!")

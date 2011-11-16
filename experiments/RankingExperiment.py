@@ -1,7 +1,5 @@
 from json import loads
 import os
-from pprint import pformat, pprint
-import re
 from src.ranking.BM25Ranking import BM25Ranking
 from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
 
