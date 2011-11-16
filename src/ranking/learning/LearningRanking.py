@@ -10,6 +10,7 @@ from whoosh.qparser.syntax import OrGroup
 from whoosh.scoring import BM25F
 from experiments.RankingExperiment import RankingExperiment
 from src.ranking.BM25Ranking import BM25Ranking
+from src.ranking.learning.LearningScorer import LearningScorer
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
 from util.RankingExperimentUtil import getRankingResults, outputRankingResults
@@ -77,6 +78,8 @@ class LearningRanking(BM25Ranking):
         termBoosts = deepcopy(self.testValues)
         del termBoosts['pageRank']
         del termBoosts['pageRankScaling']
+        LearningScorer.pageRankWeight = self.testValues['pageRank']
+        LearningScorer.pageRankScalingWeight = self.testValues['pageRankScaling']
         keywordsQueryParser = MultifieldParser(['content', 'title', 'description', 'keywords', 'headers', 'yqlKeywords'],
                 self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
         keywordsQueryParser.add_plugin(PlusMinusPlugin)
@@ -132,6 +135,12 @@ class LearningRanking(BM25Ranking):
         return score
 
 
+    def actuallyRank(self):
+
+        reRankedResults = self.queryIndex(LearningScorer)
+        return reRankedResults
+
+
     def rank(self):
         """
           Run the learning algorithm, and return the learned feature weights
@@ -150,21 +159,21 @@ class LearningRanking(BM25Ranking):
                 pprint(newValues)
 
                 # Get the current scoring
-                rankingResults = BM25Ranking.rank(self)
+                rankingResults = self.actuallyRank()
                 currentWeightingScoring = self.evaluateResults(rankingResults, self.relevantResults)
 
                 # Evaluate effect of increase in weight of this features
                 testValues = deepcopy(newValues)
                 testValues[feature] += self.stepSizes[feature]
                 self.testValues = testValues
-                rankingResults = BM25Ranking.rank(self)
+                rankingResults = self.actuallyRank()
                 increaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
 
                 # Evaluate effect of decrease in weight of this features
                 testValues = deepcopy(newValues)
                 testValues[feature] -= self.stepSizes[feature]
                 self.testValues = testValues
-                rankingResults = BM25Ranking.rank(self)
+                rankingResults = self.actuallyRank()
                 decreaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
 
                 # Update the weighting vector if one of these was an improvement
@@ -174,6 +183,11 @@ class LearningRanking(BM25Ranking):
                 elif decreaseFeatureWeightResultScoring > currentWeightingScoring:
                     complete = False
                     newValues[feature] -= self.stepSizes[feature]
+                else:
+                    # If no change was made, don't update anything
+                    pass
+                
+            print "Finished one learning iteration"
 
         self.testValues = newValues
         self.values = newValues

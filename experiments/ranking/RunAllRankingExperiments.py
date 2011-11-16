@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
             # Rank the results
             entityName = entityId.replace(' ', '').replace('-', '')
-            retrievalResults = '/experiments/retrieval/results/%s-EntityAttributeValues' % entityName
+            retrievalResults = '/experiments/retrieval/results/%s-EntityAttributeNamesAndValues' % entityName
             extensions = [
                 PageRankExtension(),
                 YQLKeywordExtension()
