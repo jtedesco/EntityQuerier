@@ -7,10 +7,10 @@ import whoosh
 from whoosh.qparser.default import MultifieldParser
 from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
-from whoosh.scoring import BM25F
 from experiments.RankingExperiment import RankingExperiment
 from src.ranking.BM25Ranking import BM25Ranking
 from src.ranking.learning.LearningScorer import LearningScorer
+from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
 from util.RankingExperimentUtil import getRankingResults, outputRankingResults
@@ -35,6 +35,7 @@ class LearningRanking(BM25Ranking):
             'headers' : 0.1,
             'description' : 0.1,
             'yqlKeywords' : 0.1,
+            'expandedYqlKeywords' : 0.1,
             'pageRank' : 0.1,           # A constant offset based on PR
             'pageRankScaling' : 0.1     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
         }
@@ -47,10 +48,11 @@ class LearningRanking(BM25Ranking):
             'headers' : 1.0,
             'description' : 1.0,
             'yqlKeywords' : 1.0,
+            'expandedYqlKeywords' : 1.0,
             'pageRank' : 1.0,           # A constant offset based on PR
             'pageRankScaling' : 1.0     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
         }
-        self.currentValues = deepcopy(self.values)
+        self.testValues = deepcopy(self.values)
 
         # Find the project root
         projectRoot = str(os.getcwd())
@@ -75,12 +77,12 @@ class LearningRanking(BM25Ranking):
         searcher = self.index.searcher(weighting=weightingMechanism)
 
         # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
-        termBoosts = deepcopy(self.currentValues)
+        termBoosts = deepcopy(self.testValues)
         del termBoosts['pageRank']
         del termBoosts['pageRankScaling']
-        LearningScorer.pageRankWeight = self.currentValues['pageRank']
-        LearningScorer.pageRankScalingWeight = self.currentValues['pageRankScaling']
-        keywordsQueryParser = MultifieldParser(['content', 'title', 'description', 'keywords', 'headers', 'yqlKeywords'],
+        LearningScorer.pageRankWeight = self.testValues['pageRank']
+        LearningScorer.pageRankScalingWeight = self.testValues['pageRankScaling']
+        keywordsQueryParser = MultifieldParser(['content', 'title', 'description', 'keywords', 'headers', 'yqlKeywords', 'expandedYqlKeywords'],
                 self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
         keywordsQueryParser.add_plugin(PlusMinusPlugin)
         if self.query is None:
@@ -112,6 +114,7 @@ class LearningRanking(BM25Ranking):
                 'keywords': searchResult['keywords'],
                 'headers': searchResult['headers'],
                 'yqlKeywords': searchResult['yqlKeywords'],
+                'expandedYqlKeywords': searchResult['expandedYqlKeywords'],
                 'pageRank': searchResult['pagerank']
             }
             results.append(result)
@@ -164,32 +167,35 @@ class LearningRanking(BM25Ranking):
 
                 # Evaluate effect of increase in weight of this features
                 testValues = deepcopy(newValues)
-                testValues[feature] = round(testValues[feature] + self.stepSizes[feature], 2)
-                self.currentValues = testValues
+                testValues[feature] += self.stepSizes[feature]
+                self.testValues = testValues
                 rankingResults = self.actuallyRank()
                 increaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
 
                 # Evaluate effect of decrease in weight of this features
                 testValues = deepcopy(newValues)
-                testValues[feature] = round(testValues[feature] - self.stepSizes[feature], 2)
-                self.currentValues = testValues
+                testValues[feature] -= self.stepSizes[feature]
+                self.testValues = testValues
                 rankingResults = self.actuallyRank()
                 decreaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
 
                 # Update the weighting vector if one of these was an improvement
                 if increaseFeatureWeightResultScoring > currentWeightingScoring:
                     complete = False
-                    newValues[feature] = round(testValues[feature] + self.stepSizes[feature], 2)
+                    newValues[feature] += self.stepSizes[feature]
                 elif decreaseFeatureWeightResultScoring > currentWeightingScoring:
                     complete = False
-                    newValues[feature] = round(testValues[feature] - self.stepSizes[feature], 2)
+                    newValues[feature] -= self.stepSizes[feature]
                 else:
                     # If no change was made, don't update anything
                     pass
+
+                for feature in newValues:
+                    newValues[feature] = round(newValues[feature], 2)
                 
             print "Finished one learning iteration"
 
-        self.currentValues = newValues
+        self.testValues = newValues
         self.values = newValues
         results = BM25Ranking.rank(self)
 
@@ -212,7 +218,8 @@ if __name__ == '__main__':
     retrievalResults = '/experiments/retrieval/results/%s-EntityAttributeNamesAndValues' % entityName
     extensions = [
         PageRankExtension(),
-        YQLKeywordExtension()
+        YQLKeywordExtension(),
+        ExpandedYQLKeywordExtension()
     ]
     rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, False, True)
     results = rankingExperiment.rank()

@@ -1,6 +1,5 @@
 from IN import INT_MAX
 import os
-from pprint import pprint
 import whoosh
 from whoosh.analysis import StemmingAnalyzer, CharsetFilter
 from whoosh.fields import Schema, TEXT, ID, NUMERIC, KEYWORD
@@ -19,27 +18,9 @@ class TermFrequencyRanking(TermVectorRanking):
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-
+    
     def __init__(self, searchResults, keywords):
-        """
-          Creates a ranking object with the necessary parameters
-
-            @param  searchResults   The list of search results, in the following format:
-                                        [
-                                            {
-                                                'url': <url>
-                                                'preview' : <preview snippet>
-                                                'title' : <title>
-                                                'description' : <meta description>
-                                                'pageRank' : <PageRank, between 0 and 10>
-                                                'content' : <page content>
-                                            },
-                                            ...
-                                        ]
-            @param  keywords        The keywords for these search results to use for scoring the results
-        """
         TermVectorRanking.__init__(self, searchResults, keywords)
-
         self.createIndex()
 
 
@@ -57,7 +38,8 @@ class TermFrequencyRanking(TermVectorRanking):
         analyzer = StemmingAnalyzer() | CharsetFilter(accent_map)
         self.indexSchema = Schema(content=TEXT(analyzer=analyzer, stored=True), title=TEXT(analyzer=analyzer, stored=True),
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
-                                  keywords=TEXT(stored=True), yqlKeywords=TEXT(stored=True), headers=TEXT(stored=True))
+                                  keywords=TEXT(stored=True), yqlKeywords=TEXT(stored=True), expandedYqlKeywords=TEXT(stored=True),
+                                  headers=TEXT(stored=True))
         indexDirectory = self.getIndexLocation()
 
         # Remove the index if it exists
@@ -101,6 +83,10 @@ class TermFrequencyRanking(TermVectorRanking):
                     except TypeError:
                         unicodeYqlKeywords = ', '.join(searchResult['yqlKeywords'])
                     try:
+                        unicodeExpandedYqlKeywords = unicode(', '.join(searchResult['expandedYqlKeywords']), errors='ignore')
+                    except TypeError:
+                        unicodeExpandedYqlKeywords = ', '.join(searchResult['expandedYqlKeywords'])
+                    try:
                         unicodeHeaders = unicode(', '.join(searchResult['headers']), errors='ignore')
                     except TypeError:
                         unicodeHeaders = ', '.join(searchResult['headers'])
@@ -119,11 +105,14 @@ class TermFrequencyRanking(TermVectorRanking):
                         unicodeKeywords = u'?'
                     if len(unicodeYqlKeywords) == 0:
                         unicodeYqlKeywords = u'?'
+                    if len(unicodeExpandedYqlKeywords) == 0:
+                        unicodeExpandedYqlKeywords = u'?'
                     if len(unicodeHeaders) == 0:
                         unicodeHeaders = u'?'
 
-                    indexWriter.add_document(content=unicodeContent, title=unicodeTitle, description=unicodeDescription, yqlKeywords=unicodeYqlKeywords,
-                                         pagerank=pageRank, url=unicodeUrl, keywords=unicodeKeywords, headers=unicodeHeaders)
+                    indexWriter.add_document(content=unicodeContent, title=unicodeTitle, description=unicodeDescription,
+                                     yqlKeywords=unicodeYqlKeywords, expandedYqlKeywords=unicodeExpandedYqlKeywords,
+                                     pagerank=pageRank, url=unicodeUrl, keywords=unicodeKeywords, headers=unicodeHeaders)
 
                 except KeyError:
                     pass
@@ -175,6 +164,7 @@ class TermFrequencyRanking(TermVectorRanking):
                 'keywords': searchResult['keywords'],
                 'headers': searchResult['headers'],
                 'yqlKeywords': searchResult['yqlKeywords'],
+                'expandedYqlKeywords': searchResult['expandedYqlKeywords'],
                 'pageRank': searchResult['pagerank']
             }
             results.append(result)

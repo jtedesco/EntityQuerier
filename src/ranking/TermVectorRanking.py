@@ -1,6 +1,3 @@
-import operator
-from src.analysis.TermFrequencyAnalysis import TermFrequencyAnalysis
-
 __author__ = 'jon'
 
 class TermVectorRanking(object):

@@ -4,6 +4,7 @@ from experiments.retrieval.EntityAttributeValues import EntityAttributeValues
 from src.queries.EntityAttributeNamesAndValuesQueryBuilder import EntityAttributeNamesAndValuesQueryBuilder
 from src.queries.EntityAttributeNamesQueryBuilder import EntityAttributeNamesQueryBuilder
 from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
+from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
 from src.search.google.GoogleSearch import GoogleSearch
@@ -17,6 +18,7 @@ if __name__ == '__main__':
     extensions = [
         PageRankExtension(),
         YQLKeywordExtension(),
+        ExpandedYQLKeywordExtension()
     ]
     searchInterface = GoogleSearch(numberOfSearchResults, True, extensions)
 

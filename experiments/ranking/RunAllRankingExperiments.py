@@ -11,6 +11,7 @@ from src.ranking.WeightedHeadersTitlePageRankBM25Ranking import WeightedHeadersT
 from src.ranking.WeightedTitleKeywordsDescriptionPageRankBM25Ranking import WeightedTitleKeywordsDescriptionPageRankBM25Ranking
 from src.ranking.WeightedTitlePageRankBM25Ranking import WeightedTitlePageRankBM25Ranking
 from src.ranking.WeightedTitleYQLKeywordsPageRankBM25Ranking import WeightedTitleYQLKeywordsPageRankBM25Ranking
+from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
 from util.RankingExperimentUtil import outputRankingResults
@@ -54,7 +55,8 @@ if __name__ == '__main__':
             retrievalResults = '/experiments/retrieval/results/%s-EntityAttributeNamesAndValues' % entityName
             extensions = [
                 PageRankExtension(),
-                YQLKeywordExtension()
+                YQLKeywordExtension(),
+                ExpandedYQLKeywordExtension()
             ]
             includeOriginalResults = experiment[0] == 'Baseline'
             rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, includeOriginalResults, True)
