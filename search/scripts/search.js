@@ -66,7 +66,7 @@ function submitQuery() {
 
     // Grab the query from the page
     var query = $('#query').val();
-    console.log("Submitting " + query);
+    console.log("Submitting \"" + query + "\"");
 
     // Launch an AJAX request to query the system
     var searchUrl = "/search";
@@ -101,5 +101,6 @@ function handleResponse(data, query) {
 
         // Hide the popup
         hideProgress();
+        console.log(data);
     }
 }
