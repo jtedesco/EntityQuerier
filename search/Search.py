@@ -1,5 +1,5 @@
 from copy import deepcopy
-from json import dumps
+from json import dumps, loads
 import threading
 import cherrypy
 import os
@@ -25,18 +25,23 @@ class Search(object):
 
     
     @cherrypy.expose
-    def search(self, query=None):
+    def search(self, query=None, idField=None):
         """
           Takes in a query, and triggers a search, returning only the status that it has started the query. This will
             add the query into the global data structure and launch the search thread.
         """
 
+        # Get the entity id
+        entity = loads(query)
+        entityId = entity[idField]
+
         # Add the new data structure
         global queryResults
         queryResults[query] = {
-            "status" : "Started query...",
-            "query"  : query,
-            "trigger"   : threading.Semaphore()
+            'status' : 'Started query...',
+            'entity'  : entity,
+            'entityId' : entityId,
+            'trigger'   : threading.Semaphore()
         }
 
         # Prepare the response results

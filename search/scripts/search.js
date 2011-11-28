@@ -66,11 +66,14 @@ function submitQuery() {
 
     // Grab the query from the page
     var query = $('#query').val();
-    console.log("Submitting \"" + query + "\"");
+    var idField = $('#id').val();
 
     // Launch an AJAX request to query the system
     var searchUrl = "/search";
-    var ajaxRequest = $.getJSON(searchUrl, {'query' : query}, function(data) {
+    var ajaxRequest = $.getJSON(searchUrl, {
+        'query' : query,
+        'idField' : idField
+    }, function(data) {
         handleResponse(data, query);
     });
 }
@@ -93,7 +96,9 @@ function handleResponse(data, query) {
         showProgress(status);
 
         // Then wait for more progress updates
-        $.getJSON("/update", {'query': query}, function(data){
+        $.getJSON("/update", {
+            'query': query
+        }, function(data){
             handleResponse(data, query);
         });
 

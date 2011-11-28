@@ -1,3 +1,4 @@
+from pprint import pprint
 import threading
 from time import sleep
 
@@ -11,13 +12,24 @@ class SearchThread(threading.Thread):
           Initialize this parser, given the dictionary into which the page's data is going to be placed
         """
         threading.Thread.__init__(self)
+
+        # Pull the data out of the dictionary
         self.dictionary = dictionary
-        self.query = dictionary['query']
+        self.entity = dictionary['entity']
+        self.entityId = dictionary['entityId']
         self.trigger = dictionary['trigger']
 
-        self.iterations = 0
+        pprint(dictionary)
 
+    def update(self, message):
+        """
+          Updates the UI saying with the given message
+        """
 
+        self.dictionary['status'] = message
+        self.trigger.release()
+
+        
     def run(self):
         """
           Run the search, and update the dictionary (releasing the lock to trigger a callback whenever one should occur)
@@ -28,10 +40,10 @@ class SearchThread(threading.Thread):
             sleep(2)
 
             self.iterations +=1
-            self.dictionary['status'] = "Iteration " + str(self.iterations)
-            self.trigger.release()
+            message = "Iteration " + str(self.iterations)
+            self.update(message)
 
         # Signal that we're finally done
-        self.dictionary['status'] = "done"
-        self.trigger.release()
+        message = "done"
+        self.update(message)
 
