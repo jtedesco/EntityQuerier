@@ -37,7 +37,7 @@ body {
 
 /* Mimic Google's form interface */
 
-.search #queryWrapper {
+.search .queryWrapper {
     width: 405px;
     height: 205px;
 }
@@ -55,19 +55,19 @@ body {
     text-align: left;
 }
 
-#query {
+.query {
     color: #222;
-    border: 0;
+    border: none;
 }
 
-#queryWrapper {
+.queryWrapper {
     background-color: white;
     border: 1px solid #D9D9D9;
     border-top-color: silver;
     border-radius: 1px;
 }
 
-#queryWrapper:hover {
+.queryWrapper:hover {
     background-color: white;
     border: 1px solid darkgray;
     border-top-color: gray;
