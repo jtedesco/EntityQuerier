@@ -39,7 +39,7 @@ class TermFrequencyRanking(TermVectorRanking):
         self.indexSchema = Schema(content=TEXT(analyzer=analyzer, stored=True), title=TEXT(analyzer=analyzer, stored=True),
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
                                   keywords=TEXT(stored=True), yqlKeywords=TEXT(stored=True), expandedYqlKeywords=TEXT(stored=True),
-                                  headers=TEXT(stored=True))
+                                  headers=TEXT(stored=True), baselineScore=NUMERIC(stored=True))
         indexDirectory = self.getIndexLocation()
 
         # Remove the index if it exists
@@ -92,6 +92,7 @@ class TermFrequencyRanking(TermVectorRanking):
                         unicodeHeaders = ', '.join(searchResult['headers'])
 
                     pageRank = searchResult['pageRank']
+                    baselineScore = searchResult['baselineScore']
 
                     if len(unicodeContent) == 0:
                         unicodeContent = u'?'
@@ -112,7 +113,8 @@ class TermFrequencyRanking(TermVectorRanking):
 
                     indexWriter.add_document(content=unicodeContent, title=unicodeTitle, description=unicodeDescription,
                                      yqlKeywords=unicodeYqlKeywords, expandedYqlKeywords=unicodeExpandedYqlKeywords,
-                                     pagerank=pageRank, url=unicodeUrl, keywords=unicodeKeywords, headers=unicodeHeaders)
+                                     pagerank=pageRank, url=unicodeUrl, keywords=unicodeKeywords, headers=unicodeHeaders,
+                                     baselineScore=baselineScore)
 
                 except KeyError:
                     pass
@@ -165,7 +167,8 @@ class TermFrequencyRanking(TermVectorRanking):
                 'headers': searchResult['headers'],
                 'yqlKeywords': searchResult['yqlKeywords'],
                 'expandedYqlKeywords': searchResult['expandedYqlKeywords'],
-                'pageRank': searchResult['pagerank']
+                'pageRank': searchResult['pagerank'],
+                'baselineScore': searchResult['baselineScore']
             }
             results.append(result)
 

@@ -31,6 +31,11 @@ class RankingExperiment(object):
             # Load the data dumped from the first stage
             self.resultsDump = loads(resultsData)
 
+            # Initialize the extensions (HACK)
+            for extension in extensions:
+                if 'initialize' in dir(extension):
+                    extension.initialize(self.resultsDump)
+
             # Build the data structure that will map entity id -> urls
             self.results = []
             for entityId in self.resultsDump:

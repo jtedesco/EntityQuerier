@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Entity Querier</title>
+
+        <link href="resources/search.css" rel="stylesheet" type="text/css"/>
+
+        <!-- Include necessary scripts -->
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="scripts/search.js"></script>
+
+        <!-- Google favicon -->
+        <link rel="shortcut icon" href="resources/favicon.ico"/>
+
+    </head>
+    <body>
+
+        <!-- The search view, the standard view when you first visit the page -->
+        <div id="searchView">
+            <center>
+                <div class="logo">
+                    <img class="logo" src="resources/logo.gif"/>
+                </div>
+
+                <div class="search">
+                    <div class="searchLabel">
+                        <label>JSON description of your entity:</label><br/>
+                    </div>
+                    <div id="queryWrapper">
+                        <textarea id="query" name="query"></textarea><br/>
+                    </div>
+                    <button id="submitButton">EntityQuerier Search</button>
+                </div>
+            </center>
+        </div>
+
+        <!-- The popup to display, hidden by default -->
+        <div id="popup">
+            <table>
+                <tr>
+                    <td><img src="resources/busy.gif"></td><td><div id="popupText"></div></td>
+                </tr>
+            </table>
+        </div>
+        <div id="backgroundPopup"></div>
+    </body>
+
+
+    <script>
+
+        // Attach listener to submit the form
+        $('#submit').click(submitQuery);
+
+        // Hide the popup
+        $('#popup').hide();
+        $('#backgroundPopup').hide();
+
+    </script>
+</html>

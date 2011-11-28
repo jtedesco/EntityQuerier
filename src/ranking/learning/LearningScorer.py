@@ -10,6 +10,7 @@ class LearningScorer(BM25F):
     use_final = True
     pageRankScalingWeight = 1.0
     pageRankWeight = 1.0
+    baselineScoreWeight = 1.0
 
     def final(self, searcher, docnum, score):
         """
@@ -18,6 +19,7 @@ class LearningScorer(BM25F):
 
         # Add the raw weight & scaling from pagerank
         pageRank = float(searcher.stored_fields(docnum)['pagerank'])
-        newScore = LearningScorer.pageRankScalingWeight * (score + (pageRank * LearningScorer.pageRankWeight))
+        baselineScore = float(searcher.stored_fields(docnum)['baselineScore'])
+        newScore = LearningScorer.pageRankScalingWeight * ((LearningScorer.baselineScoreWeight * baselineScore) + score + (pageRank * LearningScorer.pageRankWeight))
 
         return newScore

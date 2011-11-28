@@ -10,6 +10,7 @@ from whoosh.qparser.syntax import OrGroup
 from experiments.RankingExperiment import RankingExperiment
 from src.ranking.BM25Ranking import BM25Ranking
 from src.ranking.learning.LearningScorer import LearningScorer
+from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
@@ -22,7 +23,7 @@ class LearningRanking(BM25Ranking):
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-    def __init__(self, searchResults, keywords):
+    def __init__(self, searchResults, keywords, originalSearchResults):
         """
           Initializes data structures for the learning algorithm
         """
@@ -36,22 +37,23 @@ class LearningRanking(BM25Ranking):
             'description' : 0.1,
             'yqlKeywords' : 0.1,
             'expandedYqlKeywords' : 0.1,
+            'baselineScore' : 0.1,      # A constant added to the final score
             'pageRank' : 0.1,           # A constant offset based on PR
             'pageRankScaling' : 0.1     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
         }
 
         # The initial guesses at the feature's weightings (starts at 1.0), and
-        self.values = {
-            'content' : 1.0,
-            'title' : 1.0,
-            'keywords' : 1.0,
-            'headers' : 1.0,
-            'description' : 1.0,
-            'yqlKeywords' : 1.0,
-            'expandedYqlKeywords' : 1.0,
-            'pageRank' : 1.0,           # A constant offset based on PR
-            'pageRankScaling' : 1.0     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
-        }
+        self.values = {'baselineScore': 1.5,
+ 'content': 0.7,
+ 'description': 1.6,
+ 'expandedYqlKeywords': 0.7,
+ 'headers': 1.3,
+ 'keywords': 0.5,
+ 'pageRank': 1.7,
+ 'pageRankScaling': 1.6,
+ 'title': 1.3,
+ 'yqlKeywords': 0.7}
+
         self.testValues = deepcopy(self.values)
 
         # Find the project root
@@ -78,8 +80,10 @@ class LearningRanking(BM25Ranking):
 
         # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
         termBoosts = deepcopy(self.testValues)
+        del termBoosts['baselineScore']
         del termBoosts['pageRank']
         del termBoosts['pageRankScaling']
+        LearningScorer.baselineScoreWeight = self.testValues['baselineScore']
         LearningScorer.pageRankWeight = self.testValues['pageRank']
         LearningScorer.pageRankScalingWeight = self.testValues['pageRankScaling']
         keywordsQueryParser = MultifieldParser(['content', 'title', 'description', 'keywords', 'headers', 'yqlKeywords', 'expandedYqlKeywords'],
@@ -115,7 +119,8 @@ class LearningRanking(BM25Ranking):
                 'headers': searchResult['headers'],
                 'yqlKeywords': searchResult['yqlKeywords'],
                 'expandedYqlKeywords': searchResult['expandedYqlKeywords'],
-                'pageRank': searchResult['pagerank']
+                'pageRank': searchResult['pagerank'],
+                'baselineScore': searchResult['baselineScore']
             }
             results.append(result)
 
@@ -196,7 +201,7 @@ class LearningRanking(BM25Ranking):
             print "Finished one learning iteration"
 
         self.testValues = newValues
-        self.values = newValues
+        self.values = newValues  
         results = BM25Ranking.rank(self)
 
         return results
@@ -219,9 +224,10 @@ if __name__ == '__main__':
     extensions = [
         PageRankExtension(),
         YQLKeywordExtension(),
-        ExpandedYQLKeywordExtension()
+        ExpandedYQLKeywordExtension(),
+        BaselineScoreExtension()
     ]
-    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, False, True)
+    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, True, True)
     results = rankingExperiment.rank()
 
     # Output the ranking results
