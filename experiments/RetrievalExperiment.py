@@ -55,8 +55,12 @@ class RetrievalExperiment(object):
         self.entities = {}
         for entityId in self.entityIds:
 
+            # Find the project root & open the input entity
+            projectRoot = str(os.getcwd())
+            projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
+
             # Get the entity object
-            entity = load(open("../../entities/%s.json" % entityId))
+            entity = load(open(projectRoot + '/entities/%s.json' % entityId))
             self.entities[entityId] = entity
 
 
@@ -78,7 +82,13 @@ class RetrievalExperiment(object):
 
         self.idealURLs = {}
         for entityId in self.entityIds:
-            idealURLs = load(open("../../standard/%s.json" % entityId))
+
+            # Find the project root & open the input entity
+            projectRoot = str(os.getcwd())
+            projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
+
+
+            idealURLs = load(open(projectRoot + "/standard/%s.json" % entityId))
             self.idealURLs[entityId] = set(idealURLs)
 
             
