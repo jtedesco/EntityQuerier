@@ -1,5 +1,5 @@
-/** SETTING UP OUR POPUP
- * 0 means disabled; 1 means enabled;
+/**
+ * The status of the popup
  */
 var popupStatus = 0;
 
@@ -40,21 +40,10 @@ function showProgress(message) {
 
     // If the popup's not displayed, fade it in
     if(popupStatus == 0) {
-        $("#backgroundPopup").fadeIn("fast");
-        $("#popup").fadeIn("fast");
+        $("#backgroundPopup").fadeIn("slow");
+        $("#popup").fadeIn("slow");
         popupStatus = 1;
     }
-}
-
-/**
- * Update a displayed busy message with a new message
- *  @param  message  The new message to display
- */
-function updateProgress(message) {
-    
-    // Set the popup's text
-    $("#popupText").text(message);
-    centerPopup();
 }
 
 /**
@@ -64,8 +53,8 @@ function hideProgress() {
 
     // If the popup's displayed, fade it out
     if(popupStatus == 1) {
-        $("#backgroundPopup").fadeOut("fast");
-        $("#popup").fadeOut("fast");
+        $("#backgroundPopup").fadeOut("slow");
+        $("#popup").fadeOut("slow");
         popupStatus = 0;
     }
 }
@@ -77,11 +66,40 @@ function submitQuery() {
 
     // Grab the query from the page
     var query = $('#query').val();
-    console.log(query);
+    console.log("Submitting " + query);
 
     // Launch an AJAX request to query the system
-    var url = "/search";
-    var ajaxRequest = $.post(url, {'query' : query}, undefined, "json");
+    var searchUrl = "/search";
+    var ajaxRequest = $.getJSON(searchUrl, {'query' : query}, function(data) {
+        handleResponse(data, query);
+    });
+}
 
-    showProgress("Submitted query...");
+
+/**
+ * Handles an AJAX response, and triggers
+ * 
+ *  @param data The data received from the server
+ */
+function handleResponse(data, query) {
+
+    console.log(data);
+
+    // If this was just a status update, update the progress
+    var status = data['status'];
+    if(status != 'done') {
+
+        // Update the popup
+        showProgress(status);
+
+        // Then wait for more progress updates
+        $.getJSON("/update", {'query': query}, function(data){
+            handleResponse(data, query);
+        });
+
+    } else {
+
+        // Hide the popup
+        hideProgress();
+    }
 }
