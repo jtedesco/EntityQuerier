@@ -28,18 +28,25 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
     output += "Score         Url\n"
     output += "=====         ===\n"
     count = 0
+    relevantUrls = set(relevantUrls)
     if includesScores:
         for score, result in results:
             count += 1
             if count > cutoff:
                 break
-            output += "%1.5f       %s\n" % (score, result['url'])
+            if result['url'] in relevantUrls:
+                output += "RELEVANT        %1.5f       %s\n" % (score, result['url'])
+            else:
+                output += "NON-RELEVANT    %1.5f       %s\n" % (score, result['url'])
     else:
         for result in results:
             count += 1
             if count > cutoff:
                 break
-            output += "??????       %s\n" % result['url']
+            if result['url'] in relevantUrls:
+                output += "RELEVANT        ??????       %s\n" % result['url']
+            else:
+                output += "NON-RELEVANT    ??????       %s\n" % result['url']
     output += "\n\n\n"
 
     # Write it out a file
