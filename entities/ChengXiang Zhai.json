@@ -4,27 +4,45 @@
     "institution" : "University of Illinois at Urbana-Champaign",
     "undergraduate education" : null,
     "graduate education" : [
-        "Caregie Mellon University"
+        "Caregie Mellon University",
+        "Nanjing University"
     ],
     "research interests" : [
-        "information retrieval",
+        "information",
+        "retrieval",
         "text mining",
-        "natural language processing"
+        "natural language",
+        "genomic biology",
+        "statistics",
+        "marchine learning",
+        "bioinformatics",
+        "search engine",
+        "web",
+        "biology literature analysis",
+        "gene regulatory pattern analysis",
+        "massive protein motif analysis",
+        "biology",
+        "protein sequences"
     ],
     "associations" : [
         "TIMan",
         "DAIS",
         "SIGIR",
         "LTI",
-        "SCS"
+        "SCS",
+        "Clairvoyance"
     ],
     "teaching" : [
-        "CS 598 Advanced Topics in Information Retrieval",
+        "Advanced Topics in Information Retrieval",
         "Introduction to Text Information Systems"
     ],
     "keywords": [
         "NSF career award",
         "IBM",
-        "Lemur"
+        "Lemur",
+        "BeeSpace",
+        "DBLP",
+        "computer science",
+        
     ]
 }

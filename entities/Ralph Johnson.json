@@ -11,8 +11,6 @@
         "object-oriented",
         "frameworks"
     ],
-    "research labs" : [
-    ],
     "associations" : [
         "Hillside",
         "UPCRC",
@@ -21,7 +19,10 @@
         "ACM",
         "IEEE"
     ],
-    "teaching" : null,
+    "teaching" : [
+        "design patterns",
+        "software engineering"
+    ],
     "keywords": [
         "Design Patterns",
         "Gang of Four",
