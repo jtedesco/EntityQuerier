@@ -1,4 +1,3 @@
-from pprint import pprint
 import threading
 from experiments.RankingExperiment import RankingExperiment
 from experiments.retrieval.EntityAttributeValues import EntityAttributeValues
