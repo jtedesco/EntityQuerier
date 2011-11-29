@@ -11,8 +11,3 @@ class EntityAttributeNames(RetrievalExperiment):
       A basic experiment that evaluates queries by simply assigned the score as the fraction of relevant documents retrieved
         in the first five pages of the result.
     """
-
-if __name__ == '__main__':
-    experiment = EntityAttributeNames(['Kevin Chen-Chuan Chang'], GoogleSearch(50, True, [PageRankExtension(), YQLKeywordExtension()]), EntityAttributeNamesQueryBuilder())
-    experiment.run()
-    experiment.printResults("results/KevinChenChuanChang-EntityAttributeNames")
