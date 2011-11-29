@@ -33,7 +33,7 @@ class EntityAttributeValuesQueryBuilder(QueryBuilder):
                     if type(entityProperty) == type([]):
                         for property in entityProperty:
                             queries.append('"' + str(entityKey) + '" "' + str(property) + '"')
-                    else:
+                    elif entityProperty is not None:
                         queries.append('"' + str(entityKey) + '" "' + str(entityProperty) + '"')
 
         return queries

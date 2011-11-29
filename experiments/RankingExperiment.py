@@ -13,7 +13,7 @@ class RankingExperiment(object):
 
     def __init__(self, resultsFilePath, entity, rankingScheme = BM25Ranking, extensions = [], includeOriginalResults = False, verbose = False):
 
-        if not os.path.exists('.index'):
+        if not os.path.exists(rankingScheme.getIndexLocation()):
 
             # Get the contents of the file
             resultsData = open(resultsFilePath).read()

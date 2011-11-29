@@ -1,7 +1,9 @@
-from BeautifulSoup import BeautifulSoup
-from pprint import pprint
-import socket
 import urllib2
+from BeautifulSoup import BeautifulSoup
+from _socket import setdefaulttimeout
+from time import sleep
+from urllib2 import HTTPError
+import sys
 from util.Cache import Cache
 
 __author__ = 'jon'
@@ -10,8 +12,8 @@ __author__ = 'jon'
 SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/6.3.1"
 
 # Set a 5 second timeout for all pages
-#timeout = 5
-#socket.setdefaulttimeout(timeout)
+timeout = 5
+setdefaulttimeout(timeout)
 
 
 def loadFromUrl(url):
@@ -31,7 +33,7 @@ def loadFromUrl(url):
 
 def getPageContent(url):
     """
-      Returns the text content of a single URL. (emulates Firefox 7 on Linux for the user-agent)
+      Returns the text content of a single URL.
 
         @param  url The url from which to fetch the content
         @return The contents of the page
@@ -55,11 +57,10 @@ def getPageContent(url):
             # Cache this page
             cache.write(url, content)
 
-        except Exception:
+        except HTTPError, e:
 
-            # Register this URL so that we don't try to fetch it again
-            cache.registerUrlError(url)
-            content = None
+            print "Encountered HTTP error '%s'" % str(sys.exc_info()[1])
+            content = ''
 
     return content
 
