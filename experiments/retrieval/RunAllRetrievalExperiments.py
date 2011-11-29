@@ -10,13 +10,13 @@ if __name__ == '__main__':
 
     numberOfSearchResults = 50
     entityIds = [
-#        "ChengXiang Zhai",
-#        "Danny Dig",
-#        "Kevin Chen-Chuan Chang",
-        "Paris Smaragdis"
-#        "Matthew Caesar"
-#        "Ralph Johnson"
-#        "Robin Kravets"
+        "ChengXiang Zhai",
+        "Danny Dig",
+        "Kevin Chen-Chuan Chang",
+        "Paris Smaragdis",
+        "Matthew Caesar",
+        "Ralph Johnson",
+        "Robin Kravets"
     ]
     searchInterface = GoogleSearch(numberOfSearchResults, True)
 
