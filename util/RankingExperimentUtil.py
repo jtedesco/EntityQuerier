@@ -84,67 +84,75 @@ def getRankingResults(results, relevantUrls, cutoff):
     averagePrecisionRunningTotal = 0.0
     for result in results:
         count += 1
-        if count > cutoff:
-            break
+        if count <= cutoff:
 
-        # Record if this was a relevant result
-        wasRelevant = False
-        if includesScores:
-            if result[1]['url'] in relevantUrls:
-                wasRelevant = True
-                relevantUrlsFound.append(result[1]['url'])
-        else:
-            if result['url'] in relevantUrls:
-                wasRelevant = True
-                relevantUrlsFound.append(result['url'])
+            # Record if this was a relevant result
+            wasRelevant = False
+            if includesScores:
+                if result[1]['url'] in relevantUrls:
+                    wasRelevant = True
+                    relevantUrlsFound.append(result[1]['url'])
+            else:
+                if result['url'] in relevantUrls:
+                    wasRelevant = True
+                    relevantUrlsFound.append(result['url'])
 
-        # Precision at 100% recall point
-        if wasRelevant:
-            fullPrecision = float(len(relevantUrlsFound)) / count
+            # Precision at 100% recall point
+            if wasRelevant:
+                fullPrecision = float(len(relevantUrlsFound)) / count
 
-        # Update running total for average precision
-        if wasRelevant:
-            averagePrecisionRunningTotal += float(len(relevantUrlsFound)) / count
+            # Update running total for average precision
+            if wasRelevant:
+                averagePrecisionRunningTotal += float(len(relevantUrlsFound)) / count
 
-        # Gather precision & recall data
-        if count == 1:
-            precisionAt1 = float(len(relevantUrlsFound))
-            recallAt1 = float(len(relevantUrlsFound)) / len(relevantUrls)
-            try:
-                averagePrecisionAt1 = averagePrecisionRunningTotal / len(relevantUrlsFound)
-            except ZeroDivisionError:
-                averagePrecisionAt1 = 0
-        elif count == 10:
-            precisionAt10 = float(len(relevantUrlsFound)) / 10
-            recallAt10 = float(len(relevantUrlsFound)) / len(relevantUrls)
-            try:
-                averagePrecisionAt10 = averagePrecisionRunningTotal / len(relevantUrlsFound)
-            except ZeroDivisionError:
-                averagePrecisionAt10 = 0
-        elif count == 20:
-            precisionAt20 = float(len(relevantUrlsFound)) / 20
-            recallAt20 = float(len(relevantUrlsFound)) / len(relevantUrls)
-            try:
-                averagePrecisionAt20 = averagePrecisionRunningTotal / len(relevantUrlsFound)
-            except ZeroDivisionError:
-                averagePrecisionAt20 = 0
-        elif count == 50:
-            precisionAt50 = float(len(relevantUrlsFound)) / 50
-            recallAt50 = float(len(relevantUrlsFound)) / len(relevantUrls)
-            try:
-                averagePrecisionAt50 = averagePrecisionRunningTotal / len(relevantUrlsFound)
-            except ZeroDivisionError:
-                averagePrecisionAt50 = 0
+            # Gather precision & recall data
+            if count == 1:
+                precisionAt1 = float(len(relevantUrlsFound))
+                recallAt1 = float(len(relevantUrlsFound)) / len(relevantUrls)
+                try:
+                    averagePrecisionAt1 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+                except ZeroDivisionError:
+                    averagePrecisionAt1 = 0
+            elif count == 10:
+                precisionAt10 = float(len(relevantUrlsFound)) / 10
+                recallAt10 = float(len(relevantUrlsFound)) / len(relevantUrls)
+                try:
+                    averagePrecisionAt10 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+                except ZeroDivisionError:
+                    averagePrecisionAt10 = 0
+            elif count == 20:
+                precisionAt20 = float(len(relevantUrlsFound)) / 20
+                recallAt20 = float(len(relevantUrlsFound)) / len(relevantUrls)
+                try:
+                    averagePrecisionAt20 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+                except ZeroDivisionError:
+                    averagePrecisionAt20 = 0
+            elif count == 50:
+                precisionAt50 = float(len(relevantUrlsFound)) / 50
+                recallAt50 = float(len(relevantUrlsFound)) / len(relevantUrls)
+                try:
+                    averagePrecisionAt50 = averagePrecisionRunningTotal / len(relevantUrlsFound)
+                except ZeroDivisionError:
+                    averagePrecisionAt50 = 0
 
     count = 0
+    relevantResults = 0
     for result in results:
         count += 1
         if count > cutoff:
             break
 
+        # Record if this was a relevant result
+        if includesScores:
+            if result[1]['url'] in relevantUrls:
+                relevantResults += 1
+        else:
+            if result['url'] in relevantUrls:
+                relevantResults += 1
+
         # r-precision
         if count == len(relevantUrlsFound):
-            rPrecision = float(len(relevantUrlsFound)) / count
+            rPrecision = float(relevantResults) / count
 
     return recallAt1, recallAt10, recallAt20, recallAt50, precisionAt1, precisionAt10, precisionAt20, precisionAt50,\
            averagePrecisionAt1, averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, rPrecision, fullPrecision
