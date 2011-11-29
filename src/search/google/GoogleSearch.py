@@ -77,7 +77,6 @@ class GoogleSearch(Search):
         """
 
         results = []
-        resultsToRetrieve = []
 
         # Get the result entries (the list of results)
         parsedHTML = BeautifulSoup(resultsContent)
@@ -89,7 +88,11 @@ class GoogleSearch(Search):
 
             # Extract all the data we can for this result from the main results page
             url = str(resultEntry.find('a').attrs[0][1])
-            preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
+
+            try:
+                preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
+            except AttributeError:
+                preview = ""
 
             # Add it to our results
             result = {
@@ -97,46 +100,47 @@ class GoogleSearch(Search):
                 'preview': preview
             }
             results.append(result)
-            
+
         # Parse the next page's URL from the current results page, if it can be found
         try:
             nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
         except AttributeError:
             nextURL = None
 
-        try:
-            # Create threads to process the pages for this set of results
-            threads = []
-            for resultData in results:
-                url = resultData['url']
-                dotLocation = url.rfind('.')
-                if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'} and fetchContent:
-                    parserThread = ResultParserThread(resultData, self.verbose, self.extensions)
-                    threads.append(parserThread)
+        if fetchContent:
+            try:
+                # Create threads to process the pages for this set of results
+                threads = []
+                for resultData in results:
+                    url = resultData['url']
+                    dotLocation = url.rfind('.')
+                    if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'}:
+                        parserThread = ResultParserThread(resultData, self.verbose, self.extensions)
+                        threads.append(parserThread)
 
-            # Launch all threads
-            for thread in threads:
-                thread.start()
+                # Launch all threads
+                for thread in threads:
+                    thread.start()
 
-            # Wait for all the threads to finish
-            for thread in threads:
+                # Wait for all the threads to finish
+                for thread in threads:
 
-                # Allow up to 5 seconds for this thread to respond, otherwise, kill it
-                thread.join(5)
+                    # Allow up to 5 seconds for this thread to respond, otherwise, kill it
+                    thread.join(5)
 
-                # Kill it if it hung
-                if thread.isAlive():
-                    try:
-                        thread._Thread__stop()
-                    except Exception:
-                        print(str(thread.getName()) + ' could not be terminated')
+                    # Kill it if it hung
+                    if thread.isAlive():
+                        try:
+                            thread._Thread__stop()
+                        except Exception:
+                            print(str(thread.getName()) + ' could not be terminated')
 
 
-        except Exception:
+            except Exception:
 
-            if self.verbose:
-                print "Error parsing basic results from Google: '%s'" % str(sys.exc_info()[1]).strip()
-                
+                if self.verbose:
+                    print "Error parsing basic results from Google: '%s'" % str(sys.exc_info()[1]).strip()
+
         return results, nextURL
 
 

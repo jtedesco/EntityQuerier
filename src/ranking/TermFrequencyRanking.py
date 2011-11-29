@@ -145,6 +145,7 @@ class TermFrequencyRanking(TermVectorRanking):
             if keyword != self.entityId:
                 query += "\"" + keyword + "\" "
         query = query.rstrip()
+        print "Query: " + query
         queryObject = keywordsQueryParser.parse(query)
 
         # Perform the query itself

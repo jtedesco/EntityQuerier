@@ -16,7 +16,7 @@ if __name__ == '__main__':
         "Matthew Caesar",
         "Paris Smaragdis",
         "Ralph Johnson",
-        "Robin Kravets",
+        "Robin Kravets"
     ]
     searchInterface = GoogleSearch(numberOfSearchResults, True)
 
