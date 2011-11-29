@@ -1,6 +1,13 @@
 from pprint import pprint
 import threading
-from time import sleep
+from experiments.RankingExperiment import RankingExperiment
+from experiments.retrieval.EntityAttributeValues import EntityAttributeValues
+from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
+from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
+from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
+from src.search.extension.PageRankExtension import PageRankExtension
+from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
+from src.search.google.GoogleSearch import GoogleSearch
 
 __author__ = 'jon'
 
@@ -19,8 +26,7 @@ class SearchThread(threading.Thread):
         self.entityId = dictionary['entityId']
         self.trigger = dictionary['trigger']
 
-        pprint(dictionary)
-
+        
     def update(self, message):
         """
           Updates the UI saying with the given message
@@ -35,15 +41,27 @@ class SearchThread(threading.Thread):
           Run the search, and update the dictionary (releasing the lock to trigger a callback whenever one should occur)
         """
 
-        while self.iterations < 5:
+        # Run retrieval phase
+        self.update("Running retrieval phase")
+        numberOfSearchResults = 50
+        searchInterface = GoogleSearch(numberOfSearchResults, True, [])
+        experiment = EntityAttributeValues([self.entityId], searchInterface, EntityAttributeValuesQueryBuilder(), numberOfSearchResults)
+        experiment.run()
+        temporaryFileName = "tmp-output" + self.entityId
+        experiment.printResults(temporaryFileName)
 
-            sleep(2)
-
-            self.iterations +=1
-            message = "Iteration " + str(self.iterations)
-            self.update(message)
+        # Run ranking phase
+        self.update("Running ranking phase")
+        extensions = [
+            PageRankExtension(),
+            YQLKeywordExtension(),
+            ExpandedYQLKeywordExtension(),
+            BaselineScoreExtension()
+        ]
+        rankingExperiment = RankingExperiment(temporaryFileName, self.entity, experiment, extensions, True, True)
+        results = rankingExperiment.rank()
+        self.dictionary['results'] = results
 
         # Signal that we're finally done
-        message = "done"
-        self.update(message)
+        self.update("done")
 
