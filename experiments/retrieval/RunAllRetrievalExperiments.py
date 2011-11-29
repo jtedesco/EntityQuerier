@@ -1,6 +1,4 @@
-from experiments.retrieval.EntityAttributeNames import EntityAttributeNames
-from experiments.retrieval.EntityAttributeNamesAndValues import EntityAttributeNamesAndValues
-from experiments.retrieval.EntityAttributeValues import EntityAttributeValues
+from experiments.RetrievalExperiment import RetrievalExperiment
 from src.queries.EntityAttributeNamesAndValuesQueryBuilder import EntityAttributeNamesAndValuesQueryBuilder
 from src.queries.EntityAttributeNamesQueryBuilder import EntityAttributeNamesQueryBuilder
 from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
@@ -20,8 +18,7 @@ if __name__ == '__main__':
         "Ralph Johnson",
         "Robin Kravets",
     ]
-    extensions = []
-    searchInterface = GoogleSearch(numberOfSearchResults, True, extensions)
+    searchInterface = GoogleSearch(numberOfSearchResults, True)
 
     for entity in entityIds:
 
@@ -29,16 +26,16 @@ if __name__ == '__main__':
         entityName = entityName.replace('-', '')
 
         # Attribute names only
-        experiment = EntityAttributeNames(entityIds, searchInterface, EntityAttributeNamesQueryBuilder(), numberOfSearchResults)
+        experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeNamesQueryBuilder(), numberOfSearchResults)
         experiment.run()
         experiment.printResults("results/%s/EntityAttributeNames" % entityName)
 
         # Attribute values only
-        experiment = EntityAttributeValues(entityIds, searchInterface, EntityAttributeValuesQueryBuilder(), numberOfSearchResults)
+        experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeValuesQueryBuilder(), numberOfSearchResults)
         experiment.run()
         experiment.printResults("results/%s/EntityAttributeValues" % entityName)
 
         # Attribute names & values
-        experiment = EntityAttributeNamesAndValues(entityIds, searchInterface, EntityAttributeNamesAndValuesQueryBuilder(), numberOfSearchResults)
+        experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeNamesAndValuesQueryBuilder(), numberOfSearchResults)
         experiment.run()
         experiment.printResults("results/%s/EntityAttributeNamesAndValues" % entityName)

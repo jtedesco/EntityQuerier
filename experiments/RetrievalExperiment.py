@@ -154,7 +154,7 @@ class RetrievalExperiment(object):
                 queryURLs = []
 
                 # Run this query
-                queryResults = self.searchInterface.query(query)
+                queryResults = self.searchInterface.query(query, False)
 
                 # Add the retrieved results
                 if queryResults is not None:
