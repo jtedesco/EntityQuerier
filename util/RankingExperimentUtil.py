@@ -25,8 +25,8 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
     output += "Precision @ 20:  %1.5f | Average Precision @ 20:  %1.5f\n" % (precisionAt20, averagePrecisionAt20)
     output += "Precision @ 50: %1.5f | Average Precision @ 50:  %1.5f\n\n" % (precisionAt50, averagePrecisionAt50)
     output += "Recall @ 50: %1.5f | R-Precision:  %1.5f | Precision at 100 Percent (full) Recall Point: %1.5f\n\n" % (recallAt50, rPrecision, fullPrecision)
-    output += "Score         Url\n"
-    output += "=====         ===\n"
+    output += "Relevant?       Score         Url\n"
+    output += "=========       =====         ===\n"
     count = 0
     relevantUrls = set(relevantUrls)
     if includesScores:
@@ -74,7 +74,7 @@ def getRankingResults(results, relevantUrls, cutoff):
     averagePrecisionAt20 = 0
     averagePrecisionAt50 = 0
     rPrecision = 0
-
+    fullPrecision = 0
 
     if len(results) > 0 and type(results[0]) == type({}):
         includesScores = False
@@ -82,7 +82,6 @@ def getRankingResults(results, relevantUrls, cutoff):
         includesScores = True
 
     averagePrecisionRunningTotal = 0.0
-    fullPrecision = 0
     for result in results:
         count += 1
         if count > cutoff:
@@ -137,8 +136,14 @@ def getRankingResults(results, relevantUrls, cutoff):
             except ZeroDivisionError:
                 averagePrecisionAt50 = 0
 
+    count = 0
+    for result in results:
+        count += 1
+        if count > cutoff:
+            break
+
         # r-precision
-        if count == len(relevantUrls):
+        if count == len(relevantUrlsFound):
             rPrecision = float(len(relevantUrlsFound)) / count
 
     return recallAt1, recallAt10, recallAt20, recallAt50, precisionAt1, precisionAt10, precisionAt20, precisionAt50,\
