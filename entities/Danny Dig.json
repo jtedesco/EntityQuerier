@@ -10,9 +10,7 @@
     "research interests" : [
         "refactoring",
         "patterns",
-        "parallelism"
-    ],
-    "research labs" : [
+        "parallel"
     ],
     "associations" : [
         "UPCRC",
@@ -23,10 +21,11 @@
         "OOPSLA"
     ],
     "teaching" : [
-        "CS 427 Software Engineering"
+        "Software Engineering"
     ],
     "keywords": [
         "MIT",
-        "guitar"
+        "guitar",
+        "music"
     ]
 }
