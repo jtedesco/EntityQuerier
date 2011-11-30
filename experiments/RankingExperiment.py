@@ -79,18 +79,21 @@ class RankingExperiment(object):
             keywords.extend(key.split())
             if type(entity[key]) == type([]):
                 for keyword in entity[key]:
+                    if keyword is not None:
+                        lowercaseKeyword = keyword.lower()
+                        if len(lowercaseKeyword.split()) > 1:
+                            keywords.append(lowercaseKeyword)
+                            keywords.extend(lowercaseKeyword.split())
+                        else:
+                            keywords.append(lowercaseKeyword)
+            else:
+                keyword = entity[key]
+                if keyword is not None:
                     lowercaseKeyword = keyword.lower()
                     if len(lowercaseKeyword.split()) > 1:
                         keywords.append(lowercaseKeyword)
                         keywords.extend(lowercaseKeyword.split())
                     else:
                         keywords.append(lowercaseKeyword)
-            else:
-                lowercaseKeyword = entity[key].lower()
-                if len(lowercaseKeyword.split()) > 1:
-                    keywords.append(lowercaseKeyword)
-                    keywords.extend(lowercaseKeyword.split())
-                else:
-                    keywords.append(lowercaseKeyword)
 
         return keywords
