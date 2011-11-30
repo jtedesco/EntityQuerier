@@ -16,10 +16,6 @@ __author__ = 'jon'
 
 if __name__ == '__main__':
 
-    # Cleanup all the indexes
-    output = subprocess.check_call(["rm",  "-rf", ".dmoz-10000-index", ".dmoz-1000-index", ".dmoz-100-index", ".dmoz-5000-index",
-                                    ".dmoz-500-index", ".dmoz-index", ".index"])
-
     # The entities for which to run the experiments
     entityIds = [
         "ChengXiang Zhai",
