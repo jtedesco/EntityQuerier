@@ -20,22 +20,22 @@ if __name__ == '__main__':
     ]
     searchInterface = GoogleSearch(numberOfSearchResults, True)
 
-    for entity in entityIds:
+    for entityId in entityIds:
 
-        entityName = entity.replace(' ', '')
+        entityName = entityId.replace(' ', '')
         entityName = entityName.replace('-', '')
 
         # Attribute names only
         experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeNamesQueryBuilder(), numberOfSearchResults)
         experiment.run()
-        experiment.printResults("results/%s/EntityAttributeNames" % entityName)
+        experiment.printResults("results/%s/EntityAttributeNames" % entityName, entityId)
 
         # Attribute values only
         experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeValuesQueryBuilder(), numberOfSearchResults)
         experiment.run()
-        experiment.printResults("results/%s/EntityAttributeValues" % entityName)
+        experiment.printResults("results/%s/EntityAttributeValues" % entityName, entityId)
 
         # Attribute names & values
         experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeNamesAndValuesQueryBuilder(), numberOfSearchResults)
         experiment.run()
-        experiment.printResults("results/%s/EntityAttributeNamesAndValues" % entityName)
+        experiment.printResults("results/%s/EntityAttributeNamesAndValues" % entityName, entityId)

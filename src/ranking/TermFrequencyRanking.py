@@ -18,13 +18,13 @@ class TermFrequencyRanking(TermVectorRanking):
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-    
+
     def __init__(self, searchResults, keywords):
         TermVectorRanking.__init__(self, searchResults, keywords)
         self.createIndex()
 
-
-    def getIndexLocation(self):
+    @staticmethod
+    def getIndexLocation():
         indexDirectory = ".index"
         return indexDirectory
 
@@ -40,7 +40,7 @@ class TermFrequencyRanking(TermVectorRanking):
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
                                   keywords=TEXT(stored=True), yqlKeywords=TEXT(stored=True), expandedYqlKeywords=TEXT(stored=True),
                                   headers=TEXT(stored=True), baselineScore=NUMERIC(stored=True))
-        indexDirectory = self.getIndexLocation()
+        indexDirectory = TermFrequencyRanking.getIndexLocation()
 
         # Remove the index if it exists
         if not os.path.exists(indexDirectory):

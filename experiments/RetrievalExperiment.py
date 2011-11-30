@@ -231,18 +231,17 @@ class RetrievalExperiment(object):
         return self.results
 
                     
-    def printResults(self, outputPath = "output"):
+    def printResults(self, outputPath = "output", entityId = None):
 
         # Summarize the results\
         summaryOutput = "Results Summary\n"
         summaryOutput += "===============\n\n"
-        for entityId in self.entityIds:
-            summaryOutput += '\t' + entityId + ":\n"
-            summaryOutput += '\t' + len(entityId) * '~' + '\n'
-            for metric in self.results[entityId]['overall']['score']:
-                summaryOutput += '\t' + metric.title() + ": %1.5f\n" % self.results[entityId]['overall']['score'][metric]
-            summaryOutput += '\t' + (len(entityId) * '~') + '\n'
-            summaryOutput += '\n'
+        summaryOutput += '\t' + entityId + ":\n"
+        summaryOutput += '\t' + len(entityId) * '~' + '\n'
+        for metric in self.results[entityId]['overall']['score']:
+            summaryOutput += '\t' + metric.title() + ": %1.5f\n" % self.results[entityId]['overall']['score'][metric]
+        summaryOutput += '\t' + (len(entityId) * '~') + '\n'
+        summaryOutput += '\n'
 
         # Format the results
         resultsOutput = dumps(self.results, indent=4)

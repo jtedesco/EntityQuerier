@@ -1,11 +1,11 @@
 This lists the schema for a professor:
 
     Name
-    Research Interests
+    Title
     Institution
-    Research Groups
     Undergraduate Education
     Graduate Education
-    Service
+    Research Interests
+    Associations
     Teaching
     Keywords
