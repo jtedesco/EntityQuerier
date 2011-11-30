@@ -33,15 +33,15 @@ if __name__ == '__main__':
         # The experiments to run
         experiments = [
             ('BM25Ranking', BM25Ranking),
-            ('PageRankBM25Ranking', PageRankBM25Ranking),
-            ('TermFrequencyRanking', TermFrequencyRanking),
-            ('TFIDFRanking', TFIDFRanking),
-            ('WeightedHeadersPageRankBM25Ranking', WeightedHeadersPageRankBM25Ranking),
-            ('WeightedHeadersTitleKeywordsPageRankBM25Ranking', WeightedHeadersTitleKeywordsPageRankBM25Ranking),
-            ('WeightedHeadersTitlePageRankBM25Ranking', WeightedHeadersTitlePageRankBM25Ranking),
-            ('WeightedTitleKeywordsDescriptionPageRankBM25Ranking', WeightedTitleKeywordsDescriptionPageRankBM25Ranking),
-            ('WeightedTitlePageRankBM25Ranking', WeightedTitlePageRankBM25Ranking),
-            ('WeightedTitleYQLKeywordsPageRankBM25Ranking', WeightedTitleYQLKeywordsPageRankBM25Ranking)
+#            ('PageRankBM25Ranking', PageRankBM25Ranking),
+#            ('TermFrequencyRanking', TermFrequencyRanking),
+#            ('TFIDFRanking', TFIDFRanking),
+#            ('WeightedHeadersPageRankBM25Ranking', WeightedHeadersPageRankBM25Ranking),
+#            ('WeightedHeadersTitleKeywordsPageRankBM25Ranking', WeightedHeadersTitleKeywordsPageRankBM25Ranking),
+#            ('WeightedHeadersTitlePageRankBM25Ranking', WeightedHeadersTitlePageRankBM25Ranking),
+#            ('WeightedTitleKeywordsDescriptionPageRankBM25Ranking', WeightedTitleKeywordsDescriptionPageRankBM25Ranking),
+#            ('WeightedTitlePageRankBM25Ranking', WeightedTitlePageRankBM25Ranking),
+#            ('WeightedTitleYQLKeywordsPageRankBM25Ranking', WeightedTitleYQLKeywordsPageRankBM25Ranking)
         ]
 
         for experiment in experiments:
@@ -60,7 +60,7 @@ if __name__ == '__main__':
                 ExpandedYQLKeywordExtension(),
                 BaselineScoreExtension()
             ]
-            rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, True, True)
+            rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, False, True)
             results = rankingExperiment.rank()
 
             # Output the ranking results

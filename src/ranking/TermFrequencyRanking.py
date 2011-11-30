@@ -9,6 +9,7 @@ from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from whoosh.scoring import Frequency
 from whoosh.support.charset import accent_map
+import sys
 from src.ranking.TermVectorRanking import TermVectorRanking
 
 __author__ = 'jon'
@@ -18,15 +19,15 @@ class TermFrequencyRanking(TermVectorRanking):
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-
     def __init__(self, searchResults, keywords):
         TermVectorRanking.__init__(self, searchResults, keywords)
         self.createIndex()
+        self.indexLocation = ".index"
 
+        
     @staticmethod
     def getIndexLocation():
-        indexDirectory = ".index"
-        return indexDirectory
+        return ".index"
 
 
     def createIndex(self):
@@ -40,16 +41,14 @@ class TermFrequencyRanking(TermVectorRanking):
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
                                   keywords=TEXT(stored=True), yqlKeywords=TEXT(stored=True), expandedYqlKeywords=TEXT(stored=True),
                                   headers=TEXT(stored=True), baselineScore=NUMERIC(stored=True))
-        indexDirectory = TermFrequencyRanking.getIndexLocation()
-
         # Remove the index if it exists
-        if not os.path.exists(indexDirectory):
+        if not os.path.exists(self.indexLocation):
 
             # Try to create the index directory
-            os.mkdir(indexDirectory)
+            os.mkdir(self.indexLocation)
 
             # Build a new index in this directory
-            self.index = create_in(indexDirectory, self.indexSchema)
+            self.index = create_in(self.indexLocation, self.indexSchema)
 
             # Get a writer for the index
             indexWriter = self.index.writer()
@@ -78,21 +77,38 @@ class TermFrequencyRanking(TermVectorRanking):
                         unicodeKeywords = unicode(', '.join(searchResult['keywords']), errors='ignore')
                     except TypeError:
                         unicodeKeywords = ', '.join(searchResult['keywords'])
+
                     try:
                         unicodeYqlKeywords = unicode(', '.join(searchResult['yqlKeywords']), errors='ignore')
                     except TypeError:
                         unicodeYqlKeywords = ', '.join(searchResult['yqlKeywords'])
+                    except KeyError:
+                        unicodeYqlKeywords = u''
+
                     try:
                         unicodeExpandedYqlKeywords = unicode(', '.join(searchResult['expandedYqlKeywords']), errors='ignore')
                     except TypeError:
                         unicodeExpandedYqlKeywords = ', '.join(searchResult['expandedYqlKeywords'])
+                    except KeyError:
+                        unicodeExpandedYqlKeywords = u''
+
                     try:
                         unicodeHeaders = unicode(', '.join(searchResult['headers']), errors='ignore')
                     except TypeError:
                         unicodeHeaders = ', '.join(searchResult['headers'])
+                    except KeyError:
+                        unicodeHeaders = u''
 
-                    pageRank = searchResult['pageRank']
-                    baselineScore = searchResult['baselineScore']
+                    try:
+                        pageRank = searchResult['pageRank']
+                    except KeyError:
+                        pageRank = 0
+
+                    try:
+                        baselineScore = searchResult['baselineScore']
+                    except KeyError:
+                        baselineScore = 0
+
 
                     if len(unicodeContent) == 0:
                         unicodeContent = u'?'
@@ -123,8 +139,8 @@ class TermFrequencyRanking(TermVectorRanking):
             indexWriter.commit()
 
         else:
-            if exists_in(indexDirectory):
-                self.index = open_dir(indexDirectory)
+            if exists_in(self.indexLocation):
+                self.index = open_dir(self.indexLocation)
             else:
                 raise Exception("Could not open index directory!")
 
@@ -145,7 +161,6 @@ class TermFrequencyRanking(TermVectorRanking):
             if keyword != self.entityId:
                 query += "\"" + keyword + "\" "
         query = query.rstrip()
-        print "Query: " + query
         queryObject = keywordsQueryParser.parse(query)
 
         # Perform the query itself
