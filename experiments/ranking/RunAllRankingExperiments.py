@@ -1,16 +1,15 @@
-from json import load
 import os
+import subprocess
+from json import load
 from experiments.RankingExperiment import RankingExperiment
-from src.ranking.BM25Ranking import BM25Ranking
-from src.ranking.PageRankBM25Ranking import PageRankBM25Ranking
-from src.ranking.TFIDFRanking import TFIDFRanking
-from src.ranking.TermFrequencyRanking import TermFrequencyRanking
-from src.ranking.WeightedHeadersPageRankBM25Ranking import WeightedHeadersPageRankBM25Ranking
-from src.ranking.WeightedHeadersTitleKeywordsPageRankBM25Ranking import WeightedHeadersTitleKeywordsPageRankBM25Ranking
-from src.ranking.WeightedHeadersTitlePageRankBM25Ranking import WeightedHeadersTitlePageRankBM25Ranking
-from src.ranking.WeightedTitleKeywordsDescriptionPageRankBM25Ranking import WeightedTitleKeywordsDescriptionPageRankBM25Ranking
-from src.ranking.WeightedTitlePageRankBM25Ranking import WeightedTitlePageRankBM25Ranking
-from src.ranking.WeightedTitleYQLKeywordsPageRankBM25Ranking import WeightedTitleYQLKeywordsPageRankBM25Ranking
+from src.ranking.static.BM25BaselineRanking import BM25BaselineRanking
+from src.ranking.static.BM25DescriptionRanking import BM25DescriptionRanking
+from src.ranking.static.BM25ExpandedYahooKeywordsRanking import BM25ExpandedYahooKeywordsRanking
+from src.ranking.static.BM25HeadersRanking import BM25HeadersRanking
+from src.ranking.static.BM25KeywordsRanking import BM25KeywordsRanking
+from src.ranking.static.BM25PageRankRanking import BM25PageRankRanking
+from src.ranking.static.BM25TitleRanking import BM25TitleRanking
+from src.ranking.static.BM25YahooKeywordsRanking import BM25YahooKeywordsRanking
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
@@ -32,20 +31,21 @@ if __name__ == '__main__':
 
         # The experiments to run
         experiments = [
-            ('BM25Ranking', BM25Ranking),
-#            ('PageRankBM25Ranking', PageRankBM25Ranking),
-#            ('TermFrequencyRanking', TermFrequencyRanking),
-#            ('TFIDFRanking', TFIDFRanking),
-#            ('WeightedHeadersPageRankBM25Ranking', WeightedHeadersPageRankBM25Ranking),
-#            ('WeightedHeadersTitleKeywordsPageRankBM25Ranking', WeightedHeadersTitleKeywordsPageRankBM25Ranking),
-#            ('WeightedHeadersTitlePageRankBM25Ranking', WeightedHeadersTitlePageRankBM25Ranking),
-#            ('WeightedTitleKeywordsDescriptionPageRankBM25Ranking', WeightedTitleKeywordsDescriptionPageRankBM25Ranking),
-#            ('WeightedTitlePageRankBM25Ranking', WeightedTitlePageRankBM25Ranking),
-#            ('WeightedTitleYQLKeywordsPageRankBM25Ranking', WeightedTitleYQLKeywordsPageRankBM25Ranking)
+            ('BM25BaselineRanking', BM25BaselineRanking),
+            ('BM25DescriptionRanking', BM25DescriptionRanking),
+            ('BM25ExpandedYahooKeywordsRanking', BM25ExpandedYahooKeywordsRanking),
+            ('BM25HeadersRanking', BM25HeadersRanking),
+            ('BM25KeywordsRanking', BM25KeywordsRanking),
+            ('BM25PageRankRanking', BM25PageRankRanking),
+            ('BM25TitleRanking', BM25TitleRanking),
+            ('BM25YahooKeywordsRanking', BM25YahooKeywordsRanking)
         ]
 
         for experiment in experiments:
-        
+
+            # Cleanup existing index if it exists
+            output = subprocess.check_call(["rm",  "-rf", ".index"], stderr=subprocess.STDOUT)
+
             # Find the project root & open the input entity
             projectRoot = str(os.getcwd())
             projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
             # Rank the results
             entityName = entityId.replace(' ', '').replace('-', '')
-            retrievalResults = '/experiments/retrieval/results/%s-EntityAttributeNamesAndValues' % entityName
+            retrievalResults = '/experiments/retrieval/results/%s/EntityAttributeNamesAndValues' % entityName
             extensions = [
                 PageRankExtension(),
                 YQLKeywordExtension(),
@@ -65,5 +65,5 @@ if __name__ == '__main__':
 
             # Output the ranking results
             outputTitle = "Results Summary (for top %d results):\n"
-            outputFile = entityName + '-' + experiment[0]
+            outputFile = entityName + '/' + experiment[0]
             outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)

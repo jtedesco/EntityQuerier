@@ -41,6 +41,7 @@ class TermFrequencyRanking(TermVectorRanking):
                                   description=TEXT(analyzer=analyzer, stored=True), url=ID(stored=True), pagerank=NUMERIC(stored=True),
                                   keywords=TEXT(stored=True), yqlKeywords=TEXT(stored=True), expandedYqlKeywords=TEXT(stored=True),
                                   headers=TEXT(stored=True), baselineScore=NUMERIC(stored=True))
+
         # Remove the index if it exists
         if not os.path.exists(self.indexLocation):
 
