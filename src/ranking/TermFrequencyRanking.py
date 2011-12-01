@@ -145,6 +145,31 @@ class TermFrequencyRanking(TermVectorRanking):
                 raise Exception("Could not open index directory!")
 
 
+    def buildQueryParser(self):
+        """
+          Build the query parser
+        """
+
+        contentQueryParser = QueryParser('content', schema=self.indexSchema, group=OrGroup)
+        contentQueryParser.add_plugin(PlusMinusPlugin)
+        return contentQueryParser
+
+
+    def buildQuery(self):
+        """
+          Builds the query for Whoosh
+        """
+
+
+        query = "+\"" + self.entityId + "\" "
+        for keyword in self.keywords:
+            if keyword != self.entityId:
+                query += "\"" + keyword + "\" "
+        query = query.rstrip()
+
+        return query
+    
+
     def queryIndex(self, weightingMechanism):
         """
           Retrieve the results matching the given keywords
@@ -154,13 +179,8 @@ class TermFrequencyRanking(TermVectorRanking):
         searcher = self.index.searcher(weighting=weightingMechanism)
 
         # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
-        keywordsQueryParser = QueryParser('content', schema=self.indexSchema, group=OrGroup)
-        keywordsQueryParser.add_plugin(PlusMinusPlugin)
-        query = "+\"" + self.entityId + "\" "
-        for keyword in self.keywords:
-            if keyword != self.entityId:
-                query += "\"" + keyword + "\" "
-        query = query.rstrip()
+        keywordsQueryParser = self.buildQueryParser()
+        query = self.buildQuery()
         queryObject = keywordsQueryParser.parse(query)
 
         # Perform the query itself
