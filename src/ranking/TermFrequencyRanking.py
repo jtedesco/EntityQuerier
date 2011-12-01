@@ -20,9 +20,9 @@ class TermFrequencyRanking(TermVectorRanking):
     """
 
     def __init__(self, searchResults, keywords):
+        self.indexLocation = ".index"
         TermVectorRanking.__init__(self, searchResults, keywords)
         self.createIndex()
-        self.indexLocation = ".index"
 
         
     @staticmethod

@@ -43,16 +43,7 @@ class LearningRanking(BM25Ranking):
         }
 
         # The initial guesses at the feature's weightings (starts at 1.0), and
-        self.values = {'baselineScore': 1.5,
- 'content': 0.7,
- 'description': 1.6,
- 'expandedYqlKeywords': 0.7,
- 'headers': 1.3,
- 'keywords': 0.5,
- 'pageRank': 1.7,
- 'pageRankScaling': 1.6,
- 'title': 1.3,
- 'yqlKeywords': 0.7}
+        self.values = {1.}
 
         self.testValues = deepcopy(self.values)
 

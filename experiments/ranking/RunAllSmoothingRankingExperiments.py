@@ -31,13 +31,13 @@ if __name__ == '__main__':
 
         # The experiments to run
         experiments = [
+            ("BM25Ranking", BM25Ranking),
             ("DMOZSmoothed10000BM25Ranking", DMOZSmoothed10000BM25Ranking),
             ("DMOZSmoothed1000BM25Ranking", DMOZSmoothed1000BM25Ranking),
             ("DMOZSmoothed100BM25Ranking", DMOZSmoothed100BM25Ranking),
             ("DMOZSmoothed5000BM25Ranking", DMOZSmoothed5000BM25Ranking),
             ("DMOZSmoothed500BM25Ranking", DMOZSmoothed500BM25Ranking),
-            ("DMOZSmoothedBM25Ranking", DMOZSmoothedBM25Ranking),
-            ("BM25Ranking", BM25Ranking)
+            ("DMOZSmoothedBM25Ranking", DMOZSmoothedBM25Ranking)
         ]
 
         for experiment in experiments:
@@ -62,5 +62,8 @@ if __name__ == '__main__':
             outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
 
         # Cleanup all the indexes
-        output = subprocess.check_call(["rm",  "-rf", ".dmoz-10000-index", ".dmoz-1000-index", ".dmoz-100-index", ".dmoz-5000-index",
+        try:
+            output = subprocess.check_call(["rm",  "-rf", ".dmoz-10000-index", ".dmoz-1000-index", ".dmoz-100-index", ".dmoz-5000-index",
                                     ".dmoz-500-index", ".dmoz-index", ".index"])
+        except subprocess.CalledProcessError:
+            print "Error cleaning up indices: " + str(sys.exc_info()[1])
