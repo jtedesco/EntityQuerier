@@ -1,7 +1,7 @@
 import threading
 from experiments.RankingExperiment import RankingExperiment
 from experiments.retrieval.EntityAttributeValues import EntityAttributeValues
-from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
+from src.queries.EntityAttributeValuesQueryBuilder import ExactAttributeValuesQueryBuilder
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
@@ -44,7 +44,7 @@ class SearchThread(threading.Thread):
         self.update("Running retrieval phase")
         numberOfSearchResults = 50
         searchInterface = GoogleSearch(numberOfSearchResults, True, [])
-        experiment = EntityAttributeValues([self.entityId], searchInterface, EntityAttributeValuesQueryBuilder(), numberOfSearchResults)
+        experiment = EntityAttributeValues([self.entityId], searchInterface, ExactAttributeValuesQueryBuilder(), numberOfSearchResults)
         experiment.run()
         temporaryFileName = "tmp-output" + self.entityId
         experiment.printResults(temporaryFileName)

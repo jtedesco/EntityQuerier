@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
         # The experiments to run
         experiments = [
-            ('BM25BaselineRanking', BM25BaselineRanking),
+#            ('BM25BaselineRanking', BM25BaselineRanking),
             ('BM25DescriptionRanking', BM25DescriptionRanking),
             ('BM25ExpandedYahooKeywordsRanking', BM25ExpandedYahooKeywordsRanking),
             ('BM25HeadersRanking', BM25HeadersRanking),
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         for experiment in experiments:
 
             # Cleanup existing index if it exists
-            output = subprocess.check_call(["rm",  "-rf", ".index"], stderr=subprocess.STDOUT)
+#            output = subprocess.check_call(["rm",  "-rf", ".index"], stderr=subprocess.STDOUT)
 
             # Find the project root & open the input entity
             projectRoot = str(os.getcwd())

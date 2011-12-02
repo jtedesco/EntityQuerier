@@ -28,7 +28,6 @@ if __name__ == '__main__':
         "Ralph Johnson",
         "Robin Kravets"
     ]
-    searchInterface = GoogleSearch(numberOfSearchResults, True)
 
     for entityId in entityIds:
 
@@ -53,6 +52,7 @@ if __name__ == '__main__':
         for experiment in experiments:
 
             # Run experiment
-            experiment = RetrievalExperiment(entityIds, searchInterface, experiment[1](), numberOfSearchResults)
-            experiment.run()
-            experiment.printResults("results/%s/%s" % (entityName, experiment[0]), entityId)
+            searchInterface = GoogleSearch(numberOfSearchResults, True)
+            retrievalExperiment = RetrievalExperiment(entityId, searchInterface, experiment[1](), numberOfSearchResults)
+            retrievalExperiment.run()
+            retrievalExperiment.printResults("results/%s/%s" % (entityName, experiment[0]), entityId)
