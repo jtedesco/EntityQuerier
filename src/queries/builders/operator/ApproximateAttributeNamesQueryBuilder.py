@@ -16,12 +16,8 @@ class ApproximateAttributeNamesQueryBuilder(QueryBuilder):
             @param  idField The field that uniquely identifies this entity
         """
         
-        entityId = str(entity[idField])
-        entityIdQuery = "~%s" % (" ~".join(entityId.split()))
+        entityIdQuery = "%s" % str(entity[idField])
         queries = [entityIdQuery]
-
-        # Get the uniquely identifying key for this entity
-        entityKey = entity[idField]
 
         # Generate queries for each data entry
         for property in entity:

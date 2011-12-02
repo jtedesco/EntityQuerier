@@ -53,7 +53,7 @@ class LearningRanking(BM25Ranking):
 
         # Prepare the list of relevant results (golden standard for each entity)
         self.entityId = 'Kevin Chen-Chuan Chang'
-        self.relevantResults = load(open(projectRoot + '/standard/' + entityId + '.json'))
+        self.relevantResults = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
 
         # Cache the parsed query
         self.query = None

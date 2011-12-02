@@ -24,7 +24,7 @@ class GoogleSearch(Search):
 
         # Start on the first page of results
         googleQuery = str(self.__prepareGoogleQuery(query))
-        url = "http://google.com/search?q=" + googleQuery
+        url = "http://google.com/search?num=50&q=" + googleQuery
 
         if self.verbose:
             print "Querying '%s'..." % query.strip()
@@ -154,6 +154,7 @@ class GoogleSearch(Search):
 
         query = query.replace('+', '%2B')
         query = query.replace(' ', '+')
+        query = query.replace('~', '%7E')
 
         return query
 

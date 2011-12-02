@@ -4,6 +4,7 @@ from _socket import setdefaulttimeout
 from time import sleep
 from urllib2 import HTTPError
 import sys
+import webbrowser
 from util.Cache import Cache
 
 __author__ = 'jon'
@@ -60,7 +61,8 @@ def getPageContent(url):
         except HTTPError, e:
 
             print "Encountered HTTP error '%s'" % str(sys.exc_info()[1])
-            content = ''
+            webbrowser.open(e.url)
+            sys.exit(1)
 
     return content
 

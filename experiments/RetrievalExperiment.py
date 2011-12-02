@@ -78,7 +78,7 @@ class RetrievalExperiment(object):
         projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
 
 
-        idealURLs = load(open(projectRoot + "/standard/%s.json" % self.entityId))
+        idealURLs = load(open(projectRoot + "/relevanceStandard/%s.json" % self.entityId))
         self.idealURLs = set(idealURLs)
 
             
