@@ -1,4 +1,4 @@
-from src.queries.QueryBuilder import QueryBuilder
+from src.queries.builders.QueryBuilder import QueryBuilder
 
 __author__ = 'jon'
 

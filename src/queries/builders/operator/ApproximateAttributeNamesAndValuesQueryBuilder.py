@@ -1,6 +1,6 @@
-from src.queries.ApproximateAttributeNamesQueryBuilder import ApproximateAttributeNamesQueryBuilder
-from src.queries.ApproximateAttributeValuesQueryBuilder import ApproximateAttributeValuesQueryBuilder
-from src.queries.QueryBuilder import QueryBuilder
+from src.queries.builders.QueryBuilder import QueryBuilder
+from src.queries.builders.operator.ApproximateAttributeNamesQueryBuilder import ApproximateAttributeNamesQueryBuilder
+from src.queries.builders.operator.ApproximateAttributeValuesQueryBuilder import ApproximateAttributeValuesQueryBuilder
 
 __author__ = 'jon'
 
