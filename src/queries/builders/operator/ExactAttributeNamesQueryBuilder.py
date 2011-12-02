@@ -3,7 +3,7 @@ from src.queries.QueryBuilder import QueryBuilder
 __author__ = 'jon'
 
 
-class EntityAttributeNamesQueryBuilder(QueryBuilder):
+class ExactAttributeNamesQueryBuilder(QueryBuilder):
     """
       Builds a query by making a query for every facet of an entity
     """

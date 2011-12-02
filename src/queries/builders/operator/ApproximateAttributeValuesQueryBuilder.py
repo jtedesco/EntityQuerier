@@ -3,7 +3,7 @@ from src.queries.QueryBuilder import QueryBuilder
 __author__ = 'jon'
 
 
-class EntityAttributeValuesQueryBuilder(QueryBuilder):
+class ApproximateAttributeValuesQueryBuilder(QueryBuilder):
     """
       Builds a query by making a query for every facet of an entity
     """
@@ -16,7 +16,9 @@ class EntityAttributeValuesQueryBuilder(QueryBuilder):
             @param  idField The field that uniquely identifies this entity
         """
 
-        queries = ["\"%s\"" % str(entity[idField])]
+        entityId = str(entity[idField])
+        entityIdQuery = "~%s" % (" ~".join(entityId.split()))
+        queries = [entityIdQuery]
 
         # Get the uniquely identifying key for this entity
         entityKey = entity[idField]
@@ -32,8 +34,12 @@ class EntityAttributeValuesQueryBuilder(QueryBuilder):
                     # Generate a query for each entry in a list
                     if type(entityProperty) == type([]):
                         for property in entityProperty:
-                            queries.append('"' + str(entityKey) + '" "' + str(property) + '"')
+                            propertyQuery = str(property)
+                            propertyQuery = '~' + ' ~'.join(propertyQuery.split())
+                            queries.append(entityIdQuery + ' ' + propertyQuery)
                     elif entityProperty is not None:
-                        queries.append('"' + str(entityKey) + '" "' + str(entityProperty) + '"')
+                        propertyQuery = str(entityProperty)
+                        propertyQuery = '~' + ' ~'.join(propertyQuery.split())
+                        queries.append(entityIdQuery + ' ' + propertyQuery)
 
         return queries

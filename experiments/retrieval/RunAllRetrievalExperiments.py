@@ -1,7 +1,17 @@
 from experiments.RetrievalExperiment import RetrievalExperiment
-from src.queries.EntityAttributeNamesAndValuesQueryBuilder import EntityAttributeNamesAndValuesQueryBuilder
-from src.queries.EntityAttributeNamesQueryBuilder import EntityAttributeNamesQueryBuilder
-from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
+from src.queries.builders.operator.ApproximateAttributeNamesAndValuesQueryBuilder import ApproximateAttributeNamesAndValuesQueryBuilder
+from src.queries.builders.operator.ApproximateAttributeNamesQueryBuilder import ApproximateAttributeNamesQueryBuilder
+from src.queries.builders.operator.ApproximateAttributeValuesQueryBuilder import ApproximateAttributeValuesQueryBuilder
+from src.queries.builders.operator.ApproximateExactAttributeNamesAndValuesQueryBuilder import ApproximateExactAttributeNamesAndValuesQueryBuilder
+from src.queries.builders.operator.ApproximateExactAttributeNamesQueryBuilder import ApproximateExactAttributeNamesQueryBuilder
+from src.queries.builders.operator.ApproximateExactAttributeValuesQueryBuilder import ApproximateExactAttributeValuesQueryBuilder
+from src.queries.builders.operator.AttributeNamesAndValuesQueryBuilder import AttributeNamesAndValuesQueryBuilder
+from src.queries.builders.operator.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder
+from src.queries.builders.operator.AttributeValuesQueryBuilder import AttributeValuesQueryBuilder
+from src.queries.builders.operator.ExactAttributeNamesAndValuesQueryBuilder import ExactAttributeNamesAndValuesQueryBuilder
+from src.queries.builders.operator.ExactAttributeNamesQueryBuilder import ExactAttributeNamesQueryBuilder
+from src.queries.builders.operator.ExactAttributeValuesQueryBuilder import ExactAttributeValuesQueryBuilder
+
 from src.search.google.GoogleSearch import GoogleSearch
 
 __author__ = 'jon'
@@ -25,17 +35,24 @@ if __name__ == '__main__':
         entityName = entityId.replace(' ', '')
         entityName = entityName.replace('-', '')
 
-        # Attribute names only
-        experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeNamesQueryBuilder(), numberOfSearchResults)
-        experiment.run()
-        experiment.printResults("results/%s/EntityAttributeNames" % entityName, entityId)
+        experiments = [
+            ('ExactAttributeNames', ExactAttributeNamesQueryBuilder),
+            ('ExactAttributeValues', ExactAttributeValuesQueryBuilder),
+            ('ExactAttributeNamesAndValues', ExactAttributeNamesAndValuesQueryBuilder),
+            ('ApproximateExactAttributeNames', ApproximateExactAttributeNamesQueryBuilder),
+            ('ApproximateExactAttributeValues', ApproximateExactAttributeValuesQueryBuilder),
+            ('ApproximateExactAttributeNamesAndValues', ApproximateExactAttributeNamesAndValuesQueryBuilder),
+            ('ApproximateAttributeNames', ApproximateAttributeNamesQueryBuilder),
+            ('ApproximateAttributeValues', ApproximateAttributeValuesQueryBuilder),
+            ('ApproximateAttributeNamesAndValues', ApproximateAttributeNamesAndValuesQueryBuilder),
+            ('AttributeNames', AttributeNamesQueryBuilder),
+            ('AttributeValues', AttributeValuesQueryBuilder),
+            ('AttributeNamesAndValues', AttributeNamesAndValuesQueryBuilder)
+        ]
 
-        # Attribute values only
-        experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeValuesQueryBuilder(), numberOfSearchResults)
-        experiment.run()
-        experiment.printResults("results/%s/EntityAttributeValues" % entityName, entityId)
+        for experiment in experiments:
 
-        # Attribute names & values
-        experiment = RetrievalExperiment(entityIds, searchInterface, EntityAttributeNamesAndValuesQueryBuilder(), numberOfSearchResults)
-        experiment.run()
-        experiment.printResults("results/%s/EntityAttributeNamesAndValues" % entityName, entityId)
+            # Run experiment
+            experiment = RetrievalExperiment(entityIds, searchInterface, experiment[1](), numberOfSearchResults)
+            experiment.run()
+            experiment.printResults("results/%s/%s" % (entityName, experiment[0]), entityId)

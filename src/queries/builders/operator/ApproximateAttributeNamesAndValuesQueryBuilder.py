@@ -1,19 +1,19 @@
-from src.queries.EntityAttributeNamesQueryBuilder import EntityAttributeNamesQueryBuilder
-from src.queries.EntityAttributeValuesQueryBuilder import EntityAttributeValuesQueryBuilder
+from src.queries.ApproximateAttributeNamesQueryBuilder import ApproximateAttributeNamesQueryBuilder
+from src.queries.ApproximateAttributeValuesQueryBuilder import ApproximateAttributeValuesQueryBuilder
 from src.queries.QueryBuilder import QueryBuilder
 
 __author__ = 'jon'
 
 
-class EntityAttributeNamesAndValuesQueryBuilder(QueryBuilder):
+class ApproximateAttributeNamesAndValuesQueryBuilder(QueryBuilder):
     """
       Builds a query by making a query for every facet of an entity, using both names and values of schema
     """
 
     def __init__(self):
 
-        self.entityNamesQueryBuilder = EntityAttributeNamesQueryBuilder()
-        self.entityValuesQueryBuilder = EntityAttributeValuesQueryBuilder()
+        self.entityNamesQueryBuilder = ApproximateAttributeNamesQueryBuilder()
+        self.entityValuesQueryBuilder = ApproximateAttributeValuesQueryBuilder()
 
 
     def buildQueries(self, entity, idField = 'name'):
