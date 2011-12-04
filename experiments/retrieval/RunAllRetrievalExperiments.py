@@ -54,19 +54,19 @@ if __name__ == '__main__':
             ('EntityId100', EntityIdQueryBuilder, 100),
             ('EntityId200', EntityIdQueryBuilder, 200),
             ('EntityId400', EntityIdQueryBuilder, 400),
-            ('EntityId400', EntityIdQueryBuilder, 800),
+            ('EntityId800', EntityIdQueryBuilder, 800),
             ('ExactEntityId10', ExactEntityIdQueryBuilder, 10),
             ('ExactEntityId50', ExactEntityIdQueryBuilder, 50),
             ('ExactEntityId100', ExactEntityIdQueryBuilder, 100),
             ('ExactEntityId200', ExactEntityIdQueryBuilder, 200),
             ('ExactEntityId400', ExactEntityIdQueryBuilder, 400),
-            ('ExactEntityId400', ExactEntityIdQueryBuilder, 800),
+            ('ExactEntityId800', ExactEntityIdQueryBuilder, 800),
             ('ApproximateEntityId10', ApproximateEntityIdQueryBuilder, 10),
             ('ApproximateEntityId50', ApproximateEntityIdQueryBuilder, 50),
             ('ApproximateEntityId100', ApproximateEntityIdQueryBuilder, 100),
             ('ApproximateEntityId200', ApproximateEntityIdQueryBuilder, 200),
             ('ApproximateEntityId400', ApproximateEntityIdQueryBuilder, 400),
-            ('ApproximateEntityId400', ApproximateEntityIdQueryBuilder, 800)
+            ('ApproximateEntityId800', ApproximateEntityIdQueryBuilder, 800)
         ]
 
         for experiment in experiments:
