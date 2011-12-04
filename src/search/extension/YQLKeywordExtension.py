@@ -49,9 +49,11 @@ class YQLKeywordExtension(Extension):
                 keywordJson = loadFromUrl(url)
                 self.cache.write(url, keywordJson)
             keywordData = loads(keywordJson)
-            fetchedKeywords = keywordData['query']['results'].values()
-
-            keywords = keywords.union(set(fetchedKeywords[0]))
+            try:
+                fetchedKeywords = keywordData['query']['results'].values()
+                keywords = keywords.union(set(fetchedKeywords[0]))
+            except AttributeError:
+                pass
 
         return list(keywords)
 

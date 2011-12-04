@@ -31,4 +31,7 @@ class BaselineScoreExtension(Extension):
 
 
     def run(self, resultDictionary):
-        resultDictionary['baselineScore'] = self.scores[resultDictionary['url']]
+        try:
+            resultDictionary['baselineScore'] = self.scores[resultDictionary['url']]
+        except KeyError:
+            resultDictionary['baselineScore'] = 0

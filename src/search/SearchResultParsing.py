@@ -1,5 +1,7 @@
 from json import load
+import mechanize
 import os
+from pprint import pprint
 from random import randint
 from time import sleep
 import urllib2
@@ -75,12 +77,9 @@ def getPageContent(url, insertDelay = False, shouldCache = True):
             # Cache this page
             cache.write(url, content)
 
-        except HTTPError, e:
+        except Exception, e:
 
-            if e.code == 503:
-                print "Encountered HTTP error '%s'" % str(sys.exc_info()[1])
-                webbrowser.open(e.url)
-                sys.exit(1)
+            print "Had an error!"
             content = ''
 
     return content

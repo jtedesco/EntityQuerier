@@ -23,7 +23,7 @@ class LearningRanking(BM25Ranking):
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-    def __init__(self, searchResults, keywords, originalSearchResults):
+    def __init__(self, searchResults, keywords):
         """
           Initializes data structures for the learning algorithm
         """
@@ -43,17 +43,23 @@ class LearningRanking(BM25Ranking):
         }
 
         # The initial guesses at the feature's weightings (starts at 1.0), and
-        self.values = {1.}
-
+        self.values = {
+         'content' : 0.1,
+         'title' : 0.1,
+         'keywords' : 0.1,
+         'headers' : 0.1,
+         'description' : 0.1,
+         'yqlKeywords' : 0.1,
+         'expandedYqlKeywords' : 0.1,
+         'baselineScore' : 0.1,      # A constant added to the final score
+         'pageRank' : 0.1,           # A constant offset based on PR
+         'pageRankScaling' : 0.1     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
+        }
+        
         self.testValues = deepcopy(self.values)
 
-        # Find the project root
-        projectRoot = str(os.getcwd())
-        projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
-
         # Prepare the list of relevant results (golden standard for each entity)
-        self.entityId = 'Kevin Chen-Chuan Chang'
-        self.relevantResults = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
+        self.entityId = 'Paris Smaragdis'
 
         # Cache the parsed query
         self.query = None
@@ -124,12 +130,13 @@ class LearningRanking(BM25Ranking):
           Returns a score based on the results, specifically computing recall, precision, and avg precision
         """
 
-        recallAt10, recallAt20, recallAt50, recallAt100, precisionAt10, precisionAt20, precisionAt50, precisionAt100, \
-            averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, averagePrecisionAt100 = getRankingResults(results, relevantResults, 101)
+        recallAt1, recallAt10, recallAt20, recallAt50, precisionAt1, precisionAt10, precisionAt20, precisionAt50, \
+            averagePrecisionAt1, averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, rPrecision, fullPrecision = getRankingResults(results, relevantUrls, cutoff)
+
 
         # Multiply metrics together (any extremely low scores at one level should make big impact on score)
         score = (recallAt10 * precisionAt10 * averagePrecisionAt10) + (recallAt20 * precisionAt20 * averagePrecisionAt20) + \
-                (recallAt50 * precisionAt50 * averagePrecisionAt50) + (recallAt100 * precisionAt100 * averagePrecisionAt100)
+                (recallAt50 * precisionAt50 * averagePrecisionAt50) + rPrecision + fullPrecision
 
         return score
 
@@ -150,50 +157,62 @@ class LearningRanking(BM25Ranking):
 
         # Keep looping until no further change is necessary
         complete = False
+        iterations = 0
         while not complete:
 
             complete = True
-            for feature in newValues:
 
-                pprint(newValues)
+            if iterations < 50:
 
-                # Get the current scoring
-                rankingResults = self.actuallyRank()
-                currentWeightingScoring = self.evaluateResults(rankingResults, self.relevantResults)
-
-                # Evaluate effect of increase in weight of this features
-                testValues = deepcopy(newValues)
-                testValues[feature] += self.stepSizes[feature]
-                self.testValues = testValues
-                rankingResults = self.actuallyRank()
-                increaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
-
-                # Evaluate effect of decrease in weight of this features
-                testValues = deepcopy(newValues)
-                testValues[feature] -= self.stepSizes[feature]
-                self.testValues = testValues
-                rankingResults = self.actuallyRank()
-                decreaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
-
-                # Update the weighting vector if one of these was an improvement
-                if increaseFeatureWeightResultScoring > currentWeightingScoring:
-                    complete = False
-                    newValues[feature] += self.stepSizes[feature]
-                elif decreaseFeatureWeightResultScoring > currentWeightingScoring:
-                    complete = False
-                    newValues[feature] -= self.stepSizes[feature]
-                else:
-                    # If no change was made, don't update anything
-                    pass
+                iterations += 1
 
                 for feature in newValues:
-                    newValues[feature] = round(newValues[feature], 2)
+
+                    pprint(newValues)
+
+                    # Get the current scoring
+                    rankingResults = self.actuallyRank()
+                    currentWeightingScoring = self.evaluateResults(rankingResults, self.relevantResults)
+
+                    # Evaluate effect of increase in weight of this features
+                    testValues = deepcopy(newValues)
+                    testValues[feature] += self.stepSizes[feature]
+                    self.testValues = testValues
+                    rankingResults = self.actuallyRank()
+                    increaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
+
+                    # Evaluate effect of decrease in weight of this features
+                    testValues = deepcopy(newValues)
+                    testValues[feature] -= self.stepSizes[feature]
+                    self.testValues = testValues
+                    rankingResults = self.actuallyRank()
+                    decreaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
+
+                    # Update the weighting vector if one of these was an improvement
+                    if increaseFeatureWeightResultScoring > currentWeightingScoring:
+                        complete = False
+                        newValues[feature] += self.stepSizes[feature]
+                    elif decreaseFeatureWeightResultScoring > currentWeightingScoring:
+                        complete = False
+                        newValues[feature] -= self.stepSizes[feature]
+                    else:
+                        # If no change was made, don't update anything
+                        pass
+
+                    for feature in newValues:
+                        newValues[feature] = round(newValues[feature], 2)
+
+                
                 
             print "Finished one learning iteration"
 
         self.testValues = newValues
         self.values = newValues  
-        results = BM25Ranking.rank(self)
+
+        pprint("Final Values:")
+        pprint(self.values)
+        
+        results = self.actuallyRank()
 
         return results
 
@@ -202,27 +221,38 @@ if __name__ == '__main__':
     
     experiment = ('LearningRanking', LearningRanking)
 
-    entityId = 'Kevin Chen-Chuan Chang'
-
-    # Find the project root & open the input entity
-    projectRoot = str(os.getcwd())
-    projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
-    entity = load(open(projectRoot + '/entities/%s.json' % entityId))
-
-    # Rank the results
-    entityName = entityId.replace(' ', '').replace('-', '')
-    retrievalResults = '/experiments/retrieval/results/%s-EntityAttributeNamesAndValues' % entityName
-    extensions = [
-        PageRankExtension(),
-        YQLKeywordExtension(),
-        ExpandedYQLKeywordExtension(),
-        BaselineScoreExtension()
+    entityIds = [
+        "ChengXiang Zhai",
+        "Danny Dig",
+        "Kevin Chen-Chuan Chang",
+        "Paris Smaragdis",
+        "Matthew Caesar",
+        "Ralph Johnson",
+        "Robin Kravets"
     ]
-    rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, True, True)
-    results = rankingExperiment.rank()
+    
+    for entityId in entityIds:
 
-    # Output the ranking results
-    outputTitle = "Results Summary (for top %d results):\n"
-    outputFile = entityName + '-' + experiment[0]
-    outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
+        # Find the project root & open the input entity
+        projectRoot = str(os.getcwd())
+        projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
+        entity = load(open(projectRoot + '/entities/%s.json' % entityId))
+
+        # Rank the results
+        entityName = entityId.replace(' ', '').replace('-', '')
+        retrievalResults = '/experiments/retrieval/results/%s/ExactAttributeNamesAndValues' % entityName
+        extensions = [
+            PageRankExtension(),
+            YQLKeywordExtension(),
+            ExpandedYQLKeywordExtension(),
+            BaselineScoreExtension()
+        ]
+        rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, True, True)
+        rankingExperiment.relevantResults = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
+        results = rankingExperiment.rank()
+
+        # Output the ranking results
+        outputTitle = "Results Summary (for top %d results):\n"
+        outputFile = entityName + '-' + experiment[0]
+        outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
     

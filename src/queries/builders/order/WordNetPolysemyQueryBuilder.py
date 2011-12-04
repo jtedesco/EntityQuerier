@@ -57,7 +57,7 @@ class WordNetPolysemyQueryBuilder(QueryBuilder):
         queries.insert(0, idQuery)
 
         # Let's just take the first 10 queries
-        return queries[0:10]
+        return queries[0:11]
 
     
     def scoreQuery(self, query):
@@ -74,7 +74,7 @@ class WordNetPolysemyQueryBuilder(QueryBuilder):
             
             # Call WordNet & get output
             arguments = (wordNetArgumentTemplate % keyword).split()
-            p = subprocess.Popen(['wn'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(['wn'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             output, errors = p.communicate()
 
             # Parse output
