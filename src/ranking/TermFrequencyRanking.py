@@ -43,10 +43,12 @@ class TermFrequencyRanking(TermVectorRanking):
                                   headers=TEXT(stored=True), baselineScore=NUMERIC(stored=True))
 
         # Remove the index if it exists
-        if not os.path.exists(self.indexLocation):
+        if not os.path.exists(self.indexLocation) or len(os.listdir(self.indexLocation)) == 0:
 
-            # Try to create the index directory
-            os.mkdir(self.indexLocation)
+            if not os.path.exists(self.indexLocation):
+                
+                # Try to create the index directory
+                os.mkdir(self.indexLocation)
 
             # Build a new index in this directory
             self.index = create_in(self.indexLocation, self.indexSchema)

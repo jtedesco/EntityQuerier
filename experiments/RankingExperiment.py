@@ -13,7 +13,8 @@ class RankingExperiment(object):
 
     def __init__(self, resultsFilePath, entity, rankingScheme = BM25Ranking, extensions = [], includeOriginalResults = False, verbose = False):
 
-        if not os.path.exists(rankingScheme.getIndexLocation()):
+        indexLocation = rankingScheme.getIndexLocation()
+        if not os.path.exists(indexLocation) or len(os.listdir(indexLocation)) == 0:
 
             # Get the contents of the file
             resultsData = open(resultsFilePath).read()
@@ -38,13 +39,12 @@ class RankingExperiment(object):
 
             # Build the data structure that will map entity id -> urls
             self.results = []
-            for entityId in self.resultsDump:
-                entityUrls = set([])
-                for query in self.resultsDump[entityId]:
-                    for resultType in self.resultsDump[entityId][query]:
-                        for url in self.resultsDump[entityId][query][resultType]:
-                            if url not in ['precision', 'recall', 'averagePrecision']:
-                                entityUrls.add(url)
+            entityUrls = set([])
+            for query in self.resultsDump:
+                for resultType in self.resultsDump[query]:
+                    for url in self.resultsDump[query][resultType]:
+                        if url not in ['precision', 'recall', 'averagePrecision']:
+                            entityUrls.add(url)
 
                 # Assume we're only doing this for one entity
                 self.results = buildGoogleResultsFromURLs(entityUrls, True, verbose, extensions)

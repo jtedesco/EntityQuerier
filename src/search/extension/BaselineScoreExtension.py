@@ -14,21 +14,20 @@ class BaselineScoreExtension(Extension):
         self.scores = {}
 
         # Score the original results
-        for entityId in originalResults:
-            for query in originalResults[entityId]:
+        for query in originalResults:
 
-                rank = 1
-                numberOfResults = len(originalResults[entityId][query]['documentsRetrieved'])
-                for url in originalResults[entityId][query]['documentsRetrieved']:
+            rank = 1
+            numberOfResults = len(originalResults[query]['documentsRetrieved'])
+            for url in originalResults[query]['documentsRetrieved']:
 
-                    rankScore = numberOfResults - rank + 1
+                rankScore = numberOfResults - rank + 1
 
-                    if url not in self.scores:
-                        self.scores[url] = log(rankScore)
-                    else:
-                        self.scores[url] = self.scores[url] + log(rankScore)
+                if url not in self.scores:
+                    self.scores[url] = log(rankScore)
+                else:
+                    self.scores[url] = self.scores[url] + log(rankScore)
 
-                    rank += 1
+                rank += 1
 
 
     def run(self, resultDictionary):

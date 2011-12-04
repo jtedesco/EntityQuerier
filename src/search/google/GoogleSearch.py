@@ -24,7 +24,7 @@ class GoogleSearch(Search):
 
         # Start on the first page of results
         googleQuery = str(self.__prepareGoogleQuery(query))
-        url = "http://google.com/search?num=50&q=" + googleQuery
+        url = "http://google.com/search?q=" + googleQuery
 
         if self.verbose:
             print "Querying '%s'..." % query.strip()
@@ -35,7 +35,7 @@ class GoogleSearch(Search):
 
             try:
                 # Get the HTML content of the (next) results page
-                searchPage = getPageContent(url)
+                searchPage = getPageContent(url, True)
 
                 # Add the results from this page
                 newResults, nextPageUrl = self.__parseResults(searchPage, fetchContent)

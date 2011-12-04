@@ -18,12 +18,12 @@ if __name__ == '__main__':
 
     # The entities for which to run the experiments
     entityIds = [
-#        "ChengXiang Zhai",
-#        "Danny Dig",
-#        "Kevin Chen-Chuan Chang",
-#        "Paris Smaragdis",
-#        "Matthew Caesar",
-#        "Ralph Johnson",
+        "ChengXiang Zhai",
+        "Danny Dig",
+        "Kevin Chen-Chuan Chang",
+        "Paris Smaragdis",
+        "Matthew Caesar",
+        "Ralph Johnson",
         "Robin Kravets"
     ]
 
@@ -31,9 +31,9 @@ if __name__ == '__main__':
 
         # The experiments to run
         experiments = [
-#            ("BM25Ranking", BM25Ranking),
-#            ("DMOZSmoothed10000BM25Ranking", DMOZSmoothed10000BM25Ranking),
-#            ("DMOZSmoothed1000BM25Ranking", DMOZSmoothed1000BM25Ranking),
+            ("BM25Ranking", BM25Ranking),
+            ("DMOZSmoothed10000BM25Ranking", DMOZSmoothed10000BM25Ranking),
+            ("DMOZSmoothed1000BM25Ranking", DMOZSmoothed1000BM25Ranking),
             ("DMOZSmoothed5000BM25Ranking", DMOZSmoothed5000BM25Ranking),
             ("DMOZSmoothed500BM25Ranking", DMOZSmoothed500BM25Ranking),
             ("DMOZSmoothedBM25Ranking", DMOZSmoothedBM25Ranking),

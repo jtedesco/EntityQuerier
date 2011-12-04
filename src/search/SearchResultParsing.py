@@ -1,7 +1,10 @@
+from json import load
+import os
+from random import randint
+from time import sleep
 import urllib2
 from BeautifulSoup import BeautifulSoup
 from _socket import setdefaulttimeout
-from time import sleep
 from urllib2 import HTTPError
 import sys
 import webbrowser
@@ -10,18 +13,29 @@ from util.Cache import Cache
 __author__ = 'jon'
 
 # Spoof the User-Agent so we don't get flagged as spam
-SPOOFED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:7.0.1) Gecko/20100101 Firefox/6.3.1"
+projectRoot = str(os.getcwd())
+projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
+userAgents = load(open(projectRoot + '/userAgents.json'))
 
 # Set a 5 second timeout for all pages
 timeout = 5
 setdefaulttimeout(timeout)
 
 
-def loadFromUrl(url):
+def loadFromUrl(url, insertDelay = False):
 
     # Build a request object to grab the content of the url
     request = urllib2.Request(url)
-    request.add_header("User-Agent", SPOOFED_USER_AGENT)
+
+    # Get a random user agent
+    randomUserAgent = userAgents[randint(0, len(userAgents)-1)]
+    request.add_header("User-Agent", randomUserAgent)
+
+    # Insert a random delay between 0 and 10 seconds (if we''re supposed to)
+    if insertDelay:
+        randomDelay = randint(0, 10)
+        print "Querying Google with %d second delay and User-Agent '%s'" % (randomDelay, randomUserAgent)
+        sleep(randomDelay)
 
     # Open the URL and read the content
     opener = urllib2.build_opener()
@@ -32,7 +46,7 @@ def loadFromUrl(url):
     return content
 
 
-def getPageContent(url):
+def getPageContent(url, insertDelay = False):
     """
       Returns the text content of a single URL.
 
@@ -53,16 +67,18 @@ def getPageContent(url):
 
         try:
             # Load the content from the web
-            content = loadFromUrl(url)
+            content = loadFromUrl(url, insertDelay)
 
             # Cache this page
             cache.write(url, content)
 
         except HTTPError, e:
 
-            print "Encountered HTTP error '%s'" % str(sys.exc_info()[1])
-            webbrowser.open(e.url)
-            sys.exit(1)
+            if e.code == 503:
+                print "Encountered HTTP error '%s'" % str(sys.exc_info()[1])
+                webbrowser.open(e.url)
+                sys.exit(1)
+            content = ''
 
     return content
 

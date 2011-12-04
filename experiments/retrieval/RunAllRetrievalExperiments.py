@@ -21,12 +21,12 @@ if __name__ == '__main__':
     numberOfSearchResults = 50
     entityIds = [
         "ChengXiang Zhai",
-#        "Danny Dig",
-#        "Kevin Chen-Chuan Chang",
-#        "Paris Smaragdis",
-#        "Matthew Caesar",
-#        "Ralph Johnson",
-#        "Robin Kravets"
+        "Danny Dig"
+        "Kevin Chen-Chuan Chang",
+        "Paris Smaragdis",
+        "Matthew Caesar",
+        "Ralph Johnson",
+        "Robin Kravets"
     ]
 
     for entityId in entityIds:
@@ -35,12 +35,12 @@ if __name__ == '__main__':
         entityName = entityName.replace('-', '')
 
         experiments = [
-#            ('ExactAttributeNames', ExactAttributeNamesQueryBuilder),
-#            ('ExactAttributeValues', ExactAttributeValuesQueryBuilder),
-#            ('ExactAttributeNamesAndValues', ExactAttributeNamesAndValuesQueryBuilder),
-#            ('ApproximateExactAttributeNames', ApproximateExactAttributeNamesQueryBuilder),
-#            ('ApproximateExactAttributeValues', ApproximateExactAttributeValuesQueryBuilder),
-#            ('ApproximateExactAttributeNamesAndValues', ApproximateExactAttributeNamesAndValuesQueryBuilder),
+            ('ExactAttributeNames', ExactAttributeNamesQueryBuilder),
+            ('ExactAttributeValues', ExactAttributeValuesQueryBuilder),
+            ('ExactAttributeNamesAndValues', ExactAttributeNamesAndValuesQueryBuilder),
+            ('ApproximateExactAttributeNames', ApproximateExactAttributeNamesQueryBuilder),
+            ('ApproximateExactAttributeValues', ApproximateExactAttributeValuesQueryBuilder),
+            ('ApproximateExactAttributeNamesAndValues', ApproximateExactAttributeNamesAndValuesQueryBuilder),
             ('ApproximateAttributeNames', ApproximateAttributeNamesQueryBuilder),
             ('ApproximateAttributeValues', ApproximateAttributeValuesQueryBuilder),
             ('ApproximateAttributeNamesAndValues', ApproximateAttributeNamesAndValuesQueryBuilder),

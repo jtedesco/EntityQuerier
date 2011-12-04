@@ -24,27 +24,34 @@ if __name__ == '__main__':
 
     # The entities for which to run the experiments
     entityIds = [
-        'ChengXiangZhai'
+        "ChengXiang Zhai",
+        "Danny Dig",
+        "Kevin Chen-Chuan Chang",
+        "Paris Smaragdis",
+        "Matthew Caesar",
+        "Ralph Johnson",
+        "Robin Kravets"
     ]
 
 
     for entityId in entityIds:
-#
-#        try:
-#            output = subprocess.check_call(["rm",  "-rf", ".index"], stderr=subprocess.STDOUT)
-#            print "Success rm -rf!"
-#        except:
-#            pass
-#        try:
-#            output = subprocess.check_call(["rmdir", ".index"], stderr=subprocess.STDOUT)
-#            print "Success rmdir!"
-#        except:
-#            pass
+
+        # Remove existing indices
+        try:
+            output = subprocess.check_call(["rm",  "-rf", ".index"], stderr=subprocess.STDOUT)
+            print "Success rm -rf!"
+        except:
+            pass
+        try:
+            output = subprocess.check_call(["rmdir", ".index"], stderr=subprocess.STDOUT)
+            print "Success rmdir!"
+        except:
+            pass
 
         # The experiments to run
         experiments = [
-            ('BM25BaselineRanking', BM25BaselineRanking),
             ('BM25Ranking', BM25Ranking),
+            ('BM25BaselineRanking', BM25BaselineRanking),
             ('BM25DescriptionRanking', BM25DescriptionRanking),
             ('BM25ExpandedYahooKeywordsRanking', BM25ExpandedYahooKeywordsRanking),
             ('BM25HeadersRanking', BM25HeadersRanking),
@@ -56,8 +63,6 @@ if __name__ == '__main__':
 
         for experiment in experiments:
 
-            # Cleanup existing index if it exists
-
             # Find the project root & open the input entity
             projectRoot = str(os.getcwd())
             projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
@@ -65,7 +70,7 @@ if __name__ == '__main__':
 
             # Rank the results
             entityName = entityId.replace(' ', '').replace('-', '')
-            retrievalResults = '/experiments/retrieval/results/%s/EntityAttributeNamesAndValues' % entityName
+            retrievalResults = '/experiments/retrieval/results/%s/ApproximateAttributeNamesAndValues' % entityName
             extensions = [
                 PageRankExtension(),
                 YQLKeywordExtension(),
