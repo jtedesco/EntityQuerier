@@ -46,7 +46,7 @@ def loadFromUrl(url, insertDelay = False):
     return content
 
 
-def getPageContent(url, insertDelay = False):
+def getPageContent(url, insertDelay = False, shouldCache = True):
     """
       Returns the text content of a single URL.
 
@@ -56,7 +56,10 @@ def getPageContent(url, insertDelay = False):
 
     # Try to retrieve this url from the cache
     cache = Cache()
-    cachedContent = cache.read(url)
+    if shouldCache:
+        cachedContent = cache.read(url)
+    else:
+        cachedContent = None
 
     if cachedContent is not None:
 

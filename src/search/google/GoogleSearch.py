@@ -31,16 +31,25 @@ class GoogleSearch(Search):
 
         # Parse the content of the results page
         results = []
-        while len(results) < self.numberOfResultsToRetrieve and url is not None:
+        start = 0
+        while start < self.numberOfResultsToRetrieve:
 
             try:
+
                 # Get the HTML content of the (next) results page
-                searchPage = getPageContent(url, True)
+                searchPage = getPageContent(url, True, self.cache)
 
                 # Add the results from this page
-                newResults, nextPageUrl = self.__parseResults(searchPage, fetchContent)
-                results.extend(newResults)
-                url = nextPageUrl
+                newResults = self.__parseResults(searchPage, fetchContent)
+
+                url = "http://google.com/search?start=%d&q=%s" % (start, googleQuery)
+
+                if len(newResults) > 0:
+                    start += 10
+                    results.extend(newResults)
+                else:
+                    start += 1
+                print "Length: %d, starting: %d" % (len(newResults), start)
 
             except Exception:
 
@@ -73,7 +82,6 @@ class GoogleSearch(Search):
             @param  resultsContent The HTML content to parse (the results page of Google)
             @return
                 results: A dictionary, parsed from the results, that contains the basic result information
-                nextURL: The URL of the next page of results
         """
 
         results = []
@@ -83,7 +91,6 @@ class GoogleSearch(Search):
         resultEntries = parsedHTML.findAll('li', {'class' : 'g'})
 
         # Add entries, and content for each
-        nextURL = None
         for resultEntry in resultEntries:
 
             # Extract all the data we can for this result from the main results page
@@ -101,11 +108,6 @@ class GoogleSearch(Search):
             }
             results.append(result)
 
-        # Parse the next page's URL from the current results page, if it can be found
-        try:
-            nextURL = "http://www.google.com" + str(parsedHTML.find(id='pnnext').attrMap['href'])
-        except AttributeError:
-            nextURL = None
 
         if fetchContent:
             try:
@@ -114,7 +116,7 @@ class GoogleSearch(Search):
                 for resultData in results:
                     url = resultData['url']
                     dotLocation = url.rfind('.')
-                    if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'}:
+                    if dotLocation != -1 or url[dotLocation:] not in set(['.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx']):
                         parserThread = ResultParserThread(resultData, self.verbose, self.extensions)
                         threads.append(parserThread)
 
@@ -141,7 +143,7 @@ class GoogleSearch(Search):
                 if self.verbose:
                     print "Error parsing basic results from Google: '%s'" % str(sys.exc_info()[1]).strip()
 
-        return results, nextURL
+        return results
 
 
     def __prepareGoogleQuery(self, query):
