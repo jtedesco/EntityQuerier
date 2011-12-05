@@ -18,7 +18,7 @@ from util.RankingExperimentUtil import getRankingResults, outputRankingResults
 
 __author__ = 'jon'
 
-class LearningRanking(BM25Ranking):
+class CoordinateDescentRanking(BM25Ranking):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
@@ -64,7 +64,7 @@ class LearningRanking(BM25Ranking):
         # Cache the parsed query
         self.query = None
 
-        super(LearningRanking, self).__init__(searchResults, keywords)
+        super(CoordinateDescentRanking, self).__init__(searchResults, keywords)
 
 
     def queryIndex(self, weightingMechanism):
@@ -219,7 +219,7 @@ class LearningRanking(BM25Ranking):
 
 if __name__ == '__main__':
     
-    experiment = ('LearningRanking', LearningRanking)
+    experiment = ('CoordinateDescentRanking', CoordinateDescentRanking)
 
     entityIds = [
         "ChengXiang Zhai",

@@ -9,7 +9,7 @@ from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from whoosh.scoring import Frequency
 from whoosh.support.charset import accent_map
-from src.ranking.TermVectorRanking import Ranking
+from src.ranking.Ranking import Ranking
 
 __author__ = 'jon'
 
@@ -162,7 +162,6 @@ class TermFrequencyRanking(Ranking):
         """
           Builds the query for Whoosh
         """
-
 
         query = "+\"" + self.entityId + "\" "
         for keyword in self.keywords:
