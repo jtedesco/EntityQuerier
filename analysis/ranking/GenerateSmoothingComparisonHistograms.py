@@ -3,7 +3,7 @@
 """
 import os
 import subprocess
-from analysis.VisualizationUtility import splitCamelCase, parseStatsFromRanking, averageEntityScores
+from analysis.VisualizationUtility import splitCamelCase, averageEntityScores, populateData
 
 __author__ = 'jon'
 
@@ -18,36 +18,7 @@ if __name__ == '__main__':
 
     # Iterate through each result directory
     rootVisualizationDirectory = projectRoot + '/experiments/ranking/results/dmoz'
-    for folder in os.listdir(rootVisualizationDirectory):
-
-        entityName = folder
-        entityDirectory = rootVisualizationDirectory + '/' + folder
-
-        data[entityName] = {}
-
-        if os.path.isdir(entityDirectory):
-            for experimentFile in os.listdir(entityDirectory):
-
-                experimentName = experimentFile
-
-                # Parse the data from the ranking output
-                precisionAt1, precisionAt10, precisionAt20, precisionAt50, averagePrecisionAt1, averagePrecisionAt10, \
-                    averagePrecisionAt20,  averagePrecisionAt50, recallAt50, rPrecision, fullPrecision = parseStatsFromRanking(entityDirectory + '/' + experimentFile)
-                
-                # Insert all these data points
-                data[entityName][experimentName] = {
-                    'precisionAt1' : precisionAt1,
-                    'precisionAt10' : precisionAt10,
-                    'precisionAt20' : precisionAt20,
-                    'precisionAt50' : precisionAt50,
-                    'averagePrecisionAt1' : averagePrecisionAt1,
-                    'averagePrecisionAt10' : averagePrecisionAt10,
-                    'averagePrecisionAt20' : averagePrecisionAt20,
-                    'averagePrecisionAt50' : averagePrecisionAt50,
-                    'recallAt50' : recallAt50,
-                    'rPrecision' : rPrecision,
-                    'fullPrecision' : fullPrecision
-                }
+    populateData(data, rootVisualizationDirectory)
 
     averageScores = averageEntityScores(data)
 
@@ -88,3 +59,6 @@ if __name__ == '__main__':
 
     # Run gnuplot
     subprocess.Popen(['gnuplot', 'config']).communicate()
+
+    os.remove('config')
+    os.remove('input.dat')

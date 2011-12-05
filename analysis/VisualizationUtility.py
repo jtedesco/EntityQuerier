@@ -82,9 +82,14 @@ def averageEntityScores(data):
         for metric in metrics:
 
             average = 0.0
+            numberOfEntities = len(entities)
             for entity in entities:
-                average += data[entity][experiment][metric]
-            average /= len(entities)
+                try:
+                    average += data[entity][experiment][metric]
+                except KeyError:
+                    numberOfEntities -= 1
+                    print "Skipping %s for experiment '%s'" % (entity, experiment)
+            average /= numberOfEntities
 
             averagedData[experiment][metric] = average
 
