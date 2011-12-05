@@ -24,13 +24,13 @@ if __name__ == '__main__':
 
     # The entities for which to run the experiments
     entityIds = [
+        "Robin Kravets",
+        "Kevin Chen-Chuan Chang",
         "ChengXiang Zhai",
         "Danny Dig",
-        "Kevin Chen-Chuan Chang",
         "Paris Smaragdis",
         "Matthew Caesar",
-        "Ralph Johnson",
-        "Robin Kravets"
+        "Ralph Johnson"
     ]
 
 

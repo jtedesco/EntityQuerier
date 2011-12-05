@@ -1,3 +1,4 @@
+from pprint import pprint
 from experiments.RetrievalExperiment import RetrievalExperiment
 from src.queries.builders.operator.ApproximateAttributeNamesAndValuesQueryBuilder import ApproximateAttributeNamesAndValuesQueryBuilder
 from src.queries.builders.operator.ApproximateAttributeNamesQueryBuilder import ApproximateAttributeNamesQueryBuilder
@@ -12,8 +13,12 @@ from src.queries.builders.operator.ExactAttributeNamesAndValuesQueryBuilder impo
 from src.queries.builders.operator.ExactAttributeNamesQueryBuilder import ExactAttributeNamesQueryBuilder
 from src.queries.builders.operator.ExactAttributeValuesQueryBuilder import ExactAttributeValuesQueryBuilder
 from src.queries.builders.order.ApproximateEntityIdQueryBuilder import ApproximateEntityIdQueryBuilder
+from src.queries.builders.order.ApproximateExactWordNetPolysemyQueryBuilder import ApproximateExactWordNetPolysemyQueryBuilder
+from src.queries.builders.order.ApproximateWordNetPolysemyQueryBuilder import ApproximateWordNetPolysemyQueryBuilder
 from src.queries.builders.order.EntityIdQueryBuilder import EntityIdQueryBuilder
 from src.queries.builders.order.ExactEntityIdQueryBuilder import ExactEntityIdQueryBuilder
+from src.queries.builders.order.ExactWordNetPolysemyQueryBuilder import ExactWordNetPolysemyQueryBuilder
+from src.queries.builders.order.WordNetPolysemyQueryBuilder import WordNetPolysemyQueryBuilder
 
 from src.search.google.GoogleSearch import GoogleSearch
 
@@ -66,7 +71,11 @@ if __name__ == '__main__':
             ('ApproximateEntityId100', ApproximateEntityIdQueryBuilder, 100),
             ('ApproximateEntityId200', ApproximateEntityIdQueryBuilder, 200),
             ('ApproximateEntityId400', ApproximateEntityIdQueryBuilder, 400),
-            ('ApproximateEntityId800', ApproximateEntityIdQueryBuilder, 800)
+            ('ApproximateEntityId800', ApproximateEntityIdQueryBuilder, 800),
+            ('WordNetPolysemy', WordNetPolysemyQueryBuilder, 50),
+            ('ExactWordNetPolysemy', ExactWordNetPolysemyQueryBuilder, 50),
+            ('ApproximateExactWordNetPolysemy', ApproximateExactWordNetPolysemyQueryBuilder, 50),
+            ('ApproximateWordNetPolysemy', ApproximateWordNetPolysemyQueryBuilder, 50)
         ]
 
         for experiment in experiments:
@@ -74,7 +83,7 @@ if __name__ == '__main__':
             # Run experiment
             numberOfSearchResults = experiment[2]
             searchInterface = GoogleSearch(numberOfSearchResults, True)
-#            searchInterface.cache = False
             retrievalExperiment = RetrievalExperiment(entityId, searchInterface, experiment[1](), numberOfSearchResults)
+            pprint(retrievalExperiment.queries)
             retrievalExperiment.run()
             retrievalExperiment.printResults("results/%s/%s" % (entityName, experiment[0]), entityId)

@@ -54,10 +54,9 @@ class WordNetPolysemyQueryBuilder(QueryBuilder):
 
         # Add the id query
         queries = list(queries)
-        queries.insert(0, idQuery)
+        queries.insert(0, idQuery.lower())
 
-        # Let's just take the first 10 queries
-        return queries[0:11]
+        return queries
 
     
     def scoreQuery(self, query):
