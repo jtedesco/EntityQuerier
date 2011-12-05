@@ -1,3 +1,5 @@
+import os
+
 __author__ = 'jon'
 
 alphabet = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
@@ -88,6 +90,41 @@ def averageEntityScores(data):
 
     return averagedData
 
+
+def populateData(data, rootVisualizationDirectory):
+    
+    for folder in os.listdir(rootVisualizationDirectory):
+        entityName = folder
+        entityDirectory = rootVisualizationDirectory + '/' + folder
+
+        data[entityName] = {}
+
+        if os.path.isdir(entityDirectory):
+            for experimentFile in os.listdir(entityDirectory):
+                experimentName = experimentFile
+
+                experimentPath = entityDirectory + '/' + experimentFile
+                if os.path.isfile(experimentPath):
+
+                    # Parse the data from the ranking output
+                    precisionAt1, precisionAt10, precisionAt20, precisionAt50, averagePrecisionAt1, averagePrecisionAt10,\
+                    averagePrecisionAt20, averagePrecisionAt50, recallAt50, rPrecision, fullPrecision = parseStatsFromRanking(
+                        experimentPath)
+    
+                    # Insert all these data points
+                    data[entityName][experimentName] = {
+                        'precisionAt1': precisionAt1,
+                        'precisionAt10': precisionAt10,
+                        'precisionAt20': precisionAt20,
+                        'precisionAt50': precisionAt50,
+                        'averagePrecisionAt1': averagePrecisionAt1,
+                        'averagePrecisionAt10': averagePrecisionAt10,
+                        'averagePrecisionAt20': averagePrecisionAt20,
+                        'averagePrecisionAt50': averagePrecisionAt50,
+                        'recallAt50': recallAt50,
+                        'rPrecision': rPrecision,
+                        'fullPrecision': fullPrecision
+                    }
 
 if __name__ == '__main__':
     pass
