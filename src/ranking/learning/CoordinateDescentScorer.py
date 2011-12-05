@@ -2,7 +2,7 @@ __author__ = 'jon'
 
 from whoosh.scoring import BM25F
 
-class LearningScorer(BM25F):
+class CoordinateDescentScorer(BM25F):
     """
       Implements a learning-based scorer for
     """
@@ -20,6 +20,6 @@ class LearningScorer(BM25F):
         # Add the raw weight & scaling from pagerank
         pageRank = float(searcher.stored_fields(docnum)['pagerank'])
         baselineScore = float(searcher.stored_fields(docnum)['baselineScore'])
-        newScore = LearningScorer.pageRankScalingWeight * ((LearningScorer.baselineScoreWeight * baselineScore) + score + (pageRank * LearningScorer.pageRankWeight))
+        newScore = CoordinateDescentScorer.pageRankScalingWeight * ((CoordinateDescentScorer.baselineScoreWeight * baselineScore) + score + (pageRank * CoordinateDescentScorer.pageRankWeight))
 
         return newScore

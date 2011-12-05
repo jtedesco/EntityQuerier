@@ -9,7 +9,7 @@ from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from experiments.RankingExperiment import RankingExperiment
 from src.ranking.BM25Ranking import BM25Ranking
-from src.ranking.learning.LearningScorer import LearningScorer
+from src.ranking.learning.LearningScorer import CoordinateDescentScorer
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
@@ -80,9 +80,9 @@ class CoordinateDescentRanking(BM25Ranking):
         del termBoosts['baselineScore']
         del termBoosts['pageRank']
         del termBoosts['pageRankScaling']
-        LearningScorer.baselineScoreWeight = self.testValues['baselineScore']
-        LearningScorer.pageRankWeight = self.testValues['pageRank']
-        LearningScorer.pageRankScalingWeight = self.testValues['pageRankScaling']
+        CoordinateDescentScorer.baselineScoreWeight = self.testValues['baselineScore']
+        CoordinateDescentScorer.pageRankWeight = self.testValues['pageRank']
+        CoordinateDescentScorer.pageRankScalingWeight = self.testValues['pageRankScaling']
         keywordsQueryParser = MultifieldParser(['content', 'title', 'description', 'keywords', 'headers', 'yqlKeywords', 'expandedYqlKeywords'],
                 self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
         keywordsQueryParser.add_plugin(PlusMinusPlugin)
@@ -143,7 +143,7 @@ class CoordinateDescentRanking(BM25Ranking):
 
     def actuallyRank(self):
 
-        reRankedResults = self.queryIndex(LearningScorer)
+        reRankedResults = self.queryIndex(CoordinateDescentScorer)
         return reRankedResults
 
 
