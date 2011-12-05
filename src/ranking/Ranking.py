@@ -13,11 +13,9 @@ class Ranking(object):
                                         [
                                             {
                                                 'url': <url>
-                                                'preview' : <preview snippet>
                                                 'title' : <title>
-                                                'description' : <meta description>
-                                                'pageRank' : <PageRank, between 0 and 10>
                                                 'content' : <page content>
+                                                ...
                                             },
                                             ...
                                         ]
