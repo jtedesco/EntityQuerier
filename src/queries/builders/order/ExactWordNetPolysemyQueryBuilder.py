@@ -1,8 +1,4 @@
-from pprint import pprint
-import subprocess
 from src.queries.builders.QueryBuilder import QueryBuilder
-from src.queries.builders.operator.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder
-from src.queries.builders.operator.AttributeValuesQueryBuilder import AttributeValuesQueryBuilder
 from src.queries.builders.order.WordNetPolysemyQueryBuilder import WordNetPolysemyQueryBuilder
 
 __author__ = 'jon'

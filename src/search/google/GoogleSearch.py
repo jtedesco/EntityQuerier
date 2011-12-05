@@ -1,16 +1,11 @@
-from json import load
 import mechanize
 from mechanize._mechanize import LinkNotFoundError
-import os
 from pprint import pprint
-from random import randint
 import re
 import sys
-from time import sleep
 from src.search.ResultParserThread import ResultParserThread
 from src.search.Search import Search
 from BeautifulSoup import BeautifulSoup
-from src.search.SearchResultParsing import getPageContent
 
 __author__ = 'jon'
 

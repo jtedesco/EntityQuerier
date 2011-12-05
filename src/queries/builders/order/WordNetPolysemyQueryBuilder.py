@@ -1,4 +1,3 @@
-from pprint import pprint
 import subprocess
 from src.queries.builders.QueryBuilder import QueryBuilder
 from src.queries.builders.operator.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder

@@ -2,14 +2,13 @@ from IN import INT_MAX
 import os
 import whoosh
 from whoosh.analysis import StemmingAnalyzer, CharsetFilter
-from whoosh.fields import Schema, TEXT, ID, NUMERIC, KEYWORD
+from whoosh.fields import Schema, TEXT, ID, NUMERIC
 from whoosh.index import create_in, exists_in, open_dir
 from whoosh.qparser.default import QueryParser
 from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from whoosh.scoring import Frequency
 from whoosh.support.charset import accent_map
-import sys
 from src.ranking.TermVectorRanking import TermVectorRanking
 
 __author__ = 'jon'

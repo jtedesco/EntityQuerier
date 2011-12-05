@@ -1,4 +1,3 @@
-from copy import deepcopy
 from json import dumps, loads
 import threading
 import cherrypy
