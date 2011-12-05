@@ -1,6 +1,6 @@
 __author__ = 'jon'
 
-class TermVectorRanking(object):
+class Ranking(object):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """

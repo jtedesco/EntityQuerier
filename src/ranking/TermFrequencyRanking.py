@@ -9,18 +9,18 @@ from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from whoosh.scoring import Frequency
 from whoosh.support.charset import accent_map
-from src.ranking.TermVectorRanking import TermVectorRanking
+from src.ranking.TermVectorRanking import Ranking
 
 __author__ = 'jon'
 
-class TermFrequencyRanking(TermVectorRanking):
+class TermFrequencyRanking(Ranking):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
     def __init__(self, searchResults, keywords):
         self.indexLocation = ".index"
-        TermVectorRanking.__init__(self, searchResults, keywords)
+        Ranking.__init__(self, searchResults, keywords)
         self.createIndex()
 
         

@@ -1,10 +1,10 @@
 from math import log
 import operator
-from src.ranking.TermVectorRanking import TermVectorRanking
+from src.ranking.Ranking import Ranking
 
 __author__ = 'jon'
 
-class BaselineResultsRanking(TermVectorRanking):
+class BaselineResultsRanking(Ranking):
     """
       Represents a baseline ranking of the original search results.
     """

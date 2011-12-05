@@ -1,7 +1,6 @@
 from json import load
 import os
 from src.ranking.BM25Ranking import BM25Ranking
-from src.ranking.TermVectorRanking import TermVectorRanking
 
 __author__ = 'jon'
 
@@ -45,7 +44,7 @@ class DMOZSmoothedBM25Ranking(BM25Ranking):
         # Create the index with both the traditional and new DMOZ search results
         searchResults.extend(dmozResults)
         self.indexLocation = ".dmoz-index"
-        TermVectorRanking.__init__(self, searchResults, keywords)
+        Ranking.__init__(self, searchResults, keywords)
         self.createIndex()
 
     @staticmethod
