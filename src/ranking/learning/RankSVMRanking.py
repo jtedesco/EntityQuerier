@@ -60,12 +60,18 @@ class RankSVMRanking(object):
         rankSVMData += "%d qid:%d" % (preferenceScore, qid)
         for index in xrange(0, len(self.features)):
             feature = self.features[index]
-            if type(scoredResult[feature]) == type(0):
-                rankSVMData += " %d:%d" % (index + 1, scoredResult[feature])
-            elif type(scoredResult[feature]) == type(0.0):
-                rankSVMData += " %d:%1.2f" % (index + 1, scoredResult[feature])
-            else:
-                print "Unrecognized feature type, feature: " + str(scoredResult[feature])
+
+            try:
+                if type(scoredResult[feature]) == type(0):
+                    rankSVMData += " %d:%d" % (index + 1, scoredResult[feature])
+                elif type(scoredResult[feature]) == type(0.0):
+                    rankSVMData += " %d:%1.2f" % (index + 1, scoredResult[feature])
+                else:
+                    print "Unrecognized feature type, feature: " + str(scoredResult[feature])
+            except KeyError:
+                print "missing feature for %s" % scoredResult['url']
+                rankSVMData += " %d:%d" % (index + 1, 0)
+
         rankSVMData += '   #%s \n' % scoredResult['url']
         return rankSVMData
 
@@ -148,7 +154,37 @@ class RankSVMRanking(object):
 
         return reRankedResults
 
-    
+
+def getDmozResults():
+
+    # Find where we expect this data to be cached
+    dmozPath = str(os.getcwd())
+    dmozPath = dmozPath[:dmozPath.find('EntityQuerier') + len('EntityQuerier')] + '/dmoz/'
+
+    # Supplement the index with the DMOZ documents
+    dmozResults = []
+    for filename in os.listdir(dmozPath):
+
+        try:
+
+            # Get the contents of the file
+            dmozResultFile = open(dmozPath + filename)
+            dmozResult = load(dmozResultFile)
+            dmozResults.append(dmozResult)
+
+        except ValueError:
+
+            # Do something awful...
+            try:
+                dmozResult = eval(dmozResultFile.read())
+                dmozResults.append(dmozResult)
+            except Exception:
+                pass
+
+    # Create the index with both the traditional and new DMOZ search results
+    return dmozResults
+
+
 def buildResultsForEntity(resultsFilePath, verbose, extensions):
 
     # Get the contents of the file
@@ -298,6 +334,11 @@ if __name__ == '__main__':
     projectRoot = str(os.getcwd())
     projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
 
+    # Get the DMOZ results for all entities
+    print "getting DMOZ results"
+    dmozResults = getDmozResults()
+    print "%d dmoz results" % len(dmozResults)
+
     # Build the relevance sets for each
     retrievalExperimentResults = 'ExactAttributeNamesAndValues'
     resultScores = {}
@@ -320,6 +361,8 @@ if __name__ == '__main__':
         entityName = entityId.replace(' ', '').replace('-', '')
         resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
         entityResults = buildResultsForEntity(resultsFilePath, True, extensions)
+        if entityResults is not None:
+            entityResults.extend(dmozResults)
         resultScores[entityId] = scoreResults(entity, entityId, entityResults, features)
 
 
