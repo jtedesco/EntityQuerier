@@ -216,11 +216,12 @@ def buildResultsForEntity(resultsFilePath, verbose, extensions):
                     entityUrls.add(url)
 
     # Gather the results
-    if not os.path.exists('.index-' + entityId):
-        results = buildGoogleResultsFromURLs(entityUrls, verbose=verbose, extensions=extensions)
-        print "Gathered all results"
-    else:
-        results = None
+    urlGroups = group(list(entityUrls), 100)
+    for urlGroup in urlGroups:
+        print "Gathering URL group"
+        results = buildGoogleResultsFromURLs(urlGroup, verbose=verbose, extensions=extensions)
+        BM25SpyRanking(results, [], None)
+    print "Gathered all results"
 
     return results
 
@@ -306,6 +307,10 @@ def getKeywords(entity):
     return keywords
 
 
+def group(results, groupSize):
+    return [results[i : i + groupSize] for i in xrange(0, len(results), groupSize)]
+
+
 if __name__ == '__main__':
 
     features = [
@@ -335,15 +340,20 @@ if __name__ == '__main__':
     projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
 
     # Get the DMOZ results for all entities
-    print "getting DMOZ results"
-    dmozResults = getDmozResults()
-    print "%d dmoz results" % len(dmozResults)
+    if not os.path.exists('.index'):
+        print "getting DMOZ results"
+        dmozResults = getDmozResults()
+        print "%d dmoz results" % len(dmozResults)
+    else:
+        dmozResults = []
 
     # Build the relevance sets for each
     retrievalExperimentResults = 'ExactAttributeNamesAndValues'
     resultScores = {}
     relevance = {}
     for entityId in entityIds:
+
+        print "Gathering pages for %s" % entityId
 
         # Get the entity
         entity = load(open(projectRoot + '/entities/%s.json' % entityId))
@@ -360,7 +370,7 @@ if __name__ == '__main__':
         # Get the retrieval results for this entity
         entityName = entityId.replace(' ', '').replace('-', '')
         resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
-        entityResults = buildResultsForEntity(resultsFilePath, True, extensions)
+        entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
         if entityResults is not None:
             entityResults.extend(dmozResults)
         resultScores[entityId] = scoreResults(entity, entityId, entityResults, features)
@@ -387,7 +397,7 @@ if __name__ == '__main__':
         # Get the retrieval results for this entity
         entityName = entityId.replace(' ', '').replace('-', '')
         resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
-        entityResults = buildResultsForEntity(resultsFilePath, True, extensions)
+        entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
         resultScores = scoreResults(entity, entityId, entityResults, features)
 
         # Get the ranked results

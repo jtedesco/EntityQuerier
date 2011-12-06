@@ -5,6 +5,7 @@ from time import sleep
 import urllib2
 from BeautifulSoup import BeautifulSoup
 from _socket import setdefaulttimeout
+import sys
 from util.Cache import Cache
 
 __author__ = 'jon'
@@ -74,7 +75,7 @@ def getPageContent(url, insertDelay = False, shouldCache = True):
 
         except Exception, e:
 
-            print "Had an error!"
+            print "Had an error: " + str(sys.exc_info()[1])
             content = ''
 
     return content
