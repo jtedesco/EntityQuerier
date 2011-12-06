@@ -118,7 +118,6 @@ def populateData(data, rootVisualizationDirectory):
     
                     # Insert all these data points
                     data[entityName][experimentName] = {
-                        'precisionAt1': precisionAt1,
                         'precisionAt10': precisionAt10,
                         'precisionAt20': precisionAt20,
                         'precisionAt50': precisionAt50,
