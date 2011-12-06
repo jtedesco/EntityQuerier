@@ -6,6 +6,7 @@ import sys
 from src.search.ResultParserThread import ResultParserThread
 from src.search.Search import Search
 from BeautifulSoup import BeautifulSoup
+from src.search.SearchResultParsing import getPageContent
 
 __author__ = 'jon'
 
@@ -29,48 +30,25 @@ class GoogleSearch(Search):
         googleQuery = str(self.__prepareGoogleQuery(query))
         url = "http://google.com/search?q=" + googleQuery
 
-        shouldStop = False
-        results = []
-
-        # Prepare the mechanize browser
-#        projectRoot = str(os.getcwd())
-#        projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
-#        userAgents = load(open(projectRoot + '/userAgents.json'))
-        br = mechanize.Browser()
-#        randomUserAgent = userAgents[randint(0, len(userAgents)-1)]
-        br.addheaders = [('User-agent', "Mozilla/5.0 (Ubuntu; X11; Linux x86_64; rv:8.0) Gecko/20100101 Firefox/8.0")]
-        br.set_handle_robots(False)
-        response = br.open(url)
-        
         if self.verbose:
             print "Querying '%s'..." % query.strip()
 
-        iteration = 0
-        while not shouldStop:
-
-            # Add the results from this page
-            content = response.read()
-            newResults = self.__parseResults(content, fetchContent)
-            iteration += 1
-
-            if len(newResults) >= self.numberOfResultsToRetrieve:
-                shouldStop = True
-            elif len(newResults) == 0:
-                shouldStop = True
-                print "Stopped parsing results on iteration %d" % iteration
-
-            # Go to the next page
+        # Parse the content of the results page
+        results = []
+        while len(results) < self.numberOfResultsToRetrieve and url is not None:
             try:
-                links = br.links(text_regex=re.compile("Next"))
-                link = links[0]
-            except LinkNotFoundError:
-                pprint(response.read())
-                shouldStop = True
-            except:
-                print "Do a captcha..."
-                var = raw_input()
-                br.find_link(text='Next')
-                response = br.follow_link(text='Next')
+                # Get the HTML content of the (next) results page
+                searchPage = getPageContent(url, True)
+
+                # Add the results from this page
+                newResults, nextPageUrl = self.__parseResults(searchPage, fetchContent)
+                results.extend(newResults)
+                url = nextPageUrl
+
+            except Exception:
+
+                if self.verbose:
+                    print "Error querying Google: '%s'" % str(sys.exc_info()[1]).strip()
 
         # Trim the results down to the exact size we want
         results = results[:self.numberOfResultsToRetrieve]
@@ -97,7 +75,8 @@ class GoogleSearch(Search):
 
             @param  resultsContent The HTML content to parse (the results page of Google)
             @return
-                results: A dictionary, parsed from the results, that contains the basic result information
+                results:    A dictionary, parsed from the results, that contains the basic result information
+                nextURL:    The URL of the next page
         """
 
         results = []
@@ -105,6 +84,23 @@ class GoogleSearch(Search):
         # Get the result entries (the list of results)
         parsedHTML = BeautifulSoup(resultsContent)
         resultEntries = parsedHTML.findAll('li', {'class' : 'g'})
+
+        try:
+            nextLinks = parsedHTML.findAll('a', {'href' : re.compile('^/search'), 'id':'pnnext'})
+            nextURL = nextLinks[0].attrMap['href']
+            if 'http://' not in nextURL:
+                nextURL = 'http://www.google.com' + nextURL
+        except Exception, e:
+            try:
+                otherNextURLTag = parsedHTML.findAll('a', {'href': re.compile('^/search')})[-1]
+                if otherNextURLTag.text == 'Next':
+                    nextURL = otherNextURLTag.attrMap['href']
+                if 'http://' not in nextURL:
+                    nextURL = 'http://www.google.com' + nextURL
+            except:
+                nextURL = None
+                print "Failed to find next page URL: %s" % str(e)
+
 
         # Add entries, and content for each
         for resultEntry in resultEntries:
@@ -116,6 +112,7 @@ class GoogleSearch(Search):
                 preview = resultEntry.find('span', {'class' : 'st'}).text.encode('ascii', 'ignore').lower()
             except AttributeError:
                 preview = ""
+
 
             # Add it to our results
             result = {
@@ -159,7 +156,7 @@ class GoogleSearch(Search):
                 if self.verbose:
                     print "Error parsing basic results from Google: '%s'" % str(sys.exc_info()[1]).strip()
 
-        return results
+        return results, nextURL
 
 
     def __prepareGoogleQuery(self, query):
