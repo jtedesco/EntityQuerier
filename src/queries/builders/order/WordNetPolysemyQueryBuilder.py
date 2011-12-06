@@ -11,6 +11,8 @@ class WordNetPolysemyQueryBuilder(QueryBuilder):
       Builds a query by making a query for every facet of an entity, using both names and values of schema
     """
 
+    numberOfQueries = 100
+
     def __init__(self):
 
         self.entityNamesQueryBuilder = AttributeNamesQueryBuilder()
@@ -55,7 +57,7 @@ class WordNetPolysemyQueryBuilder(QueryBuilder):
         queries = list(queries)
         queries.insert(0, idQuery.lower())
 
-        return queries
+        return queries[:WordNetPolysemyQueryBuilder.numberOfQueries]
 
     
     def scoreQuery(self, query):
