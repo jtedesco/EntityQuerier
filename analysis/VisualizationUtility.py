@@ -1,3 +1,4 @@
+from json import  loads
 import os
 
 __author__ = 'jon'
@@ -96,11 +97,11 @@ def averageEntityScores(data):
     return averagedData
 
 
-def populateData(data, rootVisualizationDirectory):
+def populateRankingData(data, rootDirectory):
     
-    for folder in os.listdir(rootVisualizationDirectory):
+    for folder in os.listdir(rootDirectory):
         entityName = folder
-        entityDirectory = rootVisualizationDirectory + '/' + folder
+        entityDirectory = rootDirectory + '/' + folder
 
         data[entityName] = {}
 
@@ -128,6 +129,52 @@ def populateData(data, rootVisualizationDirectory):
                         'recallAt50': recallAt50,
                         'rPrecision': rPrecision,
                         'fullPrecision': fullPrecision
+                    }
+
+
+def parseStatsFromRetrieval(retrievalFile):
+
+    content = open(retrievalFile).read().split('\n')
+
+    # Get the text lines containing stats
+    recallLine = content[5]
+    averagePrecisionLine = content[6]
+    precisionLine = content[7]
+
+    # Reconstruct the query results
+    queries = loads('\n'.join(content[10:]))
+    numberOfQueries = len(queries.keys())
+    
+    # Get the actual numbers
+    recall = float(recallLine[recallLine.find(':')+1:].strip())
+    averagePrecision = float(averagePrecisionLine[averagePrecisionLine.find(':')+1:].strip())
+    precision = float(precisionLine[precisionLine.find(':')+1:].strip())
+
+    return recall, averagePrecision, precision, numberOfQueries
+
+
+def populateRetrievalData(data, rootDirectory):
+
+    for folder in os.listdir(rootDirectory):
+        entityName = folder
+        entityDirectory = rootDirectory + '/' + folder
+
+        data[entityName] = {}
+
+        if os.path.isdir(entityDirectory):
+            for experimentFile in os.listdir(entityDirectory):
+                experimentName = experimentFile
+
+                experimentPath = entityDirectory + '/' + experimentFile
+                if os.path.isfile(experimentPath):
+
+                    recall, averagePrecision, precision, numberOfQueries = parseStatsFromRetrieval(experimentPath)
+
+                    data[entityName][experimentName] = {
+                        'precision' : precision,
+                        'recall' : recall,
+                        'averagePrecision' : averagePrecision,
+                        'numberOfQueries' : numberOfQueries
                     }
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@
 import os
 from pprint import pprint
 import subprocess
-from analysis.VisualizationUtility import splitCamelCase, averageEntityScores, populateData
+from analysis.VisualizationUtility import splitCamelCase, averageEntityScores, populateRankingData
 
 __author__ = 'jon'
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # Iterate through each result directory
     rootVisualizationDirectory = projectRoot + '/experiments/ranking/results'
-    populateData(data, rootVisualizationDirectory)
+    populateRankingData(data, rootVisualizationDirectory)
     del data['dmoz'] # ignore dmoz results
 
     averageScores = averageEntityScores(data)

@@ -3,7 +3,7 @@
 """
 import os
 import subprocess
-from analysis.VisualizationUtility import splitCamelCase, averageEntityScores, populateData
+from analysis.VisualizationUtility import splitCamelCase, averageEntityScores, populateRankingData
 
 __author__ = 'jon'
 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     # Iterate through each result directory
     rootVisualizationDirectory = projectRoot + '/experiments/ranking/results/dmoz'
-    populateData(data, rootVisualizationDirectory)
+    populateRankingData(data, rootVisualizationDirectory)
 
     averageScores = averageEntityScores(data)
 
