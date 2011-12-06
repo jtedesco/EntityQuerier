@@ -19,5 +19,4 @@ plot 'input.dat' using 2:xtic(1) title col, \
         'input.dat' using 8:xtic(1) title col, \
         'input.dat' using 9:xtic(1) title col, \
         'input.dat' using 10:xtic(1) title col, \
-        'input.dat' using 11:xtic(1) title col, \
-        'input.dat' using 12:xtic(1) title col
+        'input.dat' using 11:xtic(1) title col
