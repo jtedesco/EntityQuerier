@@ -1,4 +1,4 @@
-set terminal png enhanced font verdana 15 size 1400,1000
+set terminal png enhanced font verdana 15 size 1800,1000
 set output '%s'
 set title '%s'
 

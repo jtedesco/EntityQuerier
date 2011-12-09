@@ -2,14 +2,14 @@ from IN import INT_MAX
 from copy import deepcopy
 from json import load
 import os
-from pprint import pprint
+from pprint import pprint, pformat
 import whoosh
 from whoosh.qparser.default import MultifieldParser
 from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from experiments.RankingExperiment import RankingExperiment
 from src.ranking.BM25Ranking import BM25Ranking
-from src.ranking.learning.LearningScorer import CoordinateDescentScorer
+from src.ranking.learning.CoordinateDescentScorer import CoordinateDescentScorer
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
@@ -23,7 +23,7 @@ class CoordinateDescentRanking(BM25Ranking):
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-    def __init__(self, searchResults, keywords):
+    def __init__(self, searchResults, keywords, originalResults):
         """
           Initializes data structures for the learning algorithm
         """
@@ -44,22 +44,22 @@ class CoordinateDescentRanking(BM25Ranking):
 
         # The initial guesses at the feature's weightings (starts at 1.0), and
         self.values = {
-         'content' : 0.1,
-         'title' : 0.1,
-         'keywords' : 0.1,
-         'headers' : 0.1,
-         'description' : 0.1,
-         'yqlKeywords' : 0.1,
-         'expandedYqlKeywords' : 0.1,
-         'baselineScore' : 0.1,      # A constant added to the final score
-         'pageRank' : 0.1,           # A constant offset based on PR
-         'pageRankScaling' : 0.1     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
+         'content' : 1.0,
+         'title' : 1.0,
+         'keywords' : 1.0,
+         'headers' : 1.0,
+         'description' : 1.0,
+         'yqlKeywords' : 1.0,
+         'expandedYqlKeywords' : 1.0,
+         'baselineScore' : 1.0,      # A constant added to the final score
+         'pageRank' : 1.0,           # A constant offset based on PR
+         'pageRankScaling' : 1.0     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
         }
         
         self.testValues = deepcopy(self.values)
 
         # Prepare the list of relevant results (golden standard for each entity)
-        self.entityId = 'Paris Smaragdis'
+        self.entityId = None
 
         # Cache the parsed query
         self.query = None
@@ -96,15 +96,20 @@ class CoordinateDescentRanking(BM25Ranking):
             query = self.query
         queryObject = keywordsQueryParser.parse(query)
 
+        print "about to search"
+
         # Perform the query itself
         try:
-            searchResults = searcher.search(queryObject, INT_MAX)
+            searchResults = searcher.search(queryObject, 200)
         except whoosh.reading.TermNotFound:
             print "Term not found!"
             searchResults = []
 
+        # Evaluate results
+
         # Format the results
         results = []
+        print "Number of search results: " + str(len(searchResults))
         for searchResult in searchResults:
 
             result = {
@@ -131,7 +136,7 @@ class CoordinateDescentRanking(BM25Ranking):
         """
 
         recallAt1, recallAt10, recallAt20, recallAt50, precisionAt1, precisionAt10, precisionAt20, precisionAt50, \
-            averagePrecisionAt1, averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, rPrecision, fullPrecision = getRankingResults(results, relevantUrls, cutoff)
+            averagePrecisionAt1, averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, rPrecision, fullPrecision = getRankingResults(results, relevantResults, 200)
 
 
         # Multiply metrics together (any extremely low scores at one level should make big impact on score)
@@ -155,6 +160,12 @@ class CoordinateDescentRanking(BM25Ranking):
         # Get a copy of the values to tweak
         newValues = deepcopy(self.values)
 
+        # Get the current scoring
+        print "about to do initial ranking"
+        rankingResults = self.actuallyRank()
+        currentWeightingScoring = self.evaluateResults(rankingResults, self.relevantResults)
+        print "Did initial ranking"
+
         # Keep looping until no further change is necessary
         complete = False
         iterations = 0
@@ -162,7 +173,7 @@ class CoordinateDescentRanking(BM25Ranking):
 
             complete = True
 
-            if iterations < 50:
+            if iterations < 5:
 
                 iterations += 1
 
@@ -170,31 +181,37 @@ class CoordinateDescentRanking(BM25Ranking):
 
                     pprint(newValues)
 
-                    # Get the current scoring
-                    rankingResults = self.actuallyRank()
-                    currentWeightingScoring = self.evaluateResults(rankingResults, self.relevantResults)
-
                     # Evaluate effect of increase in weight of this features
                     testValues = deepcopy(newValues)
                     testValues[feature] += self.stepSizes[feature]
                     self.testValues = testValues
-                    rankingResults = self.actuallyRank()
-                    increaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
+                    increaseWeightResults = self.actuallyRank()
+                    increaseFeatureWeightResultScoring = self.evaluateResults(increaseWeightResults, self.relevantResults)
+
+                    print "Ranked twice"
 
                     # Evaluate effect of decrease in weight of this features
                     testValues = deepcopy(newValues)
                     testValues[feature] -= self.stepSizes[feature]
                     self.testValues = testValues
-                    rankingResults = self.actuallyRank()
-                    decreaseFeatureWeightResultScoring = self.evaluateResults(rankingResults, self.relevantResults)
+                    decreaseWeightResults = self.actuallyRank()
+                    decreaseFeatureWeightResultScoring = self.evaluateResults(decreaseWeightResults, self.relevantResults)
+
+                    print "Ranked once"
 
                     # Update the weighting vector if one of these was an improvement
+                    print "testing feature: " + feature
+                    print "previous weighting scored %1.5f" + pformat(currentWeightingScoring)
+                    print "increase feature weight scored " + pformat(increaseFeatureWeightResultScoring)
+                    print "decrease feature weight scored " + pformat(decreaseFeatureWeightResultScoring)
                     if increaseFeatureWeightResultScoring > currentWeightingScoring:
                         complete = False
                         newValues[feature] += self.stepSizes[feature]
+                        currentWeightingScoring = increaseWeightResults
                     elif decreaseFeatureWeightResultScoring > currentWeightingScoring:
                         complete = False
                         newValues[feature] -= self.stepSizes[feature]
+                        currentWeightingScoring = decreaseFeatureWeightResultScoring
                     else:
                         # If no change was made, don't update anything
                         pass
@@ -248,8 +265,27 @@ if __name__ == '__main__':
             BaselineScoreExtension()
         ]
         rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, True, True)
-        rankingExperiment.relevantResults = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
+        rankingExperiment.rankingScheme.entityId = entityId
+        rankingExperiment.rankingScheme.relevantResults = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
+
+#        print "about to rank"
         results = rankingExperiment.rank()
+#        print "finished ranking"
+#
+#        rankingExperiment.values = {
+#             'baselineScore': 1.5,
+#             'content': 0.7,
+#             'description': 1.6,
+#             'expandedYqlKeywords': 0.7,
+#             'headers': 1.3,
+#             'keywords': 0.5,
+#             'pageRank': 1.7,
+#             'pageRankScaling': 1.6,
+#             'title': 1.3,
+#             'yqlKeywords': 0.7
+#        }
+#
+#        results = rankingExperiment.rankingScheme.actuallyRank()
 
         # Output the ranking results
         outputTitle = "Results Summary (for top %d results):\n"

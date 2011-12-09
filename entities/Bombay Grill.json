@@ -1,0 +1,37 @@
+{
+    "name" : "Bombay Grill",
+    "city" : "Champaign",
+    "cuisine" : [
+        "indian"
+    ],
+    "state" : "Illinois",
+    "zipcode" : "61820",
+    "phone" : [
+        "(217) 398-8400"
+    ],
+    "address" : [
+        "401 E. Green St. Champaign IL, 61820"
+    ],
+    "attire" : "casual",
+    "delivery" : "yes",
+    "take-out" : "yes",
+    "dishes" : [
+        "chicken curry",
+        "chicken korma",
+        "chicken vendaloo",
+        "chicken saag",
+        "lamb aloo gosht",
+        "lamb saag",
+        "lamg aloo ginger curry"
+    ],
+    "ingredients" : [
+        "curry",
+        "saag",
+        "tandoori",
+        "lamb",
+        "shrimp",
+        "pakoras",
+        "naan",
+        "tikka",
+    ]
+}

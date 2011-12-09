@@ -2,11 +2,21 @@ set terminal png enhanced font verdana 14 size 1000, 800
 set output '%s'
 set title '%s'
 
+set pointsize 4.0
+
 set xlabel '%s'
 set ylabel '%s'
 
+set lmargin 15
+set bmargin 5
+set tmargin 5
+set rmargin 5
 
-plot 'input.dat' index 0 using 2:3 title '%s' with points, \
-     'input.dat' index 1 using 2:3 title '%s' with points, \
-     'input.dat' index 2 using 2:3 title '%s' with points, \
-     'input.dat' index 3 using 2:3 title '%s' with points
+#set yrange[:.55]
+set key right bottom
+set xrange[:35]
+
+plot 'input.dat' index 0 using 2:3 title '%s' with points linewidth 3, \
+     'input.dat' index 1 using 2:3 title '%s' with points linewidth 3, \
+     'input.dat' index 2 using 2:3 title '%s' with points linewidth 3, \
+     'input.dat' index 3 using 2:3 title '%s' with points linewidth 3

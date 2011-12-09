@@ -30,6 +30,7 @@ if __name__ == '__main__':
     experiments = {
         'BM25BaselineRanking': 'Baseline Google Ranking',
         'BM25Ranking': 'BM25 Content',
+        'CoordinateDescentRanking': 'Coordinate Descent Algorithm',
         'RankSVMRanking': 'RankSVM'
     }
 

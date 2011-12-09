@@ -73,8 +73,8 @@ if __name__ == '__main__':
 #            ('ApproximateEntityId400', ApproximateEntityIdQueryBuilder, 400),
 #            ('ApproximateEntityId800', ApproximateEntityIdQueryBuilder, 800),
             ('WordNetPolysemy10', WordNetPolysemyQueryBuilder, 50),
-#            ('WordNetPolysemy15', WordNetPolysemyQueryBuilder, 50),
-#            ('WordNetPolysemy20', WordNetPolysemyQueryBuilder, 50),
+            ('WordNetPolysemy15', WordNetPolysemyQueryBuilder, 50),
+            ('WordNetPolysemy20', WordNetPolysemyQueryBuilder, 50),
 #            ('ExactWordNetPolysemy', ExactWordNetPolysemyQueryBuilder, 50),
 #            ('ApproximateExactWordNetPolysemy', ApproximateExactWordNetPolysemyQueryBuilder, 50),
 #            ('ApproximateWordNetPolysemy', ApproximateWordNetPolysemyQueryBuilder, 50)
@@ -90,7 +90,6 @@ if __name__ == '__main__':
             numberOfSearchResults = experiment[2]
             searchInterface = GoogleSearch(numberOfSearchResults, True)
             retrievalExperiment = RetrievalExperiment(entityId, searchInterface, experiment[1](), numberOfSearchResults)
-            pprint(retrievalExperiment.queries)
             retrievalExperiment.run()
             retrievalExperiment.printResults("results/%s/%s" % (entityName, experiment[0]), entityId)
 

@@ -1,6 +1,5 @@
 from json import load, loads
 import os
-from pprint import pprint
 import subprocess
 import sys
 from src.ranking.learning.BM25SpyRanking import BM25SpyRanking
@@ -36,9 +35,6 @@ class RankSVMRanking(object):
         self.searchResults = searchResults
         self.relevance = relevance
         self.features = features
-
-        # Train the learning algorithm using the search results & relevance data given
-        self.train()
 
 
     def buildRankSVMRankingInput(self, qid, rankSVMData, scoredResult, relevantURLs = {}):
@@ -217,13 +213,15 @@ def buildResultsForEntity(resultsFilePath, verbose, extensions):
 
     # Gather the results
     urlGroups = group(list(entityUrls), 100)
+    totalResults = []
     for urlGroup in urlGroups:
         print "Gathering URL group"
         results = buildGoogleResultsFromURLs(urlGroup, verbose=verbose, extensions=extensions)
+        totalResults.extend(results)
         BM25SpyRanking(results, [], None)
     print "Gathered all results"
 
-    return results
+    return totalResults
 
 
 def scoreResults(entity, entityId, results, features):
@@ -351,33 +349,42 @@ if __name__ == '__main__':
     retrievalExperimentResults = 'ExactAttributeNamesAndValues'
     resultScores = {}
     relevance = {}
-    for entityId in entityIds:
+    if not os.path.exists(RankSVMRanking.trainingFilePath):
+        for entityId in entityIds:
 
-        print "Gathering pages for %s" % entityId
+            print "Gathering pages for %s" % entityId
+    
+            # Get the entity
+            entity = load(open(projectRoot + '/entities/%s.json' % entityId))
+            relevance[entityId] = load(open(projectRoot + '/relevanceStandard/%s.json' % entityId))
 
-        # Get the entity
-        entity = load(open(projectRoot + '/entities/%s.json' % entityId))
-        relevance[entityId] = load(open(projectRoot + '/relevanceStandard/%s.json' % entityId))
+            # The extensions for results
+            extensions = [
+                PageRankExtension(),
+                YQLKeywordExtension(),
+                ExpandedYQLKeywordExtension(),
+                BaselineScoreExtension()
+            ]
 
-        # The extensions for results
-        extensions = [
-            PageRankExtension(),
-            YQLKeywordExtension(),
-            ExpandedYQLKeywordExtension(),
-            BaselineScoreExtension()
-        ]
-
-        # Get the retrieval results for this entity
-        entityName = entityId.replace(' ', '').replace('-', '')
-        resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
-        entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
-        if entityResults is not None:
-            entityResults.extend(dmozResults)
-        resultScores[entityId] = scoreResults(entity, entityId, entityResults, features)
+            # Get the retrieval results for this entity
+            entityName = entityId.replace(' ', '').replace('-', '')
+            resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
+            entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
+            if entityResults is not None:
+                entityResults.extend(dmozResults)
+            resultScores[entityId] = scoreResults(entity, entityId, entityResults, features)
 
 
-    # Create the ranking object & run the training stage with entity data we have now
-    rankSVMRanking = RankSVMRanking(resultScores, relevance, features)
+        # Create the ranking object & run the training stage with entity data we have now
+        rankSVMRanking = RankSVMRanking(resultScores, relevance, features)
+
+        # Train the learning algorithm using the search results & relevance data given
+        rankSVMRanking.train()
+
+    else:
+
+        # Create the ranking object & skip the training stage
+        rankSVMRanking = RankSVMRanking(resultScores, relevance, features)
 
     # Run the ranking for each entity
     for entityId in entityIds:
@@ -397,7 +404,9 @@ if __name__ == '__main__':
         # Get the retrieval results for this entity
         entityName = entityId.replace(' ', '').replace('-', '')
         resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
+        print "Building results for entity '%s'" % entityId
         entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
+        print "Built results for entity '%s'" % entityId
         resultScores = scoreResults(entity, entityId, entityResults, features)
 
         # Get the ranked results
