@@ -1,0 +1,54 @@
+{
+    "name" : "Jiawei Han",
+    "title" : "Professor",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : null,
+    "graduate education" : [
+        "University of Wisconsin-Madison"
+    ],
+    "research interests" : [
+        "data mining",
+        "graph mining",
+        "mining moving objects",
+        "image mining",
+        "video mining",
+        "stream data mining",
+        "data mining applications",
+        "information network analysis"
+    ],
+    "associations" : [
+        "SIGKDD",
+        "SIGMOD",
+        "SIGKDD",
+        "IEEE",
+        "TKDE",
+        "TKDD",
+        "VLDB",
+        "NSF",
+        "Database and Information Systems Laboratory"
+    ],
+    "teaching" : [
+        "An Introduction to Data Warehousing and Data Mining",
+        "Data Mining: Principles and Algorithms",
+        "Advanced Topics in Data Mining"
+    ],
+    "keywords": [
+        "Information Network Analysis and Discovery",
+        "Knowledge Discovery in Cyberphysical Systems",
+        "MoveMine",
+        "Assured Information Sharing Lifecycle",
+        "OLAP and Multi-Dimensional Analysis of Text Data",
+        "Sequential and Structured Pattern Discovery",
+        "Discovery of the Dynamics of Data Streams in Multi-Dimensional Space",
+        "Multidimensional Analysis and Ranking in Databases, Web, and Other Information Repositories",
+        "IlliMine",
+        "Illinois Data Mining System",
+        "iNextCube",
+        "DBLP",
+        "NASA",
+        "BibCube",
+        "MURI",
+        "NSF",
+        "AISL"
+    ]
+}

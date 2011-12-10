@@ -1,0 +1,38 @@
+{
+    "name" : "Sarita Adve",
+    "title" : "Professor",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : "University of Wisconsin Madison",
+    "graduate education" : [
+        "Indian Institute of Technology"
+    ],
+    "research interests" : [
+        "memory consistency",
+        "computer architecture",
+        "systems",
+        "parallel computing",
+        "reliability-aware systems",
+        "power systems",
+        "data-race-free models",
+        "multiprocessors"
+    ],
+    "associations" : [
+        "Universal Parallel Computing Research Center",
+        "ISCA",
+        "ICS",
+        "SIGARCH",
+        "DeNovo",
+        "SWAT",
+        "DPJ"
+    ],
+    "teaching" : [
+        "Computer System Organization",
+        "Computer Architecture",
+        "Reliability Aware Architecture",
+        "Computer Architecture Seminar"
+    ],
+    "keywords": [
+        "NSF career award",
+        "Rice University"
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "name" : "Dos Reales",
+    "city" : "Champaign",
+    "cuisine" : [
+        "mexican"
+    ],
+    "state" : "Illinois",
+    "zipcode" : "61820",
+    "phone" : "(217) 351-6879",
+    "address" : "1407 N Prospect Ave Champaign, IL 61820",
+    "attire" : "casual",
+    "keywords" : [
+        "take out",
+        "reservations",
+        "family friendly",
+        "alcohol",
+        "outdoor seating",
+        "waiters"
+    ]
+}

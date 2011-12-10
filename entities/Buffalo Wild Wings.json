@@ -1,0 +1,21 @@
+{
+    "name" : "Buffalo Wild Wings",
+    "city" : "Champaign",
+    "cuisine" : [
+        "bar",
+        "burger",
+        "wings",
+        "american"
+    ],
+    "state" : "Champaign",
+    "zipcode" : "61820",
+    "phone" : "(217) 378-4400",
+    "address" : "907 W Marketview Dr Champaign, IL 61822",
+    "attire" : "casual",
+    "keywords" : [
+        "waiters",
+        "family friendly",
+        "take out",
+        "outdoor seating"
+    ]
+}

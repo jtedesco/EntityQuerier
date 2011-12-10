@@ -1,0 +1,38 @@
+{
+    "name" : "Eric Shaffer",
+    "title" : "Research Scientist",
+    "institution" : "University of Illinois at Urbana-Champaign",
+    "undergraduate education" : "University of Illinois at Urbana-Champaign",
+    "graduate education" : [
+        "University of Illinois at Urbana-Champaign",
+        "University of Minnesota at Minneapolis"
+    ],
+    "research interests" : [
+        "geometric data processing",
+        "mesh data processing",
+        "massive data processing",
+        "scientific visualization",
+        "information visualization",
+        "parallel computation"
+    ],
+    "associations" : [
+        "Computation Science and Engineering",
+        "Center for Simulation of Advanced Rockets",
+        "SIGGRAPH",
+        "IEEE",
+        "InfoVis",
+        "ACM",
+        "Pablo Research Group",
+        "Argonne National Laboratory",
+        "CSAR",
+    ],
+    "teaching" : [
+        "Discrete Mathematics",
+        "Computer Organization"
+    ],
+    "keywords": [
+        "Boeing",
+        "IBM",
+        "Michael Garland"
+    ]
+}

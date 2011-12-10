@@ -1,0 +1,20 @@
+{
+    "name" : "Biaggi's",
+    "city" : "",
+    "cuisine" : [
+        "italian"
+    ],
+    "state" : "Illinois",
+    "zipcode" : "61820",
+    "phone" : [
+    ],
+    "address" : "2235 S Neil St Champaign, IL 61820",
+    "attire" : "casual",
+    "keywords" : [
+        "waiters",
+        "take out",
+        "reservations",
+        "alcohol",
+        "outdoor seating"
+    ]
+}

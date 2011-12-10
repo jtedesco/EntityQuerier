@@ -1,0 +1,25 @@
+{
+    "name" : "Radio Maria",
+    "city" : "Champaign",
+    "cuisine" : [
+        "tapas",
+        "spanish",
+        "breakfast",
+        "brunch",
+        "cajun",
+        "creole",
+        "mexican",
+        "basque"
+    ],
+    "state" : "Illinois",
+    "zipcode" : "61820",
+    "phone" : "(217) 398-7729",
+    "address" : "119 N. Walnut Street Champaign, IL 61820",
+    "attire" : "casual",
+    "keywords" : [
+        "outdoor seating",
+        "alcohol",
+        "reservations",
+        "waiters"
+    ]
+}

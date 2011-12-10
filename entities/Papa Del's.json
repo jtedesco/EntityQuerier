@@ -1,0 +1,21 @@
+{
+    "name" : "Papa Del's",
+    "city" : "Champaign",
+    "cuisine" : [
+        "pizza"
+    ],
+    "state" : "Illinois",
+    "zipcode" : "61820",
+    "phone" : "(217) 359-7700",
+    "address" : "206 E Green St Champaign, IL 61820",
+    "attire" : "casual",
+    "keywords" : [
+        "outdoor seating",
+        "alcohol",
+        "reservations",
+        "take out",
+        "family friendly",
+        "delivery",
+        "waiters"
+    ]
+}

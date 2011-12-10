@@ -1,0 +1,18 @@
+{
+    "name" : "Chipotle",
+    "city" : "Champaign",
+    "cuisine" : [
+        "mexican"
+    ],
+    "state" : "Illinois",
+    "zipcode" : "61820",
+    "phone" : "(217) 344-0466",
+    "address" : [
+        "528 E Green St Champaign, IL 61820"
+    ],
+    "attire" : "casual",
+    "keywords" : [
+        "family friendly",
+        "take out"
+    ]
+}

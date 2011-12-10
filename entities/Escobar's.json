@@ -1,21 +1,19 @@
 {
-    "name" : "Bombay Grill",
+    "name" : "Escobar's",
     "city" : "Champaign",
     "cuisine" : [
-        "indian",
-        "pakistani"
+        "latin american"
     ],
     "state" : "Illinois",
     "zipcode" : "61820",
-    "phone" : "(217) 398-8400",
-    "address" : "401 E. Green St. Champaign IL, 61820",
+    "phone" : "217-352-7467",
+    "address" : "6 East Columbia Ave Champaign, IL, 61820",
     "attire" : "casual",
     "keywords" : [
-        "delivery",
-        "family friendly",
         "reservations",
-        "take out",
         "outdoor seating",
+        "take out",
+        "alcohol",
         "waiters"
     ]
 }
