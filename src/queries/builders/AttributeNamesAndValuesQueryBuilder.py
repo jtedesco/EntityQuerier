@@ -1,6 +1,6 @@
+from src.queries.builders.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder
+from src.queries.builders.AttributeValuesQueryBuilder import AttributeValuesQueryBuilder
 from src.queries.builders.QueryBuilder import QueryBuilder
-from src.queries.builders.operator.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder
-from src.queries.builders.operator.AttributeValuesQueryBuilder import AttributeValuesQueryBuilder
 
 __author__ = 'jon'
 
