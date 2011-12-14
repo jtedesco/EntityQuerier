@@ -1,8 +1,8 @@
+import os
+import sys
 from copy import deepcopy
 from json import load
-import os
 from pprint import pprint
-import sys
 from threading import Lock
 from src.ranking.learning.CoordinateDescentRankingThread import CoordinateDescentRankingThread
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension

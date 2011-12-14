@@ -1,7 +1,5 @@
-from json import loads
-import os
 from src.ranking.BM25Ranking import BM25Ranking
-from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
+from util.RankingExperimentUtil import getResultsFromRetrievalFile, getKeywords
 
 __author__ = 'jon'
 
@@ -11,44 +9,11 @@ class RankingExperiment(object):
       Rank search results
     """
 
-    def __init__(self, resultsFilePath, entity, rankingScheme = BM25Ranking, extensions = [], includeOriginalResults = False, verbose = False):
+    def __init__(self, resultsFilePath, entity, rankingScheme = BM25Ranking, extensions = [], includeOriginalResults = False, verbose = False, fetchResults = True):
 
-        indexLocation = rankingScheme.getIndexLocation()
-        if not os.path.exists(indexLocation) or len(os.listdir(indexLocation)) == 0:
+        if fetchResults:
 
-            # Get the contents of the file
-            resultsData = open(resultsFilePath).read()
-
-            # Strip off the header
-            dataToBeJoined = []
-            recordData = False
-            for dataLine in resultsData.split('\n'):
-                if not recordData and len(dataLine) > 0 and dataLine[0] == '{':
-                    recordData = True
-                if recordData:
-                    dataToBeJoined.append(dataLine)
-            resultsData = '\n'.join(dataToBeJoined)
-
-            # Load the data dumped from the first stage
-            self.resultsDump = loads(resultsData)
-
-            # Initialize the extensions (HACK)
-            for extension in extensions:
-                if 'initialize' in dir(extension):
-                    extension.initialize(self.resultsDump)
-
-            # Build the data structure that will map entity id -> urls
-            self.results = []
-            entityUrls = set([])
-            for query in self.resultsDump:
-                for resultType in self.resultsDump[query]:
-                    for url in self.resultsDump[query][resultType]:
-                        if url not in ['precision', 'recall', 'averagePrecision']:
-                            entityUrls.add(url)
-
-            # Assume we're only doing this for one entity
-            self.results = buildGoogleResultsFromURLs(entityUrls, True, verbose, extensions)
-            
+            self.results = getResultsFromRetrievalFile(resultsFilePath, extensions)
             print "Retrieved all results from web!"
 
         else:
@@ -56,7 +21,7 @@ class RankingExperiment(object):
             self.resultsDump = []
 
         # Get the keywords & build the ranking scheme
-        keywords = self.getKeywords(entity)
+        keywords = getKeywords(entity)
         if includeOriginalResults:
             self.rankingScheme = rankingScheme(self.results, keywords, self.resultsDump)
         else:
@@ -69,32 +34,4 @@ class RankingExperiment(object):
         """
           Get the ranked results using this ranking scheme
         """
-
         return self.rankingScheme.rank()
-
-
-    def getKeywords(self, entity):
-
-        keywords = []
-        for key in entity:
-            keywords.extend(key.split())
-            if type(entity[key]) == type([]):
-                for keyword in entity[key]:
-                    if keyword is not None:
-                        lowercaseKeyword = keyword.lower()
-                        if len(lowercaseKeyword.split()) > 1:
-                            keywords.append(lowercaseKeyword)
-                            keywords.extend(lowercaseKeyword.split())
-                        else:
-                            keywords.append(lowercaseKeyword)
-            else:
-                keyword = entity[key]
-                if keyword is not None:
-                    lowercaseKeyword = keyword.lower()
-                    if len(lowercaseKeyword.split()) > 1:
-                        keywords.append(lowercaseKeyword)
-                        keywords.extend(lowercaseKeyword.split())
-                    else:
-                        keywords.append(lowercaseKeyword)
-
-        return keywords
