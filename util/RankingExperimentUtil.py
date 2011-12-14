@@ -1,4 +1,5 @@
 from json import load
+from pprint import pprint
 
 __author__ = 'jon'
 
@@ -43,10 +44,14 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
             count += 1
             if count > cutoff:
                 break
-            if result['url'] in relevantUrls:
-                output += "RELEVANT        ??????       %s\n" % result['url']
-            else:
-                output += "NON-RELEVANT    ??????       %s\n" % result['url']
+            try:
+                if result['url'] in relevantUrls:
+                    output += "RELEVANT        ??????       %s\n" % result['url']
+                else:
+                    output += "NON-RELEVANT    ??????       %s\n" % result['url']
+            except KeyError:
+                print "Error on line 53:"
+                pprint(result)
     output += "\n\n\n"
 
     # Write it out a file
@@ -93,9 +98,14 @@ def getRankingResults(results, relevantUrls, cutoff):
                     wasRelevant = True
                     relevantUrlsFound.append(result[1]['url'])
             else:
-                if result['url'] in relevantUrls:
-                    wasRelevant = True
-                    relevantUrlsFound.append(result['url'])
+                try:
+                    if result['url'] in relevantUrls:
+                        wasRelevant = True
+                        relevantUrlsFound.append(result['url'])
+                except KeyError:
+                    print "Weird error, result below:"
+                    pprint(result)
+
 
             # Precision at 100% recall point
             if wasRelevant:
@@ -147,8 +157,12 @@ def getRankingResults(results, relevantUrls, cutoff):
             if result[1]['url'] in relevantUrls:
                 relevantResults += 1
         else:
-            if result['url'] in relevantUrls:
-                relevantResults += 1
+            try:
+                if result['url'] in relevantUrls:
+                    relevantResults += 1
+            except KeyError:
+                print "Weird error"
+                pprint(result)
 
         # r-precision
         if count == len(relevantUrlsFound):
