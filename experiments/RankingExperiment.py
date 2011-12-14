@@ -46,8 +46,9 @@ class RankingExperiment(object):
                         if url not in ['precision', 'recall', 'averagePrecision']:
                             entityUrls.add(url)
 
-                # Assume we're only doing this for one entity
-                self.results = buildGoogleResultsFromURLs(entityUrls, True, verbose, extensions)
+            # Assume we're only doing this for one entity
+            self.results = buildGoogleResultsFromURLs(entityUrls, True, verbose, extensions)
+            
             print "Retrieved all results from web!"
 
         else:
