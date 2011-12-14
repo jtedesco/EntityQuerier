@@ -1,29 +1,29 @@
-from IN import INT_MAX
 from copy import deepcopy
 from json import load
 import os
-from pprint import pprint, pformat
-import whoosh
-from whoosh.qparser.default import MultifieldParser
-from whoosh.qparser.plugins import PlusMinusPlugin
-from whoosh.qparser.syntax import OrGroup
-from experiments.RankingExperiment import RankingExperiment
-from src.ranking.BM25Ranking import BM25Ranking
-from src.ranking.learning.CoordinateDescentScorer import CoordinateDescentScorer
+from pprint import pprint
+import sys
+from threading import Lock
+from src.ranking.learning.CoordinateDescentRankingThread import CoordinateDescentRankingThread
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
-from util.RankingExperimentUtil import getRankingResults, outputRankingResults
+from util.RankingExperimentUtil import outputRankingResults, getResultsFromRetrievalFile, getKeywords
 
 __author__ = 'jon'
 
-class CoordinateDescentRanking(BM25Ranking):
+class CoordinateDescentRanking(object):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
 
-    def __init__(self, searchResults, keywords, originalResults):
+    @staticmethod
+    def getIndexLocation():
+        return "/home/jon/.index"
+
+
+    def __init__(self, keywords, searchResults, relevantResults):
         """
           Initializes data structures for the learning algorithm
         """
@@ -58,113 +58,27 @@ class CoordinateDescentRanking(BM25Ranking):
         
         self.testValues = deepcopy(self.values)
 
-        # Prepare the list of relevant results (golden standard for each entity)
-        self.entityId = None
-
-        # Cache the parsed query
-        self.query = None
-
-        super(CoordinateDescentRanking, self).__init__(searchResults, keywords)
+        self.keywords = keywords
+        self.searchResults = searchResults
+        self.relevantResults = relevantResults
 
 
-    def queryIndex(self, weightingMechanism):
-        """
-          Query the index, given the current scoring guess
-        """
-
-        # Create a searcher object for this index
-        searcher = self.index.searcher(weighting=weightingMechanism)
-
-        # Create a query parser, providing it with the schema of this index, and the default field to search, 'content'
-        termBoosts = deepcopy(self.testValues)
-        del termBoosts['baselineScore']
-        del termBoosts['pageRank']
-        del termBoosts['pageRankScaling']
-        CoordinateDescentScorer.baselineScoreWeight = self.testValues['baselineScore']
-        CoordinateDescentScorer.pageRankWeight = self.testValues['pageRank']
-        CoordinateDescentScorer.pageRankScalingWeight = self.testValues['pageRankScaling']
-        keywordsQueryParser = MultifieldParser(['content', 'title', 'description', 'keywords', 'headers', 'yqlKeywords', 'expandedYqlKeywords'],
-                self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
-        keywordsQueryParser.add_plugin(PlusMinusPlugin)
-        if self.query is None:
-            query = "+\"" + self.entityId + "\" "
-            for keyword in self.keywords:
-                if keyword != self.entityId:
-                    query += "\"" + keyword + "\" "
-            query = query.rstrip()
-        else:
-            query = self.query
-        queryObject = keywordsQueryParser.parse(query)
-
-        print "about to search"
-
-        # Perform the query itself
-        try:
-            searchResults = searcher.search(queryObject, 200)
-        except whoosh.reading.TermNotFound:
-            print "Term not found!"
-            searchResults = []
-
-        # Evaluate results
-
-        # Format the results
-        results = []
-        print "Number of search results: " + str(len(searchResults))
-        for searchResult in searchResults:
-
-            result = {
-                'url': searchResult['url'],
-                'content': searchResult['content'],
-                'title': searchResult['title'],
-                'description': searchResult['description'],
-                'keywords': searchResult['keywords'],
-                'headers': searchResult['headers'],
-                'yqlKeywords': searchResult['yqlKeywords'],
-                'expandedYqlKeywords': searchResult['expandedYqlKeywords'],
-                'pageRank': searchResult['pagerank'],
-                'baselineScore': searchResult['baselineScore']
-            }
-            results.append(result)
-
-        # Return the list of web pages along with the terms used in the search
-        return results
-
-
-    def evaluateResults(self, results, relevantResults):
-        """
-          Returns a score based on the results, specifically computing recall, precision, and avg precision
-        """
-
-        recallAt1, recallAt10, recallAt20, recallAt50, precisionAt1, precisionAt10, precisionAt20, precisionAt50, \
-            averagePrecisionAt1, averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, rPrecision, fullPrecision = getRankingResults(results, relevantResults, 200)
-
-
-        # Multiply metrics together (any extremely low scores at one level should make big impact on score)
-        score = (recallAt10 * precisionAt10 * averagePrecisionAt10) + (recallAt20 * precisionAt20 * averagePrecisionAt20) + \
-                (recallAt50 * precisionAt50 * averagePrecisionAt50) + rPrecision + fullPrecision
-
-        return score
-
-
-    def actuallyRank(self):
-
-        reRankedResults = self.queryIndex(CoordinateDescentScorer)
-        return reRankedResults
-
-
-    def rank(self):
+    def learn(self):
         """
           Run the learning algorithm, and return the learned feature weights
         """
 
         # Get a copy of the values to tweak
-        newValues = deepcopy(self.values)
+        values = deepcopy(self.values)
 
         # Get the current scoring
-        print "about to do initial ranking"
-        rankingResults = self.actuallyRank()
-        currentWeightingScoring = self.evaluateResults(rankingResults, self.relevantResults)
-        print "Did initial ranking"
+        changes = {
+            'lock' : Lock()
+        }
+        scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original', self.relevantResults)
+        scoringThread.start()
+        scoringThread.join()
+        currentWeightingScoring = changes['original']
 
         # Keep looping until no further change is necessary
         complete = False
@@ -172,71 +86,87 @@ class CoordinateDescentRanking(BM25Ranking):
         while not complete:
 
             complete = True
+            iterations += 1
 
-            if iterations < 5:
+            # Create data structures for managing threads
+            changes = {
+                'lock' : Lock()
+            }
+            threads = []
 
-                iterations += 1
+            # Launch threads to test changes to each feature weight
+            print "Launching threads..."
+            for feature in self.values:
 
-                for feature in newValues:
+                # Launch test for increasing weight of this feature
+                values = deepcopy(self.values)
+                values[feature] += self.stepSizes[feature]
+                scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, feature + '+', self.relevantResults)
+                threads.append(scoringThread)
+                scoringThread.start()
 
-                    pprint(newValues)
+                # Launch test for decreasing weight of this feature
+                values = deepcopy(self.values)
+                values[feature] -= self.stepSizes[feature]
+                scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, feature + '-', self.relevantResults)
+                threads.append(scoringThread)
+                scoringThread.start()
 
-                    # Evaluate effect of increase in weight of this features
-                    testValues = deepcopy(newValues)
-                    testValues[feature] += self.stepSizes[feature]
-                    self.testValues = testValues
-                    increaseWeightResults = self.actuallyRank()
-                    increaseFeatureWeightResultScoring = self.evaluateResults(increaseWeightResults, self.relevantResults)
 
-                    print "Ranked twice"
+            # Wait for all threads to finish
+            print "Waiting for threads to finish..."
+            for thread in threads:
+                thread.join()
 
-                    # Evaluate effect of decrease in weight of this features
-                    testValues = deepcopy(newValues)
-                    testValues[feature] -= self.stepSizes[feature]
-                    self.testValues = testValues
-                    decreaseWeightResults = self.actuallyRank()
-                    decreaseFeatureWeightResultScoring = self.evaluateResults(decreaseWeightResults, self.relevantResults)
+            # Update feature weights accordingly
+            print "Analyzing ranking results"
+            for feature in self.values:
 
-                    print "Ranked once"
+                increaseFeatureWeightResultScoring = changes[feature+'+']
+                decreaseFeatureWeightResultScoring = changes[feature+'-']
 
-                    # Update the weighting vector if one of these was an improvement
-                    print "testing feature: " + feature
-                    print "previous weighting scored %1.5f" + pformat(currentWeightingScoring)
-                    print "increase feature weight scored " + pformat(increaseFeatureWeightResultScoring)
-                    print "decrease feature weight scored " + pformat(decreaseFeatureWeightResultScoring)
-                    if increaseFeatureWeightResultScoring > currentWeightingScoring:
-                        complete = False
-                        newValues[feature] += self.stepSizes[feature]
-                        currentWeightingScoring = increaseWeightResults
-                    elif decreaseFeatureWeightResultScoring > currentWeightingScoring:
-                        complete = False
-                        newValues[feature] -= self.stepSizes[feature]
-                        currentWeightingScoring = decreaseFeatureWeightResultScoring
-                    else:
-                        # If no change was made, don't update anything
-                        pass
+                # If one of these improved...
+                if increaseFeatureWeightResultScoring > currentWeightingScoring or decreaseFeatureWeightResultScoring > currentWeightingScoring:
+                    if increaseFeatureWeightResultScoring > decreaseFeatureWeightResultScoring:
+                        self.values[feature] += self.stepSizes[feature]
+                    elif decreaseFeatureWeightResultScoring >= increaseFeatureWeightResultScoring:
+                        self.values[feature] -= self.stepSizes[feature]
+                else:
+                    print "No improvement found for tweaking %s!" % feature
 
-                    for feature in newValues:
-                        newValues[feature] = round(newValues[feature], 2)
+            print "Finished learning iteration %d, new values:" % iterations
+            pprint(self.values)
 
-                
-                
-            print "Finished one learning iteration"
 
-        self.testValues = newValues
-        self.values = newValues  
+    def rank(self):
+        """
+          Perform the ranking with the given parameters
+        """
 
-        pprint("Final Values:")
-        pprint(self.values)
-        
-        results = self.actuallyRank()
+        values = deepcopy(self.values)
+
+        # Get the current scoring
+        changes = {
+            'lock' : Lock()
+        }
+        scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original', self.relevantResults)
+        scoringThread.start()
+        scoringThread.join()
+        results = scoringThread.results
 
         return results
 
 
 if __name__ == '__main__':
-    
+
+    if not os.path.exists(CoordinateDescentRanking.getIndexLocation()):
+        print "Cannot find index location!"
+        sys.exit()
+
+    retrievalTest = 'ExactAttributeNamesAndValues'
     experiment = ('CoordinateDescentRanking', CoordinateDescentRanking)
+
+    finalValues = None
 
     entityIds = [
         "ChengXiang Zhai",
@@ -247,48 +177,61 @@ if __name__ == '__main__':
         "Ralph Johnson",
         "Robin Kravets"
     ]
-    
+
+    keywords = {}
+    results = {}
+    relevantResults = {}
+
+    projectRoot = str(os.getcwd())
+    projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
+
     for entityId in entityIds:
 
         # Find the project root & open the input entity
-        projectRoot = str(os.getcwd())
-        projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
         entity = load(open(projectRoot + '/entities/%s.json' % entityId))
 
-        # Rank the results
-        entityName = entityId.replace(' ', '').replace('-', '')
-        retrievalResults = '/experiments/retrieval/results/%s/ExactAttributeNamesAndValues' % entityName
+        # The extensions to use to gather results
         extensions = [
             PageRankExtension(),
             YQLKeywordExtension(),
             ExpandedYQLKeywordExtension(),
             BaselineScoreExtension()
         ]
-        rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions, True, True)
-        rankingExperiment.rankingScheme.entityId = entityId
-        rankingExperiment.rankingScheme.relevantResults = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
 
-#        print "about to rank"
-        results = rankingExperiment.rank()
-#        print "finished ranking"
-#
-#        rankingExperiment.values = {
-#             'baselineScore': 1.5,
-#             'content': 0.7,
-#             'description': 1.6,
-#             'expandedYqlKeywords': 0.7,
-#             'headers': 1.3,
-#             'keywords': 0.5,
-#             'pageRank': 1.7,
-#             'pageRankScaling': 1.6,
-#             'title': 1.3,
-#             'yqlKeywords': 0.7
-#        }
-#
-#        results = rankingExperiment.rankingScheme.actuallyRank()
+        # Get & store the results for this entity
+        entityName = entityId.replace(' ', '').replace('-', '').replace('\'', '')
+        retrievalResultsPath = '/experiments/retrieval/results/%s/%s' % (entityName, retrievalTest)
+        results[entityId] = getResultsFromRetrievalFile(retrievalResultsPath, extensions)
 
-        # Output the ranking results
-        outputTitle = "Results Summary (for top %d results):\n"
-        outputFile = entityName + '-' + experiment[0]
-        outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
-    
+        # Store the relevant results for this entity
+        relevantResults[entityId] = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
+
+        # Build the keywords for this entity
+        keywords[entityId] = getKeywords(entity)
+
+
+    # Perform the learned ranking if we haven't, or generate the final ranking if we have
+    if finalValues is None:
+
+        # Learn the ranking
+        ranking = CoordinateDescentRanking(keywords, results, relevantResults)
+        values = ranking.learn()
+
+        print "Final Values:"
+        pprint(values)
+
+    else:
+
+        # Perform the ranking
+        ranking = CoordinateDescentRanking(keywords, results, relevantResults)
+        ranking.values = finalValues
+        results = ranking.rank()
+
+        for entityId in entityIds:
+
+            entityName = entityId.replace(' ', '').replace('-', '').replace('\'', '')
+
+            # Output the ranking results
+            outputTitle = "Results Summary (for top %d results):\n"
+            outputFile = entityName + '-' + experiment[0]
+            outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)

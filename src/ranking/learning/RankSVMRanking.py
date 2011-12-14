@@ -8,7 +8,7 @@ from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordE
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
 from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
-from util.RankingExperimentUtil import outputRankingResults
+from util.RankingExperimentUtil import outputRankingResults, getKeywords
 
 __author__ = 'jon'
 
@@ -242,7 +242,24 @@ def scoreResults(entity, entityId, results, features):
     # The data structure in which we're going to store the scored results (scores instead of content)
     scoredResults = {}
 
-    # Get the scores for each feature of this entity
+    # Gather the URLs we care about
+    urls = set([])
+    for result in results:
+        urls.add(result['url'])
+
+    # Allocate dictionaries for numeric features for these results
+    for feature in {'baselineScore', 'pageRank'}:
+        for url in urls:
+            try:
+                scoredResults[url][feature] = result[feature]
+            except KeyError:
+                try:
+                    scoredResults[url] = {}
+                    scoredResults[url][feature] = result[feature]
+                except Exception:
+                    print "Error processing %s, skipping because %s" % (url, str(sys.exc_info()[1]))
+
+    # Get the scores for each URL we care about
     for feature in features:
 
         # Check if the feature is already a numeric
@@ -255,7 +272,7 @@ def scoreResults(entity, entityId, results, features):
             # Gather the scores
             featureScores = spyRanking.getScores()
             for url in featureScores:
-                if url not in scoredResults:
+                if url not in scoredResults and url in urls:
                     numerics = spyRanking.getNumerics()
                     scoredResults[url] = {
                         'url' : url,
@@ -264,51 +281,7 @@ def scoreResults(entity, entityId, results, features):
                     }
                 scoredResults[url][feature] = featureScores[url]
 
-        else:
-
-            # Copy numeric features
-            if results is not None:
-                for result in results:
-                    url = result['url']
-                    try:
-                        scoredResults[url][feature] = result[feature]
-                    except KeyError:
-                        try:
-                            scoredResults[url] = {}
-                            scoredResults[url][feature] = result[feature]
-                        except:
-                            print "Error processing %s, skipping because %s" % (url, str(sys.exc_info()[1]))
-
     return scoredResults.values()
-
-
-
-
-def getKeywords(entity):
-
-    keywords = []
-    for key in entity:
-        keywords.extend(key.split())
-        if type(entity[key]) == type([]):
-            for keyword in entity[key]:
-                if keyword is not None:
-                    lowercaseKeyword = keyword.lower()
-                    if len(lowercaseKeyword.split()) > 1:
-                        keywords.append(lowercaseKeyword)
-                        keywords.extend(lowercaseKeyword.split())
-                    else:
-                        keywords.append(lowercaseKeyword)
-        else:
-            keyword = entity[key]
-            if keyword is not None:
-                lowercaseKeyword = keyword.lower()
-                if len(lowercaseKeyword.split()) > 1:
-                    keywords.append(lowercaseKeyword)
-                    keywords.extend(lowercaseKeyword.split())
-                else:
-                    keywords.append(lowercaseKeyword)
-
-    return keywords
 
 
 def group(results, groupSize):
@@ -423,3 +396,5 @@ if __name__ == '__main__':
         outputTitle = "Results Summary (for top %d results):\n"
         outputFile = entityName + '/RankSVMRanking'
         outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
+
+        sys.exit()

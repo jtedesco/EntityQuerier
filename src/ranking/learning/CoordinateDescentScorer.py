@@ -20,6 +20,7 @@ class CoordinateDescentScorer(BM25F):
         # Add the raw weight & scaling from pagerank
         pageRank = float(searcher.stored_fields(docnum)['pagerank'])
         baselineScore = float(searcher.stored_fields(docnum)['baselineScore'])
-        newScore = CoordinateDescentScorer.pageRankScalingWeight * ((CoordinateDescentScorer.baselineScoreWeight * baselineScore) + score + (pageRank * CoordinateDescentScorer.pageRankWeight))
+        newScore = (CoordinateDescentScorer.baselineScoreWeight * baselineScore) + (1 - CoordinateDescentScorer.baselineScoreWeight) * (
+            CoordinateDescentScorer.pageRankScalingWeight * (score + (pageRank * CoordinateDescentScorer.pageRankWeight)))
 
         return newScore

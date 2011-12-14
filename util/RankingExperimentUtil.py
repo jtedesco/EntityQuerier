@@ -1,12 +1,79 @@
-from json import load
+from json import load, loads
 from pprint import pprint
+from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
 
 __author__ = 'jon'
 
-def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results, append = False, cutoff = 200):
+def getResultsFromRetrievalFile(path, extensions):
+
+        # Get the contents of the file
+        resultsData = open(path).read()
+
+        # Strip off the header
+        dataToBeJoined = []
+        recordData = False
+        for dataLine in resultsData.split('\n'):
+            if not recordData and len(dataLine) > 0 and dataLine[0] == '{':
+                recordData = True
+            if recordData:
+                dataToBeJoined.append(dataLine)
+        resultsData = '\n'.join(dataToBeJoined)
+
+        # Load the data dumped from the first stage
+        resultsDump = loads(resultsData)
+
+        # Initialize the extensions (HACK)
+        for extension in extensions:
+            if 'initialize' in dir(extension):
+                extension.initialize(resultsDump)
+
+        # Build the data structure that will map entity id -> urls
+        results = []
+        entityUrls = set([])
+        for query in resultsDump:
+            for resultType in resultsDump[query]:
+                for url in resultsDump[query][resultType]:
+                    if url not in ['precision', 'recall', 'averagePrecision']:
+                        entityUrls.add(url)
+
+        # Assume we're only doing this for one entity
+        results = buildGoogleResultsFromURLs(entityUrls, True, True, extensions)
+
+        return results
+
+
+def getKeywords(entity):
+
+    keywords = []
+    for key in entity:
+        keywords.extend(key.split())
+        if type(entity[key]) == type([]):
+            for keyword in entity[key]:
+                if keyword is not None:
+                    lowercaseKeyword = keyword.lower()
+                    if len(lowercaseKeyword.split()) > 1:
+                        keywords.append(lowercaseKeyword)
+                        keywords.extend(lowercaseKeyword.split())
+                    else:
+                        keywords.append(lowercaseKeyword)
+        else:
+            keyword = entity[key]
+            if keyword is not None:
+                lowercaseKeyword = keyword.lower()
+                if len(lowercaseKeyword.split()) > 1:
+                    keywords.append(lowercaseKeyword)
+                    keywords.extend(lowercaseKeyword.split())
+                else:
+                    keywords.append(lowercaseKeyword)
+    return keywords
+
+
+def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results):
     """
       Give nice formatted output of some search results
     """
+
+    cutoff = 200
 
     if len(results) > 0 and type(results[0]) == type({}):
         includesScores = False
@@ -55,10 +122,7 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
     output += "\n\n\n"
 
     # Write it out a file
-    if append:
-        open(projectRoot + '/experiments/ranking/results/' + outputFile, 'a').write(output)
-    else:
-        open(projectRoot + '/experiments/ranking/results/' + outputFile, 'w').write(output)
+    open(projectRoot + '/experiments/ranking/results/' + outputFile, 'w').write(output)
 
 
 def getRankingResults(results, relevantUrls, cutoff):
