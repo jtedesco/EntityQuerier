@@ -47,28 +47,30 @@ class RankSVMRanking(object):
             @param  relevantURLs    The relevance set of urls (empty if unknown)
         """
 
-        # The RankSVM relevance label
-        preferenceScore = 1
-        if str(scoredResult['url']) in relevantURLs:
-            preferenceScore = 2
+        if 'url' in scoredResult:
 
-        # build the training line
-        rankSVMData += "%d qid:%d" % (preferenceScore, qid)
-        for index in xrange(0, len(self.features)):
-            feature = self.features[index]
+            # The RankSVM relevance label
+            preferenceScore = 0
+            if str(scoredResult['url']) in relevantURLs:
+                preferenceScore = 1
 
-            try:
-                if type(scoredResult[feature]) == type(0):
-                    rankSVMData += " %d:%d" % (index + 1, scoredResult[feature])
-                elif type(scoredResult[feature]) == type(0.0):
-                    rankSVMData += " %d:%1.2f" % (index + 1, scoredResult[feature])
-                else:
-                    print "Unrecognized feature type, feature: " + str(scoredResult[feature])
-            except KeyError:
-                print "missing feature for %s" % scoredResult['url']
-                rankSVMData += " %d:%d" % (index + 1, 0)
+            # build the training line
+            rankSVMData += "%d qid:%d" % (preferenceScore, qid)
+            for index in xrange(0, len(self.features)):
+                feature = self.features[index]
+    
+                try:
+                    if type(scoredResult[feature]) == type(0):
+                        rankSVMData += " %d:%d" % (index + 1, scoredResult[feature])
+                    elif type(scoredResult[feature]) == type(0.0):
+                        rankSVMData += " %d:%1.2f" % (index + 1, scoredResult[feature])
+                    else:
+                        print "Unrecognized feature type, feature: " + str(scoredResult[feature])
+                except KeyError:
+                    print "missing feature for %s" % scoredResult['url']
+                    rankSVMData += " %d:%d" % (index + 1, 0)
 
-        rankSVMData += '   #%s \n' % scoredResult['url']
+            rankSVMData += '   #%s \n' % scoredResult['url']
         return rankSVMData
 
 
@@ -88,8 +90,8 @@ class RankSVMRanking(object):
             # Add a title for the query training section
             rankSVMTrainingData += "# Entity '%s'\n" % entityId
 
-            for searchResult in self.searchResults[entityId]:
-                rankSVMTrainingData = self.buildRankSVMRankingInput(qid, rankSVMTrainingData, searchResult, relevantURLs)
+            for searchResults in self.searchResults[entityId]:
+                rankSVMTrainingData = self.buildRankSVMRankingInput(qid, rankSVMTrainingData, searchResults, relevantURLs)
 
             qid +=1
 
@@ -181,7 +183,7 @@ def getDmozResults():
     return dmozResults
 
 
-def buildResultsForEntity(resultsFilePath, verbose, extensions):
+def buildResultsForEntity(resultsFilePath, verbose, extensions, relevantURLs = []):
 
     # Get the contents of the file
     resultsData = open(resultsFilePath).read()
@@ -204,7 +206,7 @@ def buildResultsForEntity(resultsFilePath, verbose, extensions):
             extension.initialize(resultsDump)
 
     # Build the data structure that will map entity id -> urls
-    entityUrls = set([])
+    entityUrls = set(relevantURLs)
     for query in resultsDump:
         for resultType in resultsDump[query]:
             for url in resultsDump[query][resultType]:
@@ -271,7 +273,11 @@ def scoreResults(entity, entityId, results, features):
                     try:
                         scoredResults[url][feature] = result[feature]
                     except KeyError:
-                        print "Error processing %s, skipping because %s" % (url, str(sys.exc_info()[1]))
+                        try:
+                            scoredResults[url] = {}
+                            scoredResults[url][feature] = result[feature]
+                        except:
+                            print "Error processing %s, skipping because %s" % (url, str(sys.exc_info()[1]))
 
     return scoredResults.values()
 
@@ -338,7 +344,7 @@ if __name__ == '__main__':
     projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
 
     # Get the DMOZ results for all entities
-    if not os.path.exists('.index'):
+    if not os.path.exists('/home/jon/.index'):
         print "getting DMOZ results"
         dmozResults = getDmozResults()
         print "%d dmoz results" % len(dmozResults)
@@ -346,7 +352,7 @@ if __name__ == '__main__':
         dmozResults = []
 
     # Build the relevance sets for each
-    retrievalExperimentResults = 'ExactAttributeNamesAndValues'
+    retrievalExperimentResults = 'ApproximateExactAttributeNamesAndValues'
     resultScores = {}
     relevance = {}
     if not os.path.exists(RankSVMRanking.trainingFilePath):
@@ -369,7 +375,7 @@ if __name__ == '__main__':
             # Get the retrieval results for this entity
             entityName = entityId.replace(' ', '').replace('-', '')
             resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
-            entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
+            entityResults = buildResultsForEntity(resultsFilePath, False, extensions, relevance[entityId])
             if entityResults is not None:
                 entityResults.extend(dmozResults)
             resultScores[entityId] = scoreResults(entity, entityId, entityResults, features)
@@ -386,12 +392,14 @@ if __name__ == '__main__':
         # Create the ranking object & skip the training stage
         rankSVMRanking = RankSVMRanking(resultScores, relevance, features)
 
+    print "Finished training phase, beginning evaluation"
+
     # Run the ranking for each entity
     for entityId in entityIds:
 
         # Get the entity
         entity = load(open(projectRoot + '/entities/%s.json' % entityId))
-        relevantResults = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
+        relevantURLs = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
 
         # The extensions for results
         extensions = [
@@ -405,7 +413,7 @@ if __name__ == '__main__':
         entityName = entityId.replace(' ', '').replace('-', '')
         resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
         print "Building results for entity '%s'" % entityId
-        entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
+        entityResults = buildResultsForEntity(resultsFilePath, False, extensions, relevantURLs)
         print "Built results for entity '%s'" % entityId
         resultScores = scoreResults(entity, entityId, entityResults, features)
 

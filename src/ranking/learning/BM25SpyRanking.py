@@ -18,7 +18,7 @@ class BM25SpyRanking(TermFrequencyRanking):
     """
 
     def __init__(self, searchResults, keywords, entityId):
-        self.indexLocation = ".index"
+        self.indexLocation = "/home/jon/.index"
         Ranking.__init__(self, searchResults, keywords)
         self.createIndex()
 
