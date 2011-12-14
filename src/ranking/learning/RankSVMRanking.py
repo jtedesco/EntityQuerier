@@ -399,7 +399,6 @@ if __name__ == '__main__':
 
         # Get the entity
         entity = load(open(projectRoot + '/entities/%s.json' % entityId))
-        relevantURLs = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
 
         # The extensions for results
         extensions = [
@@ -413,7 +412,7 @@ if __name__ == '__main__':
         entityName = entityId.replace(' ', '').replace('-', '')
         resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
         print "Building results for entity '%s'" % entityId
-        entityResults = buildResultsForEntity(resultsFilePath, False, extensions, relevantURLs)
+        entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
         print "Built results for entity '%s'" % entityId
         resultScores = scoreResults(entity, entityId, entityResults, features)
 
