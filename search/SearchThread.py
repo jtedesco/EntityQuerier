@@ -6,7 +6,7 @@ from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
-from src.search.google.GoogleSearch import GoogleSearch
+from src.search.google.GoogleSearch import GoogleSearchFacade
 
 __author__ = 'jon'
 
@@ -43,7 +43,7 @@ class SearchThread(threading.Thread):
         # Run retrieval phase
         self.update("Running retrieval phase")
         numberOfSearchResults = 50
-        searchInterface = GoogleSearch(numberOfSearchResults, True, [])
+        searchInterface = GoogleSearchFacade(numberOfSearchResults, True, [])
         experiment = EntityAttributeValues([self.entityId], searchInterface, ExactAttributeValuesQueryBuilder(), numberOfSearchResults)
         experiment.run()
         temporaryFileName = "tmp-output" + self.entityId

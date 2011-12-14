@@ -13,7 +13,7 @@ from src.ranking.Ranking import Ranking
 
 __author__ = 'jon'
 
-class TermFrequencyRanking(Ranking):
+class IndexRanking(Ranking):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """

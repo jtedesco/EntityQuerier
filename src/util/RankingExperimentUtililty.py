@@ -1,44 +1,7 @@
-from json import load, loads
+from json import load
 from pprint import pprint
-from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
 
 __author__ = 'jon'
-
-def getResultsFromRetrievalFile(path, extensions):
-
-    # Get the contents of the file
-    resultsData = open(path).read()
-
-    # Strip off the header
-    dataToBeJoined = []
-    recordData = False
-    for dataLine in resultsData.split('\n'):
-        if not recordData and len(dataLine) > 0 and dataLine[0] == '{':
-            recordData = True
-        if recordData:
-            dataToBeJoined.append(dataLine)
-    resultsData = '\n'.join(dataToBeJoined)
-
-    # Load the data dumped from the first stage
-    resultsDump = loads(resultsData)
-
-    # Initialize the extensions (HACK)
-    for extension in extensions:
-        if 'initialize' in dir(extension):
-            extension.initialize(resultsDump)
-
-    # Build the data structure that will map entity id -> urls
-    results = []
-    entityUrls = set([])
-    for query in resultsDump:
-        for resultType in resultsDump[query]:
-            for url in resultsDump[query][resultType]:
-                if url not in ['precision', 'recall', 'averagePrecision']:
-                    entityUrls.add(url)
-
-    results = buildGoogleResultsFromURLs(entityUrls, True, True, extensions)
-
-    return results
 
 
 def getKeywords(entity):

@@ -1,28 +1,22 @@
-import mechanize
-from mechanize._mechanize import LinkNotFoundError
-from pprint import pprint
 import re
 import sys
 from src.search.ResultParserThread import ResultParserThread
-from src.search.Search import Search
 from BeautifulSoup import BeautifulSoup
+from src.search.SearchFacade import SearchFacade
 from src.search.SearchResultParsing import getPageContent
 
 __author__ = 'jon'
 
 
-class GoogleSearch(Search):
+class GoogleSearchFacade(SearchFacade):
     """
       Implements the facade with which to query a specific search engine about the retrieved results
     """
 
-    def query(self, query, fetchContent=True):
+    def query(self, query):
         """
           Query the search interface and return a dictionary of results
-
-            @param  query               The query to submit to Google
-            @param  fetchContent        Determines whether or not we should fill in information about each result's content
-
+            @param  query   The query to submit to Google
             @return A dictionary representing the search results
         """
 
@@ -97,7 +91,7 @@ class GoogleSearch(Search):
                     nextURL = otherNextURLTag.attrMap['href']
                 if 'http://' not in nextURL:
                     nextURL = 'http://www.google.com' + nextURL
-            except:
+            except Exception:
                 nextURL = None
                 print "Failed to find next page URL: %s" % str(e)
 
@@ -129,7 +123,7 @@ class GoogleSearch(Search):
                 for resultData in results:
                     url = resultData['url']
                     dotLocation = url.rfind('.')
-                    if dotLocation != -1 or url[dotLocation:] not in set(['.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx']):
+                    if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'}:
                         parserThread = ResultParserThread(resultData, self.verbose, self.extensions)
                         threads.append(parserThread)
 

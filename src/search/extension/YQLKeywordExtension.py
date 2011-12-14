@@ -1,10 +1,10 @@
-from BeautifulSoup import BeautifulSoup
-from json import loads
 import os
 import re
+from json import loads
+from BeautifulSoup import BeautifulSoup
+from src.cache.YQLCache import YQLCache
 from src.search.SearchResultParsing import loadFromUrl
 from src.search.extension.Extension import Extension
-from util.YQLCache import YQLCache
 
 __author__ = 'jon'
 

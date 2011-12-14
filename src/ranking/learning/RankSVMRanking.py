@@ -1,14 +1,14 @@
-from json import load, loads
 import os
 import subprocess
 import sys
+from json import load
 from src.ranking.learning.BM25SpyRanking import BM25SpyRanking
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
-from util.GoogleResultsBuilder import buildGoogleResultsFromURLs
-from util.RankingExperimentUtil import outputRankingResults, getKeywords
+from src.util.RankingExperimentUtililty import outputRankingResults, getKeywords
+from src.util.ResultsBuilderUtility import getResultsFromRetrievalFile, getDmozResults
 
 __author__ = 'jon'
 
@@ -74,7 +74,7 @@ class RankSVMRanking(object):
         return rankSVMData
 
 
-    def train(self):
+    def learn(self):
         """
           Train the ranking algorithm using the search results and relevance guide
         """
@@ -152,78 +152,6 @@ class RankSVMRanking(object):
 
         return reRankedResults
 
-
-def getDmozResults():
-
-    # Find where we expect this data to be cached
-    dmozPath = str(os.getcwd())
-    dmozPath = dmozPath[:dmozPath.find('EntityQuerier') + len('EntityQuerier')] + '/dmoz/'
-
-    # Supplement the index with the DMOZ documents
-    dmozResults = []
-    for filename in os.listdir(dmozPath):
-
-        try:
-
-            # Get the contents of the file
-            dmozResultFile = open(dmozPath + filename)
-            dmozResult = load(dmozResultFile)
-            dmozResults.append(dmozResult)
-
-        except ValueError:
-
-            # Do something awful...
-            try:
-                dmozResult = eval(dmozResultFile.read())
-                dmozResults.append(dmozResult)
-            except Exception:
-                pass
-
-    # Create the index with both the traditional and new DMOZ search results
-    return dmozResults
-
-
-def buildResultsForEntity(resultsFilePath, verbose, extensions, relevantURLs = []):
-
-    # Get the contents of the file
-    resultsData = open(resultsFilePath).read()
-
-    # Strip off the header
-    dataToBeJoined = []
-    recordData = False
-    for dataLine in resultsData.split('\n'):
-        if not recordData and len(dataLine) > 0 and dataLine[0] == '{':
-            recordData = True
-        if recordData:
-            dataToBeJoined.append(dataLine)
-    resultsData = '\n'.join(dataToBeJoined)
-
-    resultsDump = loads(resultsData)
-
-    # Initialize the extensions (HACK)
-    for extension in extensions:
-        if 'initialize' in dir(extension):
-            extension.initialize(resultsDump)
-
-    # Build the data structure that will map entity id -> urls
-    entityUrls = set(relevantURLs)
-    for query in resultsDump:
-        for resultType in resultsDump[query]:
-            for url in resultsDump[query][resultType]:
-                if url not in ['precision', 'recall', 'averagePrecision']:
-                    entityUrls.add(url)
-
-    # Gather the results
-    urlGroups = group(list(entityUrls), 100)
-    totalResults = []
-    for urlGroup in urlGroups:
-        print "Gathering URL group"
-        results = buildGoogleResultsFromURLs(urlGroup, verbose=verbose, extensions=extensions)
-        totalResults.extend(results)
-        BM25SpyRanking(results, [], None)
-    print "Gathered all results"
-
-    return totalResults
 
 
 def scoreResults(entity, entityId, results, features):
@@ -348,7 +276,7 @@ if __name__ == '__main__':
             # Get the retrieval results for this entity
             entityName = entityId.replace(' ', '').replace('-', '')
             resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
-            entityResults = buildResultsForEntity(resultsFilePath, False, extensions, relevance[entityId])
+            entityResults = getResultsFromRetrievalFile(resultsFilePath, extensions)
             if entityResults is not None:
                 entityResults.extend(dmozResults)
             resultScores[entityId] = scoreResults(entity, entityId, entityResults, features)
@@ -358,7 +286,7 @@ if __name__ == '__main__':
         rankSVMRanking = RankSVMRanking(resultScores, relevance, features)
 
         # Train the learning algorithm using the search results & relevance data given
-        rankSVMRanking.train()
+        rankSVMRanking.learn()
 
     else:
 
@@ -385,7 +313,7 @@ if __name__ == '__main__':
         entityName = entityId.replace(' ', '').replace('-', '')
         resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
         print "Building results for entity '%s'" % entityId
-        entityResults = buildResultsForEntity(resultsFilePath, False, extensions)
+        entityResults = getResultsFromRetrievalFile(resultsFilePath, extensions)
         print "Built results for entity '%s'" % entityId
         resultScores = scoreResults(entity, entityId, entityResults, features)
 

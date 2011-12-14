@@ -1,6 +1,7 @@
 from json import load
 import os
 from src.ranking.BM25Ranking import BM25Ranking
+from src.ranking.Ranking import Ranking
 
 __author__ = 'jon'
 

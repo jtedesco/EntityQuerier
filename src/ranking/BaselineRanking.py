@@ -4,7 +4,7 @@ from src.ranking.Ranking import Ranking
 
 __author__ = 'jon'
 
-class BaselineResultsRanking(Ranking):
+class BaselineRanking(Ranking):
     """
       Represents a baseline ranking of the original search results.
     """

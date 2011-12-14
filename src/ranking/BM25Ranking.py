@@ -1,9 +1,9 @@
 from whoosh import scoring
-from src.ranking.TermFrequencyRanking import TermFrequencyRanking
+from src.ranking.TermFrequencyRanking import IndexRanking
 
 __author__ = 'jon'
 
-class BM25Ranking(TermFrequencyRanking):
+class BM25Ranking(IndexRanking):
     """
       Represents a ranking system using a set of keywords and a set of search results to rerank them.
     """
