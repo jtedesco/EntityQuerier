@@ -1,8 +1,4 @@
-from copy import deepcopy
 import threading
-from urllib2 import URLError
-import sys
-import whoosh
 from whoosh.analysis import StemmingAnalyzer, CharsetFilter
 from whoosh.fields import Schema, TEXT, ID, NUMERIC
 from whoosh.index import exists_in, open_dir
@@ -10,7 +6,6 @@ from whoosh.qparser.default import MultifieldParser
 from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from whoosh.support.charset import accent_map
-from src.ranking.learning.CoordinateDescentRanking import CoordinateDescentRanking
 from src.ranking.learning.CoordinateDescentScorer import CoordinateDescentScorer
 from util.RankingExperimentUtil import getRankingResults
 
@@ -21,7 +16,7 @@ class CoordinateDescentRankingThread(threading.Thread):
       Thread that performs a tweak of a given feature, and reports the
     """
 
-    def __init__(self, values, keywords, changes, changeName, relevantResults):
+    def __init__(self, values, keywords, changes, changeName, relevantResults, indexLocation):
         """
           Initializes this learning thread, by creating the index schema, analyzer, and opening the index.
 
@@ -30,6 +25,7 @@ class CoordinateDescentRankingThread(threading.Thread):
             @param  changes         Map of changes to test -> their resulting scores
             @param  changeName      Change this thread is responsible for testing
             @param  relevantResults Map of entity ids -> list of relevant urls for that entity
+            @param  indexLocation   The location of the index to use
         """
 
         self.values = values
@@ -47,9 +43,9 @@ class CoordinateDescentRankingThread(threading.Thread):
                                   headers=TEXT(stored=True), baselineScore=NUMERIC(stored=True))
         threading.Thread.__init__(self)
 
-        if exists_in(CoordinateDescentRanking.getIndexLocation()):
+        if exists_in(indexLocation):
             print "Opening existing index..."
-            self.index = open_dir(CoordinateDescentRanking.getIndexLocation())
+            self.index = open_dir(indexLocation)
             print "Opened existing index."
         else:
             raise Exception("Could not open index directory!")

@@ -75,7 +75,8 @@ class CoordinateDescentRanking(object):
         changes = {
             'lock' : Lock()
         }
-        scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original', self.relevantResults)
+        scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original',
+                                                       self.relevantResults, CoordinateDescentRanking.getIndexLocation())
         scoringThread.start()
         scoringThread.join()
         currentWeightingScoring = changes['original']
@@ -101,14 +102,16 @@ class CoordinateDescentRanking(object):
                 # Launch test for increasing weight of this feature
                 values = deepcopy(self.values)
                 values[feature] += self.stepSizes[feature]
-                scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, feature + '+', self.relevantResults)
+                scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, feature + '+',
+                                                               self.relevantResults, CoordinateDescentRanking.getIndexLocation())
                 threads.append(scoringThread)
                 scoringThread.start()
 
                 # Launch test for decreasing weight of this feature
                 values = deepcopy(self.values)
                 values[feature] -= self.stepSizes[feature]
-                scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, feature + '-', self.relevantResults)
+                scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, feature + '-',
+                                                               self.relevantResults, CoordinateDescentRanking.getIndexLocation())
                 threads.append(scoringThread)
                 scoringThread.start()
 
@@ -166,8 +169,10 @@ if __name__ == '__main__':
     retrievalTest = 'ExactAttributeNamesAndValues'
     experiment = ('CoordinateDescentRanking', CoordinateDescentRanking)
 
+    # Indicates whether to perform the learning or ranking phase
     finalValues = None
 
+    # The entity ids to use
     entityIds = [
         "ChengXiang Zhai",
         "Danny Dig",
@@ -208,7 +213,6 @@ if __name__ == '__main__':
 
         # Build the keywords for this entity
         keywords[entityId] = getKeywords(entity)
-
 
     # Perform the learned ranking if we haven't, or generate the final ranking if we have
     if finalValues is None:
