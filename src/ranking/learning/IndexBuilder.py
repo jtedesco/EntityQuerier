@@ -197,5 +197,5 @@ if __name__ == '__main__':
     ]
 
     # Build the index
-    indexBuilder = IndexBuilder(indexLocation, entityIds, retrievalExperiment, extensions)
+    indexBuilder = IndexBuilder(indexLocation, entityIds, retrievalExperiment, extensions, True)
     indexBuilder.buildIndex()
