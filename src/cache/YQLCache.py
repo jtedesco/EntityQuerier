@@ -1,7 +1,7 @@
 import os
 import hashlib
 import threading
-from util.Cache import Cache
+from src.cache.Cache import Cache
 
 __author__ = 'jon'
 

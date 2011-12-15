@@ -46,7 +46,7 @@ def outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results
         includesScores = True
 
     # Find the 'standard' for this entity -- the true list of relevant results
-    relevantUrls = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
+    relevantUrls = load(open(projectRoot + '/entities/relevanceStandard/' + entityId + '.json'))
 
     recallAt1, recallAt10, recallAt20, recallAt50, precisionAt1, precisionAt10, precisionAt20, precisionAt50, \
         averagePrecisionAt1, averagePrecisionAt10, averagePrecisionAt20, averagePrecisionAt50, rPrecision, fullPrecision = getRankingResults(results, relevantUrls, cutoff)

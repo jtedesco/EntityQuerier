@@ -209,7 +209,7 @@ if __name__ == '__main__':
         results[entityId] = getResultsFromRetrievalFile(retrievalResultsPath, extensions)
 
         # Store the relevant results for this entity
-        relevantResults[entityId] = load(open(projectRoot + '/relevanceStandard/' + entityId + '.json'))
+        relevantResults[entityId] = load(open(projectRoot + '/entities/relevanceStandard/' + entityId + '.json'))
 
         # Build the keywords for this entity
         keywords[entityId] = getKeywords(entity)

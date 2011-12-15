@@ -1,9 +1,8 @@
 from json import loads
 from pprint import pprint
+from src.cache.YQLCache import YQLCache
 from src.queries.builders.QueryBuilder import QueryBuilder
 from src.search.SearchResultParsing import loadFromUrl
-from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
-from util.YQLCache import YQLCache
 
 __author__ = 'jon'
 

@@ -263,7 +263,7 @@ if __name__ == '__main__':
     
             # Get the entity
             entity = load(open(projectRoot + '/entities/%s.json' % entityId))
-            relevance[entityId] = load(open(projectRoot + '/relevanceStandard/%s.json' % entityId))
+            relevance[entityId] = load(open(projectRoot + '/entities/relevanceStandard/%s.json' % entityId))
 
             # The extensions for results
             extensions = [

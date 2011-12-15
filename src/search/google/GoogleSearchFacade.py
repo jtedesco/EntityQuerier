@@ -35,7 +35,7 @@ class GoogleSearchFacade(SearchFacade):
                 searchPage = getPageContent(url, True)
 
                 # Add the results from this page
-                newResults, nextPageUrl = self.__parseResults(searchPage, fetchContent)
+                newResults, nextPageUrl = self.__parseResults(searchPage)
                 results.extend(newResults)
                 url = nextPageUrl
 
@@ -50,7 +50,7 @@ class GoogleSearchFacade(SearchFacade):
         return results
 
 
-    def __parseResults(self, resultsContent, fetchContent):
+    def __parseResults(self, resultsContent):
         """
           Parse the results from the HTML content of Google's results page
 
@@ -114,41 +114,6 @@ class GoogleSearchFacade(SearchFacade):
                 'preview': preview
             }
             results.append(result)
-
-
-        if fetchContent:
-            try:
-                # Create threads to process the pages for this set of results
-                threads = []
-                for resultData in results:
-                    url = resultData['url']
-                    dotLocation = url.rfind('.')
-                    if dotLocation != -1 or url[dotLocation:] not in {'.ps', '.pdf', '.ppt', '.pptx', '.doc', 'docx'}:
-                        parserThread = ResultParserThread(resultData, self.verbose, self.extensions)
-                        threads.append(parserThread)
-
-                # Launch all threads
-                for thread in threads:
-                    thread.start()
-
-                # Wait for all the threads to finish
-                for thread in threads:
-
-                    # Allow up to 5 seconds for this thread to respond, otherwise, kill it
-                    thread.join(5)
-
-                    # Kill it if it hung
-                    if thread.isAlive():
-                        try:
-                            thread._Thread__stop()
-                        except Exception:
-                            print(str(thread.getName()) + ' could not be terminated')
-
-
-            except Exception:
-
-                if self.verbose:
-                    print "Error parsing basic results from Google: '%s'" % str(sys.exc_info()[1]).strip()
 
         return results, nextURL
 
