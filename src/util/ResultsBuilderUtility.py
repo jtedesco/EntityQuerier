@@ -112,3 +112,16 @@ def getDmozResults():
 
     # Create the index with both the traditional and new DMOZ search results
     return dmozResults
+
+
+def getResultsFromEntityId(entityId, retrievalExperimentName, extensions):
+
+    # Find the project root
+    projectRoot = str(os.getcwd())
+    projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
+
+    # Find the results path
+    entityName = entityId.replace(' ', '').replace('-', '')
+    resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentName)
+
+    return getResultsFromRetrievalFile(resultsFilePath, extensions)

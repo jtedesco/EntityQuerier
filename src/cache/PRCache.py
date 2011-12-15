@@ -2,8 +2,8 @@ import os
 import hashlib
 import threading
 import sys
+from src.cache.Cache import Cache
 from src.search.extension.PageRankExtension import getPageRank
-from util.Cache import Cache
 
 __author__ = 'jon'
 
