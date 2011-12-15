@@ -78,17 +78,27 @@ class IndexBuilder(object):
             results = []
             for entityId in self.entityIds:
 
+                print "Building entity results for " + entityId
+
                 # Gather the results (initializing extensions) from the results file
                 entityResults = getResultsFromEntityId(entityId, self.retrievalExperiment, deepcopy(self.extensions))
                 results.extend(entityResults)
 
+                print "Built entity results for " + entityId
+
+            print "Built all entity results"
+
             # Get DMOZ documents if necessary
             if self.smoothed:
+                print "Building DMOZ documents"
                 smoothingDocuments = getDmozResults()
                 results.extend(smoothingDocuments)
+                print "Built DMOZ documents"
 
             # Add the documents to the index
+            print "Adding results to index..."
             self.__addResults(results, indexWriter)
+            print "Added results to index..."
 
 
         else:
@@ -111,10 +121,10 @@ class IndexBuilder(object):
             unicodeTitle = self.__getFieldFromResult(result, 'title')
             unicodeDescription = self.__getFieldFromResult(result, 'description')
             unicodeUrl = self.__getFieldFromResult(result, 'url')
-            unicodeKeywords = self.__getFieldFromResult(result, 'keywords')
-            unicodeHeaders = self.__getFieldFromResult(result, 'headers')
 
-            # Get the unicode text representation of list entries from result
+            # Get the unicode text representation of list entries (or things that may be lists) from result
+            unicodeHeaders = self.__getListFieldFromResult(result, 'headers')
+            unicodeKeywords = self.__getListFieldFromResult(result, 'keywords')
             unicodeYqlKeywords = self.__getListFieldFromResult(result, 'yqlKeywords')
             unicodeExpandedYqlKeywords = self.__getListFieldFromResult(result, 'expandedYqlKeywords')
 
@@ -140,9 +150,12 @@ class IndexBuilder(object):
         try:
             data = unicode(result[fieldName], errors='ignore')
         except TypeError:
-            data = ', '.join(result[fieldName])
+            try:
+                data = unicode(', '.join(result[fieldName]), errors='ignore')
+            except TypeError:
+                data = ', '.join(result[fieldName])
         except KeyError:
-            data = u'?'
+            data = unicode('?', errors='ignore')
             
         return data
 
@@ -198,4 +211,4 @@ if __name__ == '__main__':
 
     # Build the index
     indexBuilder = IndexBuilder(indexLocation, entityIds, retrievalExperiment, extensions, True)
-    indexBuilder.buildIndex()
+    indexBuilder.buildIndex(True)
