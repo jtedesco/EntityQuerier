@@ -1,4 +1,3 @@
-from pprint import pprint
 import threading
 from whoosh.analysis import StemmingAnalyzer, CharsetFilter
 from whoosh.fields import Schema, TEXT, ID, NUMERIC
@@ -57,9 +56,7 @@ class CoordinateDescentRankingThread(threading.Thread):
         threading.Thread.__init__(self)
 
         if exists_in(indexLocation):
-            print "Opening existing index..."
             self.index = open_dir(indexLocation)
-            print "Opened existing index."
         else:
             raise Exception("Could not open index directory!")
 
@@ -104,8 +101,6 @@ class CoordinateDescentRankingThread(threading.Thread):
         # Create a query parser, build the query & parse it
         keywordsQueryParser = self.buildQueryParser()
         query = self.buildQuery(entityId)
-        print "Querying '%s' with values" % query
-        pprint(self.weights)
         queryObject = keywordsQueryParser.parse(query)
 
         # Perform the query itself

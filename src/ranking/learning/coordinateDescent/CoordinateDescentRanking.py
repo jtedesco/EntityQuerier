@@ -20,7 +20,7 @@ class CoordinateDescentRanking(object):
 
     @staticmethod
     def getIndexLocation():
-        return "/home/jon/.index"
+        return "/home/jon/Documents/.index"
 
 
     def __init__(self, keywords, relevantResults):
@@ -42,7 +42,7 @@ class CoordinateDescentRanking(object):
             'pageRankScaling' : 0.1     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
         }
 
-        # The initial guesses at the feature's weightings (starts at 1.0), and
+        # The initial guesses at the feature's weightings (starts at 1.0 for most), and
         self.values = {
          'content' : 1.0,
          'title' : 1.0,
@@ -51,12 +51,10 @@ class CoordinateDescentRanking(object):
          'description' : 1.0,
          'yqlKeywords' : 1.0,
          'expandedYqlKeywords' : 1.0,
-         'baselineScore' : 1.0,      # A constant added to the final score
+         'baselineScore' : 0.5,      # Weight between baseline score & computed score
          'pageRank' : 1.0,           # A constant offset based on PR
          'pageRankScaling' : 1.0     # Scaling factor based on PR, if weighting is 0, score will be unchanged)
         }
-        
-        self.testValues = deepcopy(self.values)
 
         self.keywords = keywords
         self.relevantResults = relevantResults
@@ -75,11 +73,14 @@ class CoordinateDescentRanking(object):
             'lock' : Lock()
         }
         scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original',
-                                                       self.relevantResults, CoordinateDescentRanking.getIndexLocation())
+                                                       self.relevantResults, CoordinateDescentRanking.getIndexLocation() + '-original')
         scoringThread.start()
         scoringThread.join()
         currentWeightingScoring = changes['original']
         print "Original scoring: %1.5f" % currentWeightingScoring
+
+        # The set of features to still tweak
+        features = self.values.keys()
 
         # Keep looping until no further change is necessary
         complete = False
@@ -96,25 +97,30 @@ class CoordinateDescentRanking(object):
             threads = []
 
             # Launch threads to test changes to each feature weight
-            print "Launching threads..."
-            for feature in self.values:
+            print "Preparing threads..."
+            for feature in features:
+
+                # Form the path to the index to use for this test
+                featureIndexLocation = CoordinateDescentRanking.getIndexLocation() + '-' + feature
 
                 # Launch test for increasing weight of this feature
                 values = deepcopy(self.values)
                 values[feature] += self.stepSizes[feature]
                 scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, feature + '+',
-                                                               self.relevantResults, CoordinateDescentRanking.getIndexLocation())
+                                                               self.relevantResults, featureIndexLocation)
                 threads.append(scoringThread)
-                scoringThread.start()
 
                 # Launch test for decreasing weight of this feature
                 values = deepcopy(self.values)
                 values[feature] -= self.stepSizes[feature]
                 scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, feature + '-',
-                                                               self.relevantResults, CoordinateDescentRanking.getIndexLocation())
+                                                               self.relevantResults, featureIndexLocation)
                 threads.append(scoringThread)
-                scoringThread.start()
 
+
+            print "Launching threads..."
+            for thread in threads:
+                thread.start()
 
             # Wait for all threads to finish
             print "Waiting for threads to finish..."
@@ -123,7 +129,7 @@ class CoordinateDescentRanking(object):
 
             # Update feature weights accordingly
             print "Analyzing ranking results"
-            for feature in self.values:
+            for feature in deepcopy(features):
 
                 increaseFeatureWeightResultScoring = changes[feature+'+']
                 decreaseFeatureWeightResultScoring = changes[feature+'-']
@@ -131,12 +137,12 @@ class CoordinateDescentRanking(object):
                 # If one of these improved...
                 if increaseFeatureWeightResultScoring > currentWeightingScoring or decreaseFeatureWeightResultScoring > currentWeightingScoring:
                     if increaseFeatureWeightResultScoring > decreaseFeatureWeightResultScoring:
-                        print "New scoring: %1.5f" % increaseFeatureWeightResultScoring
                         self.values[feature] += self.stepSizes[feature]
                     elif decreaseFeatureWeightResultScoring >= increaseFeatureWeightResultScoring:
-                        print "New scoring: %1.5f" % decreaseFeatureWeightResultScoring
                         self.values[feature] -= self.stepSizes[feature]
+                    complete = False
                 else:
+                    del features[feature]
                     print "No improvement found for tweaking %s!" % feature
 
             print "Finished learning iteration %d, new values:" % iterations
@@ -155,7 +161,7 @@ class CoordinateDescentRanking(object):
             'lock' : Lock()
         }
         scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original', self.relevantResults,
-                                                       CoordinateDescentRanking.getIndexLocation())
+                                                       CoordinateDescentRanking.getIndexLocation() + '-original')
         scoringThread.start()
         scoringThread.join()
         results = scoringThread.results
@@ -165,7 +171,7 @@ class CoordinateDescentRanking(object):
 
 if __name__ == '__main__':
 
-    if not os.path.exists(CoordinateDescentRanking.getIndexLocation()):
+    if not os.path.exists(CoordinateDescentRanking.getIndexLocation() + '-original'):
         print "Cannot find index location!"
         sys.exit()
 
