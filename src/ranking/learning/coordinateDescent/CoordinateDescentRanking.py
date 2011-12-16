@@ -4,12 +4,12 @@ from copy import deepcopy
 from json import load
 from pprint import pprint
 from threading import Lock
-from src.ranking.learning.CoordinateDescentRankingThread import CoordinateDescentRankingThread
+from src.ranking.learning.coordinateDescent.CoordinateDescentRankingThread import CoordinateDescentRankingThread
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
-from util.RankingExperimentUtil import outputRankingResults, getResultsFromRetrievalFile, getKeywords
+from src.util.RankingExperimentUtililty import getKeywords, outputRankingResults
 
 __author__ = 'jon'
 
@@ -23,7 +23,7 @@ class CoordinateDescentRanking(object):
         return "/home/jon/.index"
 
 
-    def __init__(self, keywords, searchResults, relevantResults):
+    def __init__(self, keywords, relevantResults):
         """
           Initializes data structures for the learning algorithm
         """
@@ -59,7 +59,6 @@ class CoordinateDescentRanking(object):
         self.testValues = deepcopy(self.values)
 
         self.keywords = keywords
-        self.searchResults = searchResults
         self.relevantResults = relevantResults
 
 
@@ -80,6 +79,7 @@ class CoordinateDescentRanking(object):
         scoringThread.start()
         scoringThread.join()
         currentWeightingScoring = changes['original']
+        print "Original scoring: %1.5f" % currentWeightingScoring
 
         # Keep looping until no further change is necessary
         complete = False
@@ -131,8 +131,10 @@ class CoordinateDescentRanking(object):
                 # If one of these improved...
                 if increaseFeatureWeightResultScoring > currentWeightingScoring or decreaseFeatureWeightResultScoring > currentWeightingScoring:
                     if increaseFeatureWeightResultScoring > decreaseFeatureWeightResultScoring:
+                        print "New scoring: %1.5f" % increaseFeatureWeightResultScoring
                         self.values[feature] += self.stepSizes[feature]
                     elif decreaseFeatureWeightResultScoring >= increaseFeatureWeightResultScoring:
+                        print "New scoring: %1.5f" % decreaseFeatureWeightResultScoring
                         self.values[feature] -= self.stepSizes[feature]
                 else:
                     print "No improvement found for tweaking %s!" % feature
@@ -152,7 +154,8 @@ class CoordinateDescentRanking(object):
         changes = {
             'lock' : Lock()
         }
-        scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original', self.relevantResults)
+        scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original', self.relevantResults,
+                                                       CoordinateDescentRanking.getIndexLocation())
         scoringThread.start()
         scoringThread.join()
         results = scoringThread.results
@@ -184,7 +187,6 @@ if __name__ == '__main__':
     ]
 
     keywords = {}
-    results = {}
     relevantResults = {}
 
     projectRoot = str(os.getcwd())
@@ -205,8 +207,7 @@ if __name__ == '__main__':
 
         # Get & store the results for this entity
         entityName = entityId.replace(' ', '').replace('-', '').replace('\'', '')
-        retrievalResultsPath = '/experiments/retrieval/results/%s/%s' % (entityName, retrievalTest)
-        results[entityId] = getResultsFromRetrievalFile(retrievalResultsPath, extensions)
+        retrievalResultsPath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalTest)
 
         # Store the relevant results for this entity
         relevantResults[entityId] = load(open(projectRoot + '/entities/relevanceStandard/' + entityId + '.json'))
@@ -218,7 +219,7 @@ if __name__ == '__main__':
     if finalValues is None:
 
         # Learn the ranking
-        ranking = CoordinateDescentRanking(keywords, results, relevantResults)
+        ranking = CoordinateDescentRanking(keywords, relevantResults)
         values = ranking.learn()
 
         print "Final Values:"
@@ -227,7 +228,7 @@ if __name__ == '__main__':
     else:
 
         # Perform the ranking
-        ranking = CoordinateDescentRanking(keywords, results, relevantResults)
+        ranking = CoordinateDescentRanking(keywords, relevantResults)
         ranking.values = finalValues
         results = ranking.rank()
 

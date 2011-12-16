@@ -1,3 +1,4 @@
+from pprint import pprint
 import threading
 from whoosh.analysis import StemmingAnalyzer, CharsetFilter
 from whoosh.fields import Schema, TEXT, ID, NUMERIC
@@ -6,8 +7,8 @@ from whoosh.qparser.default import MultifieldParser
 from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from whoosh.support.charset import accent_map
-from src.ranking.learning.CoordinateDescentScorer import CoordinateDescentScorer
-from util.RankingExperimentUtil import getRankingResults
+from src.ranking.learning.coordinateDescent.CoordinateDescentScorer import CoordinateDescentScorer
+from src.util.RankingExperimentUtililty import getRankingResults
 
 __author__ = 'jon'
 
@@ -16,19 +17,31 @@ class CoordinateDescentRankingThread(threading.Thread):
       Thread that performs a tweak of a given feature, and reports the
     """
 
-    def __init__(self, values, keywords, changes, changeName, relevantResults, indexLocation):
+    def __init__(self, weights, keywords, changes, changeName, relevantResults, indexLocation):
         """
           Initializes this learning thread, by creating the index schema, analyzer, and opening the index.
 
             @param  keywords        Map of entity ids to keywords
-            @param  values          Weighting this thread will test
+            @param  weights          Weighting this thread will test
             @param  changes         Map of changes to test -> their resulting scores
             @param  changeName      Change this thread is responsible for testing
             @param  relevantResults Map of entity ids -> list of relevant urls for that entity
             @param  indexLocation   The location of the index to use
         """
 
-        self.values = values
+
+        # Grab the numerical entry weighting data from the values dictionary
+        self.baselineScoreWeight = weights['baselineScore']
+        self.pageRankWeight = weights['pageRank']
+        self.pageRankScalingWeight = weights['pageRankScaling']
+
+        # Remove the numerical entry weighting data from the values dictionary
+        del weights['baselineScore']
+        del weights['pageRank']
+        del weights['pageRankScaling']
+
+        # Store the parameter data
+        self.weights = weights
         self.entityIds = keywords.keys()
         self.keywords = keywords
         self.changes = changes
@@ -65,20 +78,14 @@ class CoordinateDescentRankingThread(threading.Thread):
 
     def buildQueryParser(self):
 
-        termBoosts = self.values
-
         # Set numerical scoring parameters
-        CoordinateDescentScorer.baselineScoreWeight = self.values['baselineScore']
-        CoordinateDescentScorer.pageRankWeight = self.values['pageRank']
-        CoordinateDescentScorer.pageRankScalingWeight = self.values['pageRankScaling']
+        CoordinateDescentScorer.baselineScoreWeight = self.baselineScoreWeight
+        CoordinateDescentScorer.pageRankWeight = self.pageRankWeight
+        CoordinateDescentScorer.pageRankScalingWeight = self.pageRankScalingWeight
 
-        # Remove the numerical entries, since they don't correspond to fields
-        del termBoosts['baselineScore']
-        del termBoosts['pageRank']
-        del termBoosts['pageRankScaling']
-
+        # Build parser
         keywordsQueryParser = MultifieldParser(['content','title', 'description', 'keywords', 'headers', 'yqlKeywords', 'expandedYqlKeywords'],
-                                                    self.indexSchema, fieldboosts=termBoosts, group=OrGroup)
+                                                    self.indexSchema, fieldboosts=self.weights, group=OrGroup)
         keywordsQueryParser.add_plugin(PlusMinusPlugin)
         
         return keywordsQueryParser
@@ -97,6 +104,8 @@ class CoordinateDescentRankingThread(threading.Thread):
         # Create a query parser, build the query & parse it
         keywordsQueryParser = self.buildQueryParser()
         query = self.buildQuery(entityId)
+        print "Querying '%s' with values" % query
+        pprint(self.weights)
         queryObject = keywordsQueryParser.parse(query)
 
         # Perform the query itself
