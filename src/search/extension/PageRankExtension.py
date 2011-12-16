@@ -24,7 +24,8 @@ class PageRankExtension(Extension):
 
 
     def run(self, resultDictionary):
-        resultDictionary['pageRank'] = getPageRank(resultDictionary['url'])
+        url = resultDictionary['url']
+        resultDictionary['pageRank'] = self.prCache.getPageRank(url)
 
 
 def getPageRank(url):
