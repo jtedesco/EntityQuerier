@@ -1,14 +1,14 @@
 import os
+from pprint import pprint
 import subprocess
-import sys
 from json import load
-from src.ranking.learning.BM25SpyRanking import BM25SpyRanking
+import sys
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
-from src.util.RankingExperimentUtililty import outputRankingResults, getKeywords
-from src.util.ResultsBuilderUtility import getResultsFromRetrievalFile, getDmozResults
+from src.util.RankingExperimentUtililty import outputRankingResults, scoreResults
+from src.util.ResultsBuilderUtility import getResultsFromRetrievalFile, getExtensionsResultsFromRetrievalFile, getResultsUrlsFromRetrievalFile
 
 __author__ = 'jon'
 
@@ -105,7 +105,7 @@ class RankSVMRanking(object):
         if os.path.exists(RankSVMRanking.trainingFilePath):
             os.remove(RankSVMRanking.trainingFilePath)
 
-        # Train RankSVM
+        # Train RankSVM model
         subprocess.Popen([RankSVMRanking.rankSVMPath + 'svm_rank_learn', '-c', '3', trainingDataPath,
                           RankSVMRanking.trainingFilePath]).communicate()
         
@@ -116,7 +116,7 @@ class RankSVMRanking(object):
           Rank the scored results of a single entity
         """
 
-        # The test input
+        # Remove the test input file if it exists
         testInputPath = 'testInput'
         if os.path.exists(testInputPath):
             os.remove(testInputPath)
@@ -127,7 +127,7 @@ class RankSVMRanking(object):
             rankSVMInputData = self.buildRankSVMRankingInput(0, rankSVMInputData, searchResult)
         open(testInputPath, 'w').write(rankSVMInputData)
 
-        # The test output
+        # Remove the test output file if it exists
         testOutputPath = 'testData'
         if os.path.exists(testOutputPath):
             os.remove(testOutputPath)
@@ -151,69 +151,6 @@ class RankSVMRanking(object):
         reRankedResults = list(zip(*scoresAndResults)[1])
 
         return reRankedResults
-
-
-
-def scoreResults(entity, entityId, results, features):
-    """
-      Score the results for an entity
-
-        @param  entity      The entity instance for which to score results
-        @param  entityId    The id of the entity instance whose results to score
-        @param  results     The unscored results
-    """
-
-    # Get a ranking object to allow us to score
-    spyRanking = BM25SpyRanking(results, getKeywords(entity), entityId)
-    spyRanking.entityId = entityId
-
-    # The data structure in which we're going to store the scored results (scores instead of content)
-    scoredResults = {}
-
-    # Gather the URLs we care about
-    urls = set([])
-    for result in results:
-        urls.add(result['url'])
-
-    # Allocate dictionaries for numeric features for these results
-    for feature in {'baselineScore', 'pageRank'}:
-        for url in urls:
-            try:
-                scoredResults[url][feature] = result[feature]
-            except KeyError:
-                try:
-                    scoredResults[url] = {}
-                    scoredResults[url][feature] = result[feature]
-                except Exception:
-                    print "Error processing %s, skipping because %s" % (url, str(sys.exc_info()[1]))
-
-    # Get the scores for each URL we care about
-    for feature in features:
-
-        # Check if the feature is already a numeric
-        if feature not in {'baselineScore', 'pageRank'}:
-
-            # Run the scoring algorithm on the results
-            spyRanking.feature = feature
-            spyRanking.rank()
-
-            # Gather the scores
-            featureScores = spyRanking.getScores()
-            for url in featureScores:
-                if url not in scoredResults and url in urls:
-                    numerics = spyRanking.getNumerics()
-                    scoredResults[url] = {
-                        'url' : url,
-                        'baselineScore' : numerics['baselineScore'][url],
-                        'pageRank' : numerics['pageRank'][url]
-                    }
-                scoredResults[url][feature] = featureScores[url]
-
-    return scoredResults.values()
-
-
-def group(results, groupSize):
-    return [results[i : i + groupSize] for i in xrange(0, len(results), groupSize)]
 
 
 if __name__ == '__main__':
@@ -244,85 +181,65 @@ if __name__ == '__main__':
     projectRoot = str(os.getcwd())
     projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
 
-    # Get the DMOZ results for all entities
-    if not os.path.exists('/home/jon/.index'):
-        print "getting DMOZ results"
-        dmozResults = getDmozResults()
-        print "%d dmoz results" % len(dmozResults)
-    else:
-        dmozResults = []
-
     # Build the relevance sets for each
     retrievalExperimentResults = 'ApproximateExactAttributeNamesAndValues'
-    resultScores = {}
+    scoredResults = {}
     relevance = {}
-    if not os.path.exists(RankSVMRanking.trainingFilePath):
-        for entityId in entityIds:
 
-            print "Gathering pages for %s" % entityId
-    
-            # Get the entity
-            entity = load(open(projectRoot + '/entities/%s.json' % entityId))
-            relevance[entityId] = load(open(projectRoot + '/entities/relevanceStandard/%s.json' % entityId))
+    # If the training file doesn't exist, perform the learning stage
+    learn = not os.path.exists(RankSVMRanking.trainingFilePath)
 
-            # The extensions for results
-            extensions = [
-                PageRankExtension(),
-                YQLKeywordExtension(),
-                ExpandedYQLKeywordExtension(),
-                BaselineScoreExtension()
-            ]
-
-            # Get the retrieval results for this entity
-            entityName = entityId.replace(' ', '').replace('-', '')
-            resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
-            entityResults = getResultsFromRetrievalFile(resultsFilePath, extensions)
-            if entityResults is not None:
-                entityResults.extend(dmozResults)
-            resultScores[entityId] = scoreResults(entity, entityId, entityResults, features)
-
-
-        # Create the ranking object & run the training stage with entity data we have now
-        rankSVMRanking = RankSVMRanking(resultScores, relevance, features)
-
-        # Train the learning algorithm using the search results & relevance data given
-        rankSVMRanking.learn()
-
-    else:
-
-        # Create the ranking object & skip the training stage
-        rankSVMRanking = RankSVMRanking(resultScores, relevance, features)
-
-    print "Finished training phase, beginning evaluation"
-
-    # Run the ranking for each entity
     for entityId in entityIds:
+
+        print "Gathering scored results"
 
         # Get the entity
         entity = load(open(projectRoot + '/entities/%s.json' % entityId))
+        if learn:
+            relevance[entityId] = load(open(projectRoot + '/entities/relevanceStandard/%s.json' % entityId))
+        else:
+            relevance[entityId] = {}
 
         # The extensions for results
         extensions = [
             PageRankExtension(),
-            YQLKeywordExtension(),
-            ExpandedYQLKeywordExtension(),
             BaselineScoreExtension()
         ]
 
         # Get the retrieval results for this entity
         entityName = entityId.replace(' ', '').replace('-', '')
         resultsFilePath = projectRoot + '/experiments/retrieval/results/%s/%s' % (entityName, retrievalExperimentResults)
-        print "Building results for entity '%s'" % entityId
-        entityResults = getResultsFromRetrievalFile(resultsFilePath, extensions)
-        print "Built results for entity '%s'" % entityId
-        resultScores = scoreResults(entity, entityId, entityResults, features)
 
-        # Get the ranked results
-        results = rankSVMRanking.rank(resultScores, entityId)
+        # Get the URLs & baseline & PR data for each result
+        urls = getResultsUrlsFromRetrievalFile(resultsFilePath, extensions)
+        incompleteResults = getExtensionsResultsFromRetrievalFile(resultsFilePath, extensions)
 
-        # Output the ranking results
-        outputTitle = "Results Summary (for top %d results):\n"
-        outputFile = entityName + '/RankSVMRanking'
-        outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
+        # Gather the scored results from the index
+        scoredResults[entityId] = scoreResults(entity, entityId, urls, features, incompleteResults)
 
+        # Either learn or rank
+        if not learn:
+
+            # Create the ranking object & run the training stage with entity data we have now
+            rankSVMRanking = RankSVMRanking(scoredResults, relevance, features)
+
+            # Get the ranked results
+            results = rankSVMRanking.rank(scoredResults, entityId)
+
+            # Output the ranking results
+            outputTitle = "Results Summary (for top %d results):\n"
+            outputFile = entityName + '/RankSVMRanking'
+            outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
+
+
+        pprint(scoredResults)
         sys.exit()
+
+
+    if learn:
+
+        # Create the ranking object & rank
+        rankSVMRanking = RankSVMRanking(scoredResults, relevance, features)
+
+        # Learn the ranking model
+        rankSVMRanking.learn()

@@ -1,6 +1,7 @@
 from json import loads, load
 import os
 from src.search.ResultParserThread import ResultParserThread
+from src.search.extension.ExtensionResultParsingThread import ExtensionResultParserThread
 
 __author__ = 'jon'
 
@@ -41,14 +42,14 @@ def buildGoogleResultsFromURLs(urls, fetchContent=True, verbose=False, extension
         if thread.isAlive():
             try:
                 thread._Thread__stop()
-            except:
+            except Exception:
                 print(str(thread.getName()) + ' could not be terminated')
 
 
     return results
 
 
-def getResultsFromRetrievalFile(path, extensions):
+def getResultsUrlsFromRetrievalFile(path, extensions):
 
     # Get the contents of the file
     resultsData = open(path).read()
@@ -72,14 +73,51 @@ def getResultsFromRetrievalFile(path, extensions):
             extension.initialize(resultsDump)
 
     # Build the data structure that will map entity id -> urls
-    entityUrls = set([])
+    urls = set([])
     for query in resultsDump:
         for resultType in resultsDump[query]:
             for url in resultsDump[query][resultType]:
                 if url not in ['precision', 'recall', 'averagePrecision']:
-                    entityUrls.add(url)
+                    urls.add(url)
 
-    results = buildGoogleResultsFromURLs(entityUrls, True, True, extensions)
+    return urls
+
+
+def getExtensionsResultsFromRetrievalFile(path, extensions):
+    """
+     Builds the results from the file, WITHOUT fetching the content of the results
+    """
+
+    # Get the URLs
+    urls = getResultsUrlsFromRetrievalFile(path, extensions)
+
+    threads= []
+
+    # Build the results
+    results = {}
+    for url in urls:
+        results[url] = {
+            'url' : url
+        }
+        thread = ExtensionResultParserThread(results[url], True, extensions)
+        threads.append(thread)
+
+    # Launch all threads
+    for thread in threads:
+        thread.start()
+
+    # Wait for all the threads to finish
+    for thread in threads:
+        thread.join()
+
+    return results
+
+
+def getResultsFromRetrievalFile(path, extensions):
+
+    # Get the URLs
+    urls = getResultsUrlsFromRetrievalFile(path, extensions)
+    results = buildGoogleResultsFromURLs(urls, True, True, extensions)
 
     return results
 
