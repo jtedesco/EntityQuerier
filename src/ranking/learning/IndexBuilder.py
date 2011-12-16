@@ -86,7 +86,15 @@ class IndexBuilder(object):
 
                 print "Built entity results for " + entityId
 
-            print "Built all entity results"
+                # Add the documents to the index
+                print "Adding results to index for '%s'..." % entityId
+                self.__addResults(results, indexWriter)
+                print "Added results to index..."
+
+                # Get a new writer to the index
+                indexWriter = self.index.writer()
+
+            print "Built all entity results for '%s'" % entityId
 
             # Get DMOZ documents if necessary
             if self.smoothed:
@@ -95,11 +103,10 @@ class IndexBuilder(object):
                 results.extend(smoothingDocuments)
                 print "Built DMOZ documents"
 
-            # Add the documents to the index
-            print "Adding results to index..."
-            self.__addResults(results, indexWriter)
-            print "Added results to index..."
-
+                # Add the documents to the index
+                print "Adding results to smoothing index"
+                self.__addResults(results, indexWriter)
+                print "Added results to index..."
 
         else:
             raise Exception("Error building index: '%s' already exists" % self.indexLocation)
