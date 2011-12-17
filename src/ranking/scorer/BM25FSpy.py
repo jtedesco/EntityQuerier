@@ -7,12 +7,16 @@ class BM25FSpy(BM25F):
 
     use_final = True
 
-    scores = {}
-    numerics = {
-        'baselineScore' : {},
-        'pageRank' : {}
-    }
+    @staticmethod
+    def initialize():
 
+        BM25FSpy.scores = {}
+        BM25FSpy.numerics = {
+            'baselineScore' : {},
+            'pageRank' : {}
+        }
+
+        
     def final(self, searcher, docnum, score):
         """
           Returns the adjusted score (modified using the document's pagerank score)

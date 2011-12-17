@@ -44,7 +44,6 @@ class PRCache(Cache):
             try:
                 pageRank = int(pageRankData)
             except Exception:
-                print "Error parsing cached pageRank: " + str(sys.exc_info()[1])
                 pageRank = -1
 
                 # Try to fetch it again if it failed

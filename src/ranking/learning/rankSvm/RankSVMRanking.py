@@ -1,7 +1,7 @@
 import os
 from pprint import pprint
 import subprocess
-from json import load
+from json import load, dumps, dump
 import sys
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
@@ -55,22 +55,23 @@ class RankSVMRanking(object):
                 preferenceScore = 1
 
             # build the training line
-            rankSVMData += "%d qid:%d" % (preferenceScore, qid)
+            lineData = "%d qid:%d" % (preferenceScore, qid)
+            addFeature = True
             for index in xrange(0, len(self.features)):
                 feature = self.features[index]
     
                 try:
                     if type(scoredResult[feature]) == type(0):
-                        rankSVMData += " %d:%d" % (index + 1, scoredResult[feature])
+                        lineData += " %d:%d" % (index + 1, scoredResult[feature])
                     elif type(scoredResult[feature]) == type(0.0):
-                        rankSVMData += " %d:%1.2f" % (index + 1, scoredResult[feature])
+                        lineData += " %d:%1.2f" % (index + 1, scoredResult[feature])
                     else:
                         print "Unrecognized feature type, feature: " + str(scoredResult[feature])
                 except KeyError:
                     print "missing feature for %s" % scoredResult['url']
-                    rankSVMData += " %d:%d" % (index + 1, 0)
-
-            rankSVMData += '   #%s \n' % scoredResult['url']
+                    addFeature = False
+            if addFeature:
+                rankSVMData += lineData + '   #%s \n' % scoredResult['url']
         return rankSVMData
 
 
@@ -187,7 +188,7 @@ if __name__ == '__main__':
     relevance = {}
 
     # If the training file doesn't exist, perform the learning stage
-    learn = not os.path.exists(RankSVMRanking.trainingFilePath)
+    learn = False
 
     for entityId in entityIds:
 
@@ -230,11 +231,6 @@ if __name__ == '__main__':
             outputTitle = "Results Summary (for top %d results):\n"
             outputFile = entityName + '/RankSVMRanking'
             outputRankingResults(entityId, outputFile, outputTitle, projectRoot, results)
-
-
-        pprint(scoredResults)
-        sys.exit()
-
 
     if learn:
 

@@ -126,6 +126,7 @@ class BM25SpyRanking(object):
             @param  feature     The feature on which this ranking will be based
         """
 
+        BM25FSpy.initialize()
         reRankedResults = self.queryIndex(BM25FSpy, feature)
         return reRankedResults
 

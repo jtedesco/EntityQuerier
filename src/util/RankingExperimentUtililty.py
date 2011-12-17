@@ -29,9 +29,15 @@ def scoreResults(entity, entityId, urls, features, incompleteResults):
     # Allocate dictionaries for numeric features for these results
     for url in urls:
         try:
-            scoredResults[url] = {}
-            scoredResults[url]['baselineScore'] = incompleteResults[url]['baselineScore']
-            scoredResults[url]['pageRank'] = incompleteResults[url]['pageRank']
+            try:
+                pageRank = int(incompleteResults[url]['pageRank'])
+            except Exception:
+                pageRank = -1
+            scoredResults[url] = {
+                'url' : url,
+                'baselineScore' : incompleteResults[url]['baselineScore'],
+                'pageRank' : pageRank
+            }
         except Exception:
             print "Error processing %s, skipping because %s" % (url, str(sys.exc_info()[1]))
 
@@ -55,7 +61,22 @@ def scoreResults(entity, entityId, urls, features, incompleteResults):
                         'baselineScore' : numerics['baselineScore'][url],
                         'pageRank' : numerics['pageRank'][url]
                     }
+                try:
                     scoredResults[url][feature] = featureScores[url]
+                except KeyError:
+                    try:
+                        scoredResults[url] = {
+                            'url' : url,
+                            'pageRank' : 0,
+                            'baselineScore' : 0
+                        }
+                        scoredResults[url][feature] = featureScores[url]
+                    except Exception:
+                        print "Skipping '%s'" % url
+                        if url in scoredResults:
+                            print "Deleting scored result after error '%s':" % str(sys.exc_info()[1])
+                            pprint(scoredResults[url])
+                            del scoredResults[url]
 
     return scoredResults.values()
 
