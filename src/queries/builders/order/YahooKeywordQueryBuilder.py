@@ -1,5 +1,6 @@
 from json import loads
 from pprint import pprint
+import sys
 from src.cache.YQLCache import YQLCache
 from src.queries.builders.QueryBuilder import QueryBuilder
 from src.search.SearchResultParsing import loadFromUrl
@@ -96,6 +97,7 @@ class YahooKeywordQueryBuilder(QueryBuilder):
         # Fill the URL template
         url = self.apiUrl.replace('####', entityDescription)
         url = url.replace(' ', '%20')
+        url = url.replace('AT&T', '') # Blows up Yahoo API for some reason...
 
         # Get the keyword data, from the cache if possible
         keywordJson = self.cache.read(url)
