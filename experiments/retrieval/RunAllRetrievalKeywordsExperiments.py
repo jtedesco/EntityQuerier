@@ -1,5 +1,8 @@
 from experiments.RetrievalExperiment import RetrievalExperiment
-from src.queries.builders.order.EntityIdQueryBuilder import EntityIdQueryBuilder
+from src.queries.builders.AttributeNamesAndValuesQueryBuilder import AttributeNamesAndValuesQueryBuilder
+from src.queries.builders.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder
+from src.queries.builders.AttributeValuesQueryBuilder import AttributeValuesQueryBuilder
+from src.queries.builders.order.YahooKeywordQueryBuilder import YahooKeywordQueryBuilder
 from src.search.google.GoogleSearchFacade import GoogleSearchFacade
 
 
@@ -34,7 +37,10 @@ if __name__ == '__main__':
     for entityId in entityIds:
 
         experiments = [
-            ('EntityId50', EntityIdQueryBuilder, 50)
+            ('AttributeNames', AttributeNamesQueryBuilder, 50),
+            ('AttributeValues', AttributeValuesQueryBuilder, 50),
+            ('AttributeNamesAndValues', AttributeNamesAndValuesQueryBuilder, 50),
+            ('YahooKeywords', YahooKeywordQueryBuilder, 50)
         ]
 
         for experiment in experiments:
