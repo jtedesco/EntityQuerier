@@ -35,16 +35,17 @@ if __name__ == '__main__':
         "Matthew Caesar",
         "Ralph Johnson",
         "Robin Kravets",
+        "Eric Shaffer",
+        "Jiawei Han",
+        "Sarita Adve",
+
         "Papa Del's",
         "Biaggi's",
         "Chipotle",
         "Radio Maria",
-        "Eric Shaffer",
         "Dos Reales",
-        "Jiawei Han",
         "Escobar's",
         "Bombay Grill",
-        "Sarita Adve",
         "Flat Top Grill",
         "Buffalo Wild Wings"
     ]
@@ -53,6 +54,15 @@ if __name__ == '__main__':
     for entityId in entityIds:
 
         experiments = [
+            ('AttributeNames', AttributeNamesQueryBuilder, 50),
+            ('AttributeValues', AttributeValuesQueryBuilder, 50),
+            ('AttributeNamesAndValues', AttributeNamesAndValuesQueryBuilder, 50),
+            ('YahooKeywords', YahooKeywordQueryBuilder, 50),
+
+            ('WordNetPolysemy10', WordNetPolysemyQueryBuilder, 50),
+            ('WordNetPolysemy15', WordNetPolysemyQueryBuilder, 50),
+            ('WordNetPolysemy20', WordNetPolysemyQueryBuilder, 50),
+
             ('ExactAttributeNames', ExactAttributeNamesQueryBuilder, 50),
             ('ExactAttributeValues', ExactAttributeValuesQueryBuilder, 50),
             ('ExactAttributeNamesAndValues', ExactAttributeNamesAndValuesQueryBuilder, 50),
@@ -62,15 +72,15 @@ if __name__ == '__main__':
             ('ApproximateAttributeNames', ApproximateAttributeNamesQueryBuilder, 50),
             ('ApproximateAttributeValues', ApproximateAttributeValuesQueryBuilder, 50),
             ('ApproximateAttributeNamesAndValues', ApproximateAttributeNamesAndValuesQueryBuilder, 50),
-            ('AttributeNames', AttributeNamesQueryBuilder, 50),
-            ('AttributeValues', AttributeValuesQueryBuilder, 50),
-            ('AttributeNamesAndValues', AttributeNamesAndValuesQueryBuilder, 50),
+
             ('EntityId10', EntityIdQueryBuilder, 10),
             ('EntityId50', EntityIdQueryBuilder, 50),
             ('EntityId100', EntityIdQueryBuilder, 100),
             ('EntityId200', EntityIdQueryBuilder, 200),
             ('EntityId400', EntityIdQueryBuilder, 400),
             ('EntityId800', EntityIdQueryBuilder, 800),
+
+
             ('ExactEntityId10', ExactEntityIdQueryBuilder, 10),
             ('ExactEntityId50', ExactEntityIdQueryBuilder, 50),
             ('ExactEntityId100', ExactEntityIdQueryBuilder, 100),
@@ -83,13 +93,10 @@ if __name__ == '__main__':
             ('ApproximateEntityId200', ApproximateEntityIdQueryBuilder, 200),
             ('ApproximateEntityId400', ApproximateEntityIdQueryBuilder, 400),
             ('ApproximateEntityId800', ApproximateEntityIdQueryBuilder, 800),
-            ('WordNetPolysemy10', WordNetPolysemyQueryBuilder, 50),
-            ('WordNetPolysemy15', WordNetPolysemyQueryBuilder, 50),
-            ('WordNetPolysemy20', WordNetPolysemyQueryBuilder, 50),
+
             ('ExactWordNetPolysemy10', ExactWordNetPolysemyQueryBuilder, 50),
             ('ApproximateExactWordNetPolysemy10', ApproximateExactWordNetPolysemyQueryBuilder, 50),
             ('ApproximateWordNetPolysemy10', ApproximateWordNetPolysemyQueryBuilder, 50),
-            ('YahooKeywords', YahooKeywordQueryBuilder, 50)
         ]
 
         WordNetPolysemyQueryBuilder.numberOfQueries = 10
