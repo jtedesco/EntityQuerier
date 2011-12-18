@@ -1,0 +1,19 @@
+set terminal png enhanced font verdana 15 size 1000,800
+set output '%s'
+set title '%s'
+
+set style data histogram
+set boxwidth 0.7
+
+set xlabel "%s"
+set ylabel "%s"
+
+set noxtics
+
+set style fill solid border rgb "black"
+set auto x
+set yrange [0:*]
+plot 'input.dat' using 2:xtic(1) fs pattern 6 title col lt -1 , \
+        'input.dat' using 3:xtic(1) fs pattern 1 title col lt -1, \
+        'input.dat' using 4:xtic(1) fs pattern 2 title col lt -1, \
+        'input.dat' using 5:xtic(1) fs pattern 5 title col lt -1

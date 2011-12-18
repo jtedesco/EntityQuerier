@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     # Fill out the configuration
     configuration = configuration % tuple([
-        projectRoot + '/analysis/output/QueryGenerationOperators.png',
+        projectRoot + '/analysis/output/retrieval/QueryGenerationOperators.png',
         'Total Recall Efficiency of Operators for Keyword Queries',
         'Number of Queries',
         'Total Recall'
