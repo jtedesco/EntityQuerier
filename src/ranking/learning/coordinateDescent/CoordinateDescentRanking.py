@@ -72,6 +72,7 @@ class CoordinateDescentRanking(object):
         changes = {
             'lock' : Lock()
         }
+        print "about to start learning"
         scoringThread = CoordinateDescentRankingThread(values, self.keywords, changes, 'original',
                                                        self.relevantResults, CoordinateDescentRanking.getIndexLocation() + '-original')
         scoringThread.start()
@@ -183,13 +184,13 @@ if __name__ == '__main__':
 
     # The entity ids to use
     entityIds = [
-        "ChengXiang Zhai",
-        "Danny Dig",
+#        "ChengXiang Zhai",
+#        "Danny Dig",
         "Kevin Chen-Chuan Chang",
-        "Paris Smaragdis",
-        "Matthew Caesar",
-        "Ralph Johnson",
-        "Robin Kravets"
+#        "Paris Smaragdis",
+#        "Matthew Caesar",
+#        "Ralph Johnson",
+#        "Robin Kravets"
     ]
 
     keywords = {}

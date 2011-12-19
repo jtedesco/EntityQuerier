@@ -6,6 +6,7 @@ from whoosh.qparser.default import MultifieldParser
 from whoosh.qparser.plugins import PlusMinusPlugin
 from whoosh.qparser.syntax import OrGroup
 from whoosh.support.charset import accent_map
+import thread
 from src.ranking.learning.coordinateDescent.CoordinateDescentScorer import CoordinateDescentScorer
 from src.util.RankingExperimentUtililty import getRankingResults
 
@@ -147,6 +148,7 @@ class CoordinateDescentRankingThread(threading.Thread):
         # Collect the results on this thread
         self.results = {}
 
+        print "starting thread"
         for entityId in self.entityIds:
 
             # Rank results for this entity, and tally the score
@@ -161,3 +163,5 @@ class CoordinateDescentRankingThread(threading.Thread):
         self.changes['lock'].acquire()
         self.changes[self.changeName] = averageResultScore
         self.changes['lock'].release()
+
+        print "Finished running thread"
