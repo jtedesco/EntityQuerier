@@ -1,5 +1,6 @@
-from json import  loads
+from json import  loads, load
 import os
+import sys
 
 __author__ = 'jon'
 
@@ -177,5 +178,32 @@ def populateRetrievalData(data, rootDirectory):
                         'numberOfQueries' : numberOfQueries
                     }
 
-if __name__ == '__main__':
-    pass
+def getHumanAverageScores(rootDirectory):
+    """
+      Gets the average scores for human queries
+    """
+
+    # Get the average number of queries required by the human baseline
+    averageNumberOfQueries = 0.0
+    entityIds = os.listdir(rootDirectory + '/entities/efficiencyStandard')
+    for entityId in entityIds:
+        try:
+            queries = load(open(rootDirectory + '/entities/efficiencyStandard/' + entityId))
+        except:
+            print "Error with '%s': '%s" % (entityId, str(sys.exc_info()[1]))
+            sys.exit()
+        averageNumberOfQueries += len(queries)
+    averageNumberOfQueries /= len(entityIds)
+
+    averageScores = {
+        'precision' : 1.0,
+        'recall' : 1.0,
+        'numberOfQueries' : averageNumberOfQueries
+    }
+
+    return averageScores
+
+
+
+
+    

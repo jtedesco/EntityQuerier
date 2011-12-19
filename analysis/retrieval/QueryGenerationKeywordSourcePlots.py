@@ -5,7 +5,7 @@ import os
 from pprint import pprint
 import subprocess
 import sys
-from analysis.VisualizationUtility import splitCamelCase, averageEntityScores, populateRankingData, populateRetrievalData
+from analysis.VisualizationUtility import splitCamelCase, averageEntityScores, populateRankingData, populateRetrievalData, getHumanAverageScores
 
 __author__ = 'jon'
 
@@ -31,10 +31,8 @@ def generatePointPlots(averageScores, experiments, projectRoot):
 
     # Fill out the configuration
     configuration = configuration % tuple([
-                                              projectRoot + '/analysis/output/retrieval/QueryGenerationKeywordsPlot.png'
-                                              ,
-                                              'Total Recall Efficiency of Keyword Sources for Query Generation Strategy'
-                                              ,
+                                              projectRoot + '/analysis/output/retrieval/QueryGenerationKeywordsPlot.png',
+                                              'Total Recall Efficiency of Keyword Sources for Query Generation Strategy',
                                               'Number of Queries',
                                               'Total Recall'
                                           ] + experiments.values())
@@ -95,17 +93,11 @@ def generateNumberQueriesHistogramPlots(averageScores, projectRoot):
     os.remove('input.dat')
 
 
-def generatePrecisionRecallHistogramPlots(averageScores, projectRoot):
+def generatePrecisionRecallHistogramPlots(averageScores, projectRoot, experimentNames, fileName, title, xLabel):
     """
       Generate histogram-style plots for the query generation keyword source experiments
     """
 
-    sortedExperiments = [
-        'AttributeNames',
-        'YahooKeywords',
-        'AttributeValues',
-        'AttributeNamesAndValues'
-    ]
 
     sortedMetrics = [
         'recall',
@@ -114,14 +106,14 @@ def generatePrecisionRecallHistogramPlots(averageScores, projectRoot):
 
     # Generate the header for the metrics
     dataContent = "Experiment "
-    for experiment in sortedExperiments:
+    for experiment in experimentNames:
         dataContent += '"' + splitCamelCase(experiment).title().replace('&', 'and') + '" '
     dataContent += '\n'
 
     # Build the results for this experiment
     for metric in sortedMetrics:
         dataContent += '"' + splitCamelCase(metric).title().replace('&', 'and') + '" '
-        for experiment in sortedExperiments:
+        for experiment in experimentNames:
             dataContent += str(averageScores[experiment][metric]) + ' '
         dataContent += "\n"
 
@@ -132,9 +124,9 @@ def generatePrecisionRecallHistogramPlots(averageScores, projectRoot):
     configurationFile = projectRoot + '/analysis/configurations/query_precision_recall_histograms'
     configuration = open(configurationFile).read()
     configuration = configuration % (
-        projectRoot + '/analysis/output/retrieval/QueryGenerationKeywordsPrecisionRecallHistogram.png',
-        'Comparison of Precision and Recall for Query Expansion Keyword Selection Strategies',
-        'Query Generation Metric',
+        projectRoot + '/analysis/output/retrieval/' + fileName + '.png',
+        title,
+        xLabel,
         )
     open('config', 'w').write(configuration)
 
@@ -170,9 +162,39 @@ if __name__ == '__main__':
     # Build the point plots
     generatePointPlots(averageScores, experiments, projectRoot)
 
+    sys.exit()
+
     # Build the histogram plots
     generateNumberQueriesHistogramPlots(averageScores, projectRoot)
-    generatePrecisionRecallHistogramPlots(averageScores, projectRoot)
 
-    # TODO: Build the baseline recall / precision histograms
+
+    experimentNames = [
+        'AttributeNames',
+        'YahooKeywords',
+        'AttributeValues',
+        'AttributeNamesAndValues'
+    ]
+    fileName = 'QueryGenerationKeywordsPrecisionRecallHistogram'
+    title = 'Comparison of Precision and Recall for Query Expansion Keyword Selection Strategies'
+    xLabel = 'Query Generation Metric'
+    generatePrecisionRecallHistogramPlots(averageScores, projectRoot, experimentNames, fileName, title, xLabel)
+
+    # Get average scores for the baselines
+    baselineAverageScores = {
+        'Naive' : averageScores['EntityId50'],
+        'YahooKeywords' : averageScores['YahooKeywords'],
+        'Manual' : getHumanAverageScores(projectRoot)
+    }
+
+    # Build the baseline recall / precision histograms
+    experimentNames = [
+        'Manual',
+        'Naive',
+        'YahooKeywords'
+    ]
+    fileName = 'QueryGenerationKeywordsBaselineHistogram'
+    title = 'Comparison of Precision and Recall for Against Baseline Strategies'
+    xLabel = 'Query Generation Metric'
+    generatePrecisionRecallHistogramPlots(baselineAverageScores, projectRoot, experimentNames, fileName, title, xLabel)
+
     # TODO: Build the baseline number of queries histograms
