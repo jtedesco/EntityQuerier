@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # Concatenate the names of metrics for the horizontal
     dataContent = "Experiment "
     sortedAverageScores = [
-        ('BM25Ranking', 'No Smoothing'),
+        ('BM25Ranking', 'None'),
         ('DMOZSmoothed500BM25Ranking', '500 Documents'),
         ('DMOZSmoothed1000BM25Ranking', '1000 Documents'),
         ('DMOZSmoothed5000BM25Ranking', '5000 Documents'),
@@ -51,9 +51,9 @@ if __name__ == '__main__':
 
     # Fill out the configuration
     configuration = configuration % (
-        projectRoot + '/analysis/output/DMOZSmoothingEffect.png',
-        'Effect of DMOZ Smoothing on BM25 Performance',
-        'DMOZ Smoothing'
+        projectRoot + '/analysis/output/ranking/DMOZSmoothingEffect.png',
+        'Effect of Adding DMOZ Documents on BM25 Performance',
+        'Number of Non-relevant DMOZ Documents'
     )
     open('config', 'w').write(configuration)
 
