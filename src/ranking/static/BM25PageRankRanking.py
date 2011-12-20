@@ -1,4 +1,4 @@
-from src.ranking.TermFrequencyRanking import IndexRanking
+from src.ranking.IndexRanking import IndexRanking
 from src.ranking.scorer.BM25FPageRank import BM25FPageRank
 
 __author__ = 'jon'

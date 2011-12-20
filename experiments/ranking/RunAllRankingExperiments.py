@@ -15,7 +15,7 @@ from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
 from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
 from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
-from util.RankingExperimentUtil import outputRankingResults
+from src.util.RankingExperimentUtililty import outputRankingResults
 
 __author__ = 'jon'
 
