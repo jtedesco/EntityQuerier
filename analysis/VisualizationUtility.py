@@ -75,6 +75,7 @@ def averageEntityScores(data):
 
     # Get the experiments and metrics stored for each entity
     entities = data.keys()
+    entities.sort()
     experiments = data[entities[0]].keys()
     metrics = data[entities[0]][experiments[0]].keys()
 
@@ -93,7 +94,10 @@ def averageEntityScores(data):
                     print "Skipping %s for experiment '%s'" % (entity, experiment)
             average /= numberOfEntities
 
-            averagedData[experiment][metric] = average
+            if metric == 'numberOfQueries':
+                averagedData[experiment][metric] = int(average)
+            else:
+                averagedData[experiment][metric] = average
 
     return averagedData
 
@@ -185,18 +189,22 @@ def getHumanAverageScores(rootDirectory):
 
     # Get the average number of queries required by the human baseline
     averageNumberOfQueries = 0.0
+    averageNumberOfResults = 0
     entityIds = os.listdir(rootDirectory + '/entities/efficiencyStandard')
     for entityId in entityIds:
         try:
             queries = load(open(rootDirectory + '/entities/efficiencyStandard/' + entityId))
+            for query in queries:
+                averageNumberOfResults += len(queries[query])
         except:
             print "Error with '%s': '%s" % (entityId, str(sys.exc_info()[1]))
             sys.exit()
         averageNumberOfQueries += len(queries)
     averageNumberOfQueries /= len(entityIds)
+    averageNumberOfResults /= len(entityIds)
 
     averageScores = {
-        'precision' : 1.0,
+        'precision' : averageNumberOfResults / (averageNumberOfQueries * 15.0),
         'recall' : 1.0,
         'numberOfQueries' : averageNumberOfQueries
     }

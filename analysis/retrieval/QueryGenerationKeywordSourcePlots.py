@@ -44,31 +44,24 @@ def generatePointPlots(averageScores, experiments, projectRoot):
     os.remove('input.dat')
 
 
-def generateNumberQueriesHistogramPlots(averageScores, projectRoot):
+def generateNumberQueriesHistogramPlots(averageScores, projectRoot, experimentNames, fileName, title, xLabel):
     """
       Generate histogram-style plots for the query generation keyword source experiments
     """
-
-    sortedExperiments = [
-        'AttributeNamesAndValues',
-        'AttributeValues',
-        'AttributeNames',
-        'YahooKeywords',
-    ]
 
     sortedMetrics = [
         'numberOfQueries'
     ]
 
     dataContent = "Experiment "
-    for experiment in sortedExperiments:
+    for experiment in experimentNames:
         dataContent += '"' + splitCamelCase(experiment).title().replace('&', 'and') + '" '
     dataContent += '\n'
 
     # Build the results for this experiment
     for metric in sortedMetrics:
         dataContent += '"' + splitCamelCase(metric).title().replace('&', 'and') + '" '
-        for experiment in sortedExperiments:
+        for experiment in experimentNames:
             dataContent += str(averageScores[experiment][metric]) + ' '
         dataContent += '\n'
 
@@ -79,9 +72,9 @@ def generateNumberQueriesHistogramPlots(averageScores, projectRoot):
     configurationFile = projectRoot + '/analysis/configurations/query_number_queries_histograms'
     configuration = open(configurationFile).read()
     configuration = configuration % (
-        projectRoot + '/analysis/output/retrieval/QueryGenerationKeywordsNumberHistogram.png',
-        'Comparison of Number of Queries for Query Expansion Keyword Selection Strategies',
-        'Query Generation Strategy',
+        projectRoot + '/analysis/output/retrieval/' + fileName + '.png',
+        title,
+        xLabel,
         'Number of Queries'
     )
     open('config', 'w').write(configuration)
@@ -162,12 +155,19 @@ if __name__ == '__main__':
     # Build the point plots
     generatePointPlots(averageScores, experiments, projectRoot)
 
-    sys.exit()
+    # Build number of queries the histogram plots
+    experimentNames = [
+        'AttributeNamesAndValues',
+        'AttributeValues',
+        'AttributeNames',
+        'YahooKeywords',
+    ]
+    fileName = 'QueryGenerationKeywordsNumberHistogram'
+    title = 'Comparison of Number of Queries for Query Expansion Keyword Selection Strategies'
+    xLabel = 'Query Keyword Generation Strategy'
+    generateNumberQueriesHistogramPlots(averageScores, projectRoot, experimentNames, fileName, title, xLabel)
 
-    # Build the histogram plots
-    generateNumberQueriesHistogramPlots(averageScores, projectRoot)
-
-
+    # Build the recall & precision histogram plots
     experimentNames = [
         'AttributeNames',
         'YahooKeywords',
@@ -182,19 +182,23 @@ if __name__ == '__main__':
     # Get average scores for the baselines
     baselineAverageScores = {
         'Naive' : averageScores['EntityId50'],
-        'YahooKeywords' : averageScores['YahooKeywords'],
+        'Combined' : averageScores['Combined'],
         'Manual' : getHumanAverageScores(projectRoot)
     }
 
     # Build the baseline recall / precision histograms
     experimentNames = [
         'Manual',
+        'Combined',
         'Naive',
-        'YahooKeywords'
     ]
     fileName = 'QueryGenerationKeywordsBaselineHistogram'
     title = 'Comparison of Precision and Recall for Against Baseline Strategies'
     xLabel = 'Query Generation Metric'
     generatePrecisionRecallHistogramPlots(baselineAverageScores, projectRoot, experimentNames, fileName, title, xLabel)
 
-    # TODO: Build the baseline number of queries histograms
+    # Build the baseline number of queries histograms
+    fileName = 'QueryGenerationKeywordsBaselineNumberHistogram'
+    title = 'Comparison of Number of Queries for Baseline Query Expansion Keyword Selection Strategies'
+    xLabel = 'Query Keyword Generation Strategy'
+    generateNumberQueriesHistogramPlots(baselineAverageScores, projectRoot, experimentNames, fileName, title, xLabel)
