@@ -26,7 +26,6 @@ class CombinedQueryBuilder(QueryBuilder):
         """
 
         yahooQueries = self.yahooKeywordQueryBuilder.buildQueries(entity, idField)
-#        WordNetPolysemyQueryBuilder.numberOfQueries
         orderedYahooQueries = self.wordNetQueryBuilder.orderQueries(entity[idField], yahooQueries)
 
         return orderedYahooQueries

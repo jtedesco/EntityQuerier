@@ -9,7 +9,7 @@ from src.ranking.smoothing.DMOZSmoothed100BM25Ranking import DMOZSmoothed100BM25
 from src.ranking.smoothing.DMOZSmoothed5000BM25Ranking import DMOZSmoothed5000BM25Ranking
 from src.ranking.smoothing.DMOZSmoothed500BM25Ranking import DMOZSmoothed500BM25Ranking
 from src.ranking.smoothing.DMOZSmoothedBM25Ranking import DMOZSmoothedBM25Ranking
-from util.RankingExperimentUtil import outputRankingResults
+from src.util.RankingExperimentUtililty import outputRankingResults
 
 __author__ = 'jon'
 
@@ -24,9 +24,21 @@ if __name__ == '__main__':
         "Paris Smaragdis",
         "Matthew Caesar",
         "Ralph Johnson",
-        "Robin Kravets"
-    ]
+        "Robin Kravets",
+        "Eric Shaffer",
+        "Jiawei Han",
+        "Sarita Adve",
 
+        "Papa Del's",
+        "Biaggi's",
+        "Chipotle",
+        "Radio Maria",
+        "Dos Reales",
+        "Escobar's",
+        "Bombay Grill",
+        "Flat Top Grill",
+        "Buffalo Wild Wings"
+    ]
     for entityId in entityIds:
 
         # The experiments to run
@@ -51,7 +63,7 @@ if __name__ == '__main__':
 
             # Rank the results
             entityName = entityId.replace(' ', '').replace('-', '')
-            retrievalResults = '/experiments/retrieval/results/%s/EntityAttributeNamesAndValues' % entityName
+            retrievalResults = '/experiments/retrieval/results/%s/AttributeValues' % entityName
             extensions = []
             rankingExperiment = RankingExperiment(projectRoot + retrievalResults, entity, experiment[1], extensions)
             results = rankingExperiment.rank()

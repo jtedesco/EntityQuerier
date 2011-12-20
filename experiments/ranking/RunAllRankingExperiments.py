@@ -24,13 +24,26 @@ if __name__ == '__main__':
 
     # The entities for which to run the experiments
     entityIds = [
-        "Robin Kravets",
-        "Kevin Chen-Chuan Chang",
         "ChengXiang Zhai",
         "Danny Dig",
+        "Kevin Chen-Chuan Chang",
         "Paris Smaragdis",
         "Matthew Caesar",
-        "Ralph Johnson"
+        "Ralph Johnson",
+        "Robin Kravets",
+        "Eric Shaffer",
+        "Jiawei Han",
+        "Sarita Adve",
+
+        "Papa Del's",
+        "Biaggi's",
+        "Chipotle",
+        "Radio Maria",
+        "Dos Reales",
+        "Escobar's",
+        "Bombay Grill",
+        "Flat Top Grill",
+        "Buffalo Wild Wings"
     ]
 
 
@@ -70,7 +83,7 @@ if __name__ == '__main__':
 
             # Rank the results
             entityName = entityId.replace(' ', '').replace('-', '')
-            retrievalResults = '/experiments/retrieval/results/%s/ApproximateAttributeNamesAndValues' % entityName
+            retrievalResults = '/experiments/retrieval/results/%s/AttributeValues' % entityName
             extensions = [
                 PageRankExtension(),
                 YQLKeywordExtension(),

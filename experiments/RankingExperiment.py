@@ -1,5 +1,6 @@
 from src.ranking.BM25Ranking import BM25Ranking
-from util.RankingExperimentUtil import getResultsFromRetrievalFile, getKeywords
+from src.util.ResultsBuilderUtility import getResultsFromRetrievalFile
+from src.util.Utility import getKeywords
 
 __author__ = 'jon'
 
