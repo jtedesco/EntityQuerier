@@ -1,7 +1,7 @@
 import subprocess
+from src.queries.builders.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder
+from src.queries.builders.AttributeValuesQueryBuilder import AttributeValuesQueryBuilder
 from src.queries.builders.QueryBuilder import QueryBuilder
-from src.queries.builders.operator.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder
-from src.queries.builders.operator.AttributeValuesQueryBuilder import AttributeValuesQueryBuilder
 
 __author__ = 'jon'
 
@@ -41,6 +41,14 @@ class WordNetPolysemyQueryBuilder(QueryBuilder):
         for index in xrange(0, len(queries)):
             queries[index] = queries[index].lower()
         queries = list(set(queries))
+
+        return self.orderQueries(idQuery, queries)
+
+
+    def orderQueries(self, idQuery, queries):
+        """
+          Order the set of queries according to their Polysemy
+        """
 
         # For each query, build the sum of polysemy of each word
         queryScores = []

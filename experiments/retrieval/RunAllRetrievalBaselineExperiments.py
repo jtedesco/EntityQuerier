@@ -1,6 +1,7 @@
 import sys
 from experiments.RetrievalExperiment import RetrievalExperiment
-from src.queries.builders.order.EntityIdQueryBuilder import EntityIdQueryBuilder
+from src.queries.builders.CombinedQueryBuilder import CombinedQueryBuilder
+from src.queries.builders.EntityIdQueryBuilder import EntityIdQueryBuilder
 from src.queries.builders.order.WordNetPolysemyQueryBuilder import WordNetPolysemyQueryBuilder
 from src.search.google.GoogleSearchFacade import GoogleSearchFacade
 
@@ -36,14 +37,13 @@ if __name__ == '__main__':
     for entityId in entityIds:
 
         experiments = [
-            ('EntityId50', EntityIdQueryBuilder, 50)
+            ('EntityId50', EntityIdQueryBuilder, 50),
+            ('Combined', CombinedQueryBuilder, 50)
         ]
 
         WordNetPolysemyQueryBuilder.numberOfQueries = 10
 
         for experiment in experiments:
-
-            print "Number of queries: %d" % WordNetPolysemyQueryBuilder.numberOfQueries
 
             try:
 
@@ -54,9 +54,6 @@ if __name__ == '__main__':
                 retrievalExperiment.run()
                 entityName = entityId.replace(' ', '').replace('-', '').replace('\'', '')
                 retrievalExperiment.printResults("results/%s/%s" % (entityName, experiment[0]), entityId)
-
-                if 'WordNetPolysemy' in experiment[0]:
-                    WordNetPolysemyQueryBuilder.numberOfQueries += 5
 
             except Exception:
                 print "ERROR: " + str(sys.exc_info()[1])

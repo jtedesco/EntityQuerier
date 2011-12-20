@@ -3,6 +3,8 @@ from experiments.RetrievalExperiment import RetrievalExperiment
 from src.queries.builders.AttributeNamesAndValuesQueryBuilder import AttributeNamesAndValuesQueryBuilder
 from src.queries.builders.AttributeNamesQueryBuilder import AttributeNamesQueryBuilder
 from src.queries.builders.AttributeValuesQueryBuilder import AttributeValuesQueryBuilder
+from src.queries.builders.EntityIdQueryBuilder import EntityIdQueryBuilder
+from src.queries.builders.YahooKeywordQueryBuilder import YahooKeywordQueryBuilder
 from src.queries.builders.operator.ApproximateAttributeNamesAndValuesQueryBuilder import ApproximateAttributeNamesAndValuesQueryBuilder
 from src.queries.builders.operator.ApproximateAttributeNamesQueryBuilder import ApproximateAttributeNamesQueryBuilder
 from src.queries.builders.operator.ApproximateAttributeValuesQueryBuilder import ApproximateAttributeValuesQueryBuilder
@@ -12,14 +14,7 @@ from src.queries.builders.operator.ApproximateExactAttributeValuesQueryBuilder i
 from src.queries.builders.operator.ExactAttributeNamesAndValuesQueryBuilder import ExactAttributeNamesAndValuesQueryBuilder
 from src.queries.builders.operator.ExactAttributeNamesQueryBuilder import ExactAttributeNamesQueryBuilder
 from src.queries.builders.operator.ExactAttributeValuesQueryBuilder import ExactAttributeValuesQueryBuilder
-from src.queries.builders.order.ApproximateEntityIdQueryBuilder import ApproximateEntityIdQueryBuilder
-from src.queries.builders.order.ApproximateExactWordNetPolysemyQueryBuilder import ApproximateExactWordNetPolysemyQueryBuilder
-from src.queries.builders.order.ApproximateWordNetPolysemyQueryBuilder import ApproximateWordNetPolysemyQueryBuilder
-from src.queries.builders.order.EntityIdQueryBuilder import EntityIdQueryBuilder
-from src.queries.builders.order.ExactEntityIdQueryBuilder import ExactEntityIdQueryBuilder
-from src.queries.builders.order.ExactWordNetPolysemyQueryBuilder import ExactWordNetPolysemyQueryBuilder
 from src.queries.builders.order.WordNetPolysemyQueryBuilder import WordNetPolysemyQueryBuilder
-from src.queries.builders.order.YahooKeywordQueryBuilder import YahooKeywordQueryBuilder
 from src.search.google.GoogleSearchFacade import GoogleSearchFacade
 
 
@@ -78,25 +73,7 @@ if __name__ == '__main__':
             ('EntityId100', EntityIdQueryBuilder, 100),
             ('EntityId200', EntityIdQueryBuilder, 200),
             ('EntityId400', EntityIdQueryBuilder, 400),
-            ('EntityId800', EntityIdQueryBuilder, 800),
-
-
-            ('ExactEntityId10', ExactEntityIdQueryBuilder, 10),
-            ('ExactEntityId50', ExactEntityIdQueryBuilder, 50),
-            ('ExactEntityId100', ExactEntityIdQueryBuilder, 100),
-            ('ExactEntityId200', ExactEntityIdQueryBuilder, 200),
-            ('ExactEntityId400', ExactEntityIdQueryBuilder, 400),
-            ('ExactEntityId800', ExactEntityIdQueryBuilder, 800),
-            ('ApproximateEntityId10', ApproximateEntityIdQueryBuilder, 10),
-            ('ApproximateEntityId50', ApproximateEntityIdQueryBuilder, 50),
-            ('ApproximateEntityId100', ApproximateEntityIdQueryBuilder, 100),
-            ('ApproximateEntityId200', ApproximateEntityIdQueryBuilder, 200),
-            ('ApproximateEntityId400', ApproximateEntityIdQueryBuilder, 400),
-            ('ApproximateEntityId800', ApproximateEntityIdQueryBuilder, 800),
-
-            ('ExactWordNetPolysemy10', ExactWordNetPolysemyQueryBuilder, 50),
-            ('ApproximateExactWordNetPolysemy10', ApproximateExactWordNetPolysemyQueryBuilder, 50),
-            ('ApproximateWordNetPolysemy10', ApproximateWordNetPolysemyQueryBuilder, 50),
+            ('EntityId800', EntityIdQueryBuilder, 800)
         ]
 
         WordNetPolysemyQueryBuilder.numberOfQueries = 10

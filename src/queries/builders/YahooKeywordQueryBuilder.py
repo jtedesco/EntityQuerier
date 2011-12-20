@@ -1,6 +1,5 @@
 from json import loads
 from pprint import pprint
-import sys
 from src.cache.YQLCache import YQLCache
 from src.queries.builders.QueryBuilder import QueryBuilder
 from src.search.SearchResultParsing import loadFromUrl
