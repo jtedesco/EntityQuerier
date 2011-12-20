@@ -1,14 +1,10 @@
 import os
-from pprint import pprint
 import subprocess
-from json import load, dumps, dump
-import sys
+from json import load
 from src.search.extension.BaselineScoreExtension import BaselineScoreExtension
-from src.search.extension.ExpandedYQLKeywordExtension import ExpandedYQLKeywordExtension
 from src.search.extension.PageRankExtension import PageRankExtension
-from src.search.extension.YQLKeywordExtension import YQLKeywordExtension
 from src.util.RankingExperimentUtililty import outputRankingResults, scoreResults
-from src.util.ResultsBuilderUtility import getResultsFromRetrievalFile, getExtensionsResultsFromRetrievalFile, getResultsUrlsFromRetrievalFile
+from src.util.ResultsBuilderUtility import  getExtensionsResultsFromRetrievalFile, getResultsUrlsFromRetrievalFile
 
 __author__ = 'jon'
 
@@ -56,22 +52,21 @@ class RankSVMRanking(object):
 
             # build the training line
             lineData = "%d qid:%d" % (preferenceScore, qid)
-            addFeature = True
             for index in xrange(0, len(self.features)):
                 feature = self.features[index]
-    
+
+                # Extract the data for this feature
                 try:
-                    if type(scoredResult[feature]) == type(0):
-                        lineData += " %d:%d" % (index + 1, scoredResult[feature])
-                    elif type(scoredResult[feature]) == type(0.0):
-                        lineData += " %d:%1.2f" % (index + 1, scoredResult[feature])
-                    else:
-                        print "Unrecognized feature type, feature: " + str(scoredResult[feature])
+                    data = scoredResult[feature]
                 except KeyError:
-                    print "missing feature for %s" % scoredResult['url']
-                    addFeature = False
-            if addFeature:
-                rankSVMData += lineData + '   #%s \n' % scoredResult['url']
+                    print "Missing '%s' for '%s'" % (feature, scoredResult['url'])
+                    data = 0.0
+
+                # Add the line data
+                lineData += " %d:%1.2f" % (index + 1, float(data))
+
+            rankSVMData += lineData + '   #%s \n' % scoredResult['url']
+
         return rankSVMData
 
 
@@ -183,12 +178,12 @@ if __name__ == '__main__':
     projectRoot = projectRoot[:projectRoot.find('EntityQuerier') + len('EntityQuerier')]
 
     # Build the relevance sets for each
-    retrievalExperimentResults = 'ApproximateExactAttributeNamesAndValues'
+    retrievalExperimentResults = 'AttributeNamesAndValues'
     scoredResults = {}
     relevance = {}
 
     # If the training file doesn't exist, perform the learning stage
-    learn = False
+    learn = True
 
     for entityId in entityIds:
 

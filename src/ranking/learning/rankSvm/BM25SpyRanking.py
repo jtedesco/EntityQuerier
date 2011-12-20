@@ -56,10 +56,10 @@ class BM25SpyRanking(object):
           Builds the query for Whoosh
         """
 
-        query = "+\"" + self.entityId + "\" "
+        query = self.entityId + " "
         for keyword in self.keywords:
             if keyword != self.entityId:
-                query += "\"" + keyword + "\" "
+                query += keyword + " "
         query = query.rstrip()
 
         return query
