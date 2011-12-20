@@ -14,9 +14,9 @@ set bmargin 5
 set tmargin 5
 set rmargin 5
 
-plot 'input.dat' index 0 using 2:3 title '%s' with points linewidth 3, \
-     'input.dat' index 1 using 2:3 title '%s' with points linewidth 3, \
-     'input.dat' index 2 using 2:3 title '%s' with points linewidth 3, \
-     'input.dat' index 3 using 2:3 title '%s' with points linewidth 3, \
-     'input.dat' index 4 using 2:3 title '%s' with points linewidth 3, \
-     'input.dat' index 5 using 2:3 title '%s' with points linewidth 3
+plot 'input.dat' index 0 using 2:3 title '%s' with points lt -1 linewidth 3, \
+     'input.dat' index 1 using 2:3 title '%s' with points lt -1 linewidth 3, \
+     'input.dat' index 2 using 2:3 title '%s' with points lt -1 linewidth 3, \
+     'input.dat' index 3 using 2:3 title '%s' with points lt -1 linewidth 3, \
+     'input.dat' index 4 using 2:3 title '%s' with points lt -1 linewidth 3, \
+     'input.dat' index 5 using 2:3 title '%s' with points lt -1 linewidth 3
