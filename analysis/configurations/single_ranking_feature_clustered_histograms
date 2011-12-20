@@ -10,13 +10,13 @@ set xlabel "%s"
 set style fill solid border rgb "black"
 set auto x
 set yrange [0:*]
-plot 'input.dat' using 2:xtic(1) title col, \
-        'input.dat' using 3:xtic(1) title col, \
-        'input.dat' using 4:xtic(1) title col, \
-        'input.dat' using 5:xtic(1) title col, \
-        'input.dat' using 6:xtic(1) title col, \
-        'input.dat' using 7:xtic(1) title col, \
-        'input.dat' using 8:xtic(1) title col, \
-        'input.dat' using 9:xtic(1) title col, \
-        'input.dat' using 10:xtic(1) title col, \
-        'input.dat' using 11:xtic(1) title col
+plot 'input.dat' using 2:xtic(1) fs pattern 1 lt -1 title col, \
+        'input.dat' using 3:xtic(1) fs pattern 2 lt -1 title col, \
+        'input.dat' using 4:xtic(1) fs pattern 4 lt -1 title col, \
+        'input.dat' using 5:xtic(1) fs pattern 5 lt -1 title col, \
+        'input.dat' using 6:xtic(1) fs pattern 6 lt -1 title col, \
+        'input.dat' using 7:xtic(1) fs pattern 7 lt -1 title col, \
+        'input.dat' using 8:xtic(1) fs pattern 8 lt -1 title col, \
+        'input.dat' using 9:xtic(1) fs pattern 9 lt -1 title col, \
+        'input.dat' using 10:xtic(1) fs pattern 11 lt -1 title col, \
+        'input.dat' using 11:xtic(1) fs pattern 12 lt -1 title col

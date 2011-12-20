@@ -75,7 +75,7 @@ if __name__ == '__main__':
             # Fill out the configuration
             newFeature = experiments[experiment].split('&')[1][1:].strip()
             configuration = configuration % (
-                projectRoot + '/analysis/output/%sRankingFeature.png' % newFeature.replace(' ', ''),
+                projectRoot + '/analysis/output/ranking/%sRankingFeature.png' % newFeature.replace(' ', ''),
                 'Effect of %s of Results on Ranking' % newFeature,
                 'Ranking Strategies'
             )
